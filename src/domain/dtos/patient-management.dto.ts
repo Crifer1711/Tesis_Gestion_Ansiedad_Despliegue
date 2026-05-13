@@ -6,6 +6,7 @@ export interface PatientListItemDTO {
   email: string;
   telefono: string;
   ultimaCita: string;
+  lastLogin?: string;
 }
 
 export interface PatientDetailDTO extends PatientListItemDTO {

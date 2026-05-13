@@ -1,27 +1,23 @@
-// src/infrastructure/actions/psicologo.patient.actions.ts
 "use server";
 import pool from "../database/db";
 import { PatientListItemDTO } from "@/domain/dtos/patient-management.dto";
 import { PgPatientRepository } from "../repositories/PgPatientRepository";
 
-/**
- * Obtiene la lista de pacientes que tienen una relación (citas) 
- * con un psicólogo específico.
- */
 export async function getPatientsForPsychologistAction(psychologistId: number): Promise<{ success: boolean; data: PatientListItemDTO[] }> {
-  // Query SQL usando GROUP BY para obtener la última cita de cada paciente
+  // 1. Agregamos u.last_login a la consulta
   const query = `
     SELECT 
       u.id, 
       u.name as nombre, 
       u.email, 
       u.contacto as telefono,
+      u.last_login, -- <--- NUEVO CAMPO
       MAX(a.appointment_date) as ultima_cita
     FROM users u
     INNER JOIN appointments a ON u.id = a.patient_id
     WHERE a.psychologist_id = $1 
     AND u.role = 'PACIENTE'
-    GROUP BY u.id, u.name, u.email, u.contacto
+    GROUP BY u.id, u.name, u.email, u.contacto, u.last_login -- <--- Agregar al GROUP BY
     ORDER BY nombre ASC;
   `;
 
@@ -35,7 +31,16 @@ export async function getPatientsForPsychologistAction(psychologistId: number): 
       telefono: row.telefono || "Sin número",
       ultimaCita: row.ultima_cita 
         ? new Date(row.ultima_cita).toLocaleDateString('es-EC') 
-        : "Sin citas"
+        : "Sin citas",
+      // 2. Mapeamos el nuevo campo para la interfaz
+      lastLogin: row.last_login 
+        ? new Date(row.last_login).toLocaleString('es-EC', {
+            day: '2-digit',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit'
+          })
+        : "Nunca"
     }));
 
     return { success: true, data: patients };

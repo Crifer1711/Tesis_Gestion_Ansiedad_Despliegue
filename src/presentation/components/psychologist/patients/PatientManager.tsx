@@ -4,6 +4,7 @@ import { Search, User, Calendar, FileText, ClipboardList, LucideIcon, X } from '
 import { PatientListItemDTO } from "@/domain/dtos/patient-management.dto";
 import { getDetailedPatientDataAction } from "@/infrastructure/actions/psicologo.patient.actions";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { MedicalRecordTab } from './MedicalRecordTab';
 
 // --- CONSTANTES DEL TEST (Fuera para no recrearlas) ---
 const GAD7_QUESTIONS = [
@@ -131,6 +132,13 @@ export function PatientManager({ patients }: Props) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-gray-800 text-base truncate uppercase">{patient.nombre}</p>
+                  {/* --- INDICADOR VISUAL DE ÚLTIMA SESIÓN --- */}
+  <div className="flex items-center gap-2 mt-1">
+     <span className={`w-2 h-2 rounded-full ${patient.lastLogin !== "Nunca" ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+     <p className="text-[10px] text-slate-500 font-semibold uppercase">
+       En línea: <span className="text-blue-600">{patient.lastLogin}</span>
+     </p>
+  </div>
                   <p className="text-xs text-blue-600 font-medium truncate mt-0.5">{patient.email}</p>
                 </div>
               </button>
@@ -256,19 +264,13 @@ export function PatientManager({ patients }: Props) {
                         ))}
 
                         {/* PESTAÑA: FICHA MÉDICA */}
-                        {activeTab === 'Ficha Médica' && details?.medicalRecords.map((rec, i) => (
-                          <div key={i} className="p-5 bg-blue-50/50 border border-blue-100 rounded-xl">
-                            <div className="flex justify-between items-center mb-3">
-                              <span className="text-xs font-black text-blue-700 uppercase bg-blue-100 px-3 py-1 rounded-md">
-                                Nivel de Ansiedad: {rec.nivelansiedad}/10
-                              </span>
-                              <span className="text-sm text-gray-500 font-medium">
-                                {new Date(rec.fecha).toLocaleDateString()}
-                              </span>
-                            </div>
-                            <p className="text-base text-gray-700 leading-relaxed">{rec.notas}</p>
-                          </div>
-                        ))}
+                        {activeTab === 'Ficha Médica' && (
+        <MedicalRecordTab 
+     patientId={selectedPatient.id} 
+     patientName={selectedPatient.nombre} 
+     patientPhone={selectedPatient.telefono} 
+  />
+)}
 
                         {/* PESTAÑA: RESULTADOS TEST */}
                         {activeTab === 'Resultados Test' && (

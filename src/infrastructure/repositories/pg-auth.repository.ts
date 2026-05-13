@@ -27,4 +27,11 @@ export class PgAuthRepository implements IAuthRepository {
     const query = "INSERT INTO users (id, name, email, password, role) VALUES ($1, $2, $3, $4, $5)";
     await pool.query(query, [user.id, user.name, user.email, user.password, user.role]);
   }
+  // Dentro de la clase PgAuthRepository
+async updateLastLogin(userId: string): Promise<void> {
+  await pool.query(
+    "UPDATE users SET last_login = NOW() WHERE id = $1",
+    [userId]
+  );
+}
 }
