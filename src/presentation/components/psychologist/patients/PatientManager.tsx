@@ -351,7 +351,7 @@ export function PatientManager({ patients }: Props) {
                 onClick={() => setSelectedTestDetails(null)} 
                 className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-400 hover:text-slate-600"
               >
-                <X size={20} />
+                <X size={20} className="text-current" />
               </button>
             </div>
 

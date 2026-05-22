@@ -29,9 +29,18 @@ export class PgAuthRepository implements IAuthRepository {
   }
   // Dentro de la clase PgAuthRepository
 async updateLastLogin(userId: string): Promise<void> {
-  await pool.query(
-    "UPDATE users SET last_login = NOW() WHERE id = $1",
-    [userId]
-  );
+  try {
+    await pool.query(
+      "UPDATE users SET last_login = NOW() WHERE id = $1",
+      [userId]
+    );
+  } catch (err: any) {
+    // Postgres error 42703 = undefined_column
+    if (err?.code === '42703') {
+      console.warn('updateLastLogin: columna last_login no existe en users, omitiendo');
+      return;
+    }
+    throw err;
+  }
 }
 }

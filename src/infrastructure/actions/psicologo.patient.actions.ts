@@ -4,20 +4,22 @@ import { PatientListItemDTO } from "@/domain/dtos/patient-management.dto";
 import { PgPatientRepository } from "../repositories/PgPatientRepository";
 
 export async function getPatientsForPsychologistAction(psychologistId: number): Promise<{ success: boolean; data: PatientListItemDTO[] }> {
-  // 1. Agregamos u.last_login a la consulta
+  // Use safe columns: some deployments may not have 'contacto' or 'last_login' columns
   const query = `
-    SELECT 
-      u.id, 
-      u.name as nombre, 
-      u.email, 
-      u.contacto as telefono,
-      u.last_login, -- <--- NUEVO CAMPO
+    SELECT
+      u.id,
+      u.name as nombre,
+      u.email,
+      -- if contacto/phone column does not exist, return empty string as telefono
+      '' as telefono,
+      -- last_login may not exist in all schemas; return NULL
+      NULL as last_login,
       MAX(a.appointment_date) as ultima_cita
     FROM users u
     INNER JOIN appointments a ON u.id = a.patient_id
-    WHERE a.psychologist_id = $1 
+    WHERE a.psychologist_id = $1
     AND u.role = 'PACIENTE'
-    GROUP BY u.id, u.name, u.email, u.contacto, u.last_login -- <--- Agregar al GROUP BY
+    GROUP BY u.id, u.name, u.email
     ORDER BY nombre ASC;
   `;
 
