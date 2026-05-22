@@ -125,3 +125,15 @@ body {
 .theme-high-contrast .text-blue-600 {
   color: #facc15 !important;
 }
+
+/* Make react-hot-toast text bold globally */
+.react-hot-toast, .react-hot-toast * {
+  font-weight: 700 !important;
+  color: #000000 !important;
+}
+
+/* Improve toast container contrast (white bg, black text) */
+.react-hot-toast > div {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}

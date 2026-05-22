@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { ArrowLeft, AlertCircle, Loader2 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 import { saveGAD7ResultAction } from '@/infrastructure/actions/anxiety.actions';
 
 // Definición de Interfaz (Debe estar arriba del componente)
@@ -51,7 +52,7 @@ export function GAD7Test({ onHomeClick }: { onHomeClick: () => void }) {
 
   const calculateResult = async () => {
     if (responses.includes(-1)) {
-      alert('Por favor, responde todas las preguntas.');
+      toast.error('Por favor, responde todas las preguntas.');
       return;
     }
 

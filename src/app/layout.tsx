@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from "@/presentation/providers/AuthProvider";
+import { ConfirmProvider } from '@/presentation/components/common/ConfirmProvider';
 import { AccessibilityProvider } from "@/presentation/context/AccessibilityContext";
 
 const geistSans = Geist({
@@ -25,9 +27,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {/* Envolvemos todo con el AccessibilityProvider */}
         <AccessibilityProvider>
-          <AuthProvider>
-            {children}
-          </AuthProvider>
+          <ConfirmProvider>
+            <AuthProvider>
+              {children}
+              <Toaster position="top-right" />
+            </AuthProvider>
+          </ConfirmProvider>
         </AccessibilityProvider>
       </body>
     </html>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { X, Loader2 } from "lucide-react";
+import { toast } from 'react-hot-toast';
 import { createPsychologistAction } from "@/infrastructure/actions/psychologist.actions";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -44,7 +45,7 @@ export function CreatePsychologistModal({ isOpen, onClose }: { isOpen: boolean, 
       const result = await createPsychologistAction(data);
       
       if (result.success) {
-        alert("Psicólogo creado con éxito");
+        toast.success("Psicólogo creado con éxito");
         reset(); // Limpiamos el formulario tras el éxito
         onClose();
       } else {

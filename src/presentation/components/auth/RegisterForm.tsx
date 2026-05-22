@@ -38,7 +38,7 @@ export const RegisterForm = () => {
       const payload = { 
         ...data, 
         role: 'PACIENTE', // Asignamos el rol de paciente por defecto
-        status: 'Activo',
+        status: 'pendiente',
         especialidad: null // Los estudiantes no tienen especialidad en tu DB
       };
 

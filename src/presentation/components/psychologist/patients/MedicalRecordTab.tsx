@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Save, Edit3, Loader2 } from "lucide-react";
+import { toast } from 'react-hot-toast';
 import { MedicalRecordDTO } from "@/domain/dtos/medical-record.dto";
 import { getMedicalRecordAction, saveMedicalRecordAction } from "@/infrastructure/actions/medical-record.actions";
 
@@ -38,7 +39,7 @@ export function MedicalRecordTab({ patientId, patientName, patientPhone }: Props
     if (res.success) {
       setIsEditing(false);
     } else {
-      alert("Error al guardar los datos.");
+      toast.error("Error al guardar los datos.");
     }
     setSaving(false);
   };

@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { Search, Edit2, Trash2, UserPlus } from "lucide-react";
+import { toast } from 'react-hot-toast';
 import { Patient } from "@/domain/dtos/patient.dto";
 // Deberás crear estas acciones similares a las de psicólogos
 import { deletePatientAction } from "@/infrastructure/actions/patient.actions"; 
+import { useConfirm } from '@/presentation/components/common/ConfirmProvider';
 import { CreatePatientModal } from "./CreatePatientModal";
 import { EditPatientModal } from "./EditPatientModal";
 import { togglePatientStatusAction } from "@/infrastructure/actions/patient.actions";
@@ -21,6 +23,7 @@ export function PatientClient({ initialData }: Props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const confirm = useConfirm();
 
   // Lógica de filtrado coincidiendo con tu diseño
   const filteredData = patients.filter(p => {
@@ -31,9 +34,14 @@ export function PatientClient({ initialData }: Props) {
   });
 
   const handleDelete = async (id: string) => {
-    if (confirm("¿Estás seguro de eliminar este paciente?")) {
+    const ok = await confirm({ title: 'Eliminar paciente', description: '¿Estás seguro de eliminar este paciente? Esta acción es irreversible.', confirmText: 'Eliminar', cancelText: 'Cancelar' });
+    if (!ok) return;
+    try {
       await deletePatientAction(id);
       setPatients(prev => prev.filter(p => p.id !== id));
+      toast.success('Paciente eliminado');
+    } catch (err) {
+      toast.error('No se pudo eliminar el paciente');
     }
   };
 
@@ -50,7 +58,7 @@ export function PatientClient({ initialData }: Props) {
         p.id === id ? { ...p, estado: result.newStatus as 'Activo' | 'Inactivo' } : p
       ));
     } else {
-      alert(result.error);
+      toast.error(result.error || 'Error');
     }
   };
 

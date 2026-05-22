@@ -26,7 +26,8 @@ export class PsychologistRepository {
         contacto: row.contacto || "N/A", // Dato ejemplo hasta que agregues la columna
         especialidad: "N/A", // Dato ejemplo hasta que agregues la columna
         pacientes: 0,
-        estado: row.status as 'Activo' | 'Inactivo' | 'Pendiente'
+        // Mapear valores de BD ('aprobado'/'pendiente') a etiquetas UI ('Activo'/'Pendiente')
+        estado: (row.status === 'aprobado') ? 'Activo' : (row.status === 'pendiente' ? 'Pendiente' : row.status)
       }));
     } finally {
       client.release();

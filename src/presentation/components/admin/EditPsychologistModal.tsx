@@ -1,6 +1,7 @@
 'use client'
 
 import { X, Loader2 } from "lucide-react";
+import { toast } from 'react-hot-toast';
 import { useState, useEffect } from "react";
 import { updatePsychologistAction } from "@/infrastructure/actions/psychologist.actions";
 import { Psychologist } from "@/domain/dtos/psychologist.dto";
@@ -61,7 +62,7 @@ export function EditPsychologistModal({ isOpen, onClose, psychologist }: Props) 
       const result = await updatePsychologistAction(psychologist.id, data);
       
       if (result.success) {
-        alert("Psicólogo actualizado correctamente");
+        toast.success("Psicólogo actualizado correctamente");
         onClose();
       } else {
         setServerError(result.error || "Error al actualizar el psicólogo");

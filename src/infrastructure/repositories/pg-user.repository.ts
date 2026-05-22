@@ -17,7 +17,9 @@ export class PgUserRepository implements IAuthRepository {
       user.name,
       user.role || 'PACIENTE',             // Evita el error NOT NULL si no viene el rol
       user.contacto,                        // Capturado desde el nuevo input del registro
-      user.status || 'Activo',              // Valor por defecto solicitado
+      // La base de datos valida el campo status con CHECK (status IN ('pendiente','aprobado'))
+      // Por compatibilidad, usamos 'pendiente' por defecto para registros nuevos
+      (user.status || 'pendiente').toLowerCase(),
       user.especialidad || 'Psicología Clínica' // Valor por defecto solicitado
     ];
 

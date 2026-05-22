@@ -27,7 +27,8 @@ export class PatientRepository {
         email: row.email,
         contacto: row.contacto || "N/A", // Dato ejemplo hasta que agregues la columna
         fecha_registro: row.fecha_registro,
-        estado: row.status as 'Activo' | 'Inactivo' | 'Pendiente'
+        // Mapear estado de BD a etiquetas UI
+        estado: (row.status === 'aprobado') ? 'Activo' : (row.status === 'pendiente' ? 'Pendiente' : row.status)
       }));
     } catch (error: unknown) {
       console.error("Error en PatientRepository.getAll:", error);

@@ -1,6 +1,7 @@
 'use client'
 
 import { X, Loader2 } from "lucide-react";
+import { toast } from 'react-hot-toast';
 import { useState } from "react";
 import { createPatientAction, CreatePatientData } from "@/infrastructure/actions/patient.actions";
 import { useForm } from "react-hook-form";
@@ -45,7 +46,7 @@ export function CreatePatientModal({ isOpen, onClose }: Props) {
       const result = await createPatientAction(data);
       
       if (result.success) {
-        alert("Paciente creado con éxito");
+        toast.success("Paciente creado con éxito");
         reset(); // Limpiamos el form
         onClose();
       } else {

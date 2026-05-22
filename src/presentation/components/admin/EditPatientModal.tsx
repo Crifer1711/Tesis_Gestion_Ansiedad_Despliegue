@@ -1,6 +1,7 @@
 'use client'
 
 import { X, Loader2 } from "lucide-react";
+import { toast } from 'react-hot-toast';
 import { useState, useEffect } from "react";
 import { Patient } from "@/domain/dtos/patient.dto";
 import { updatePatientAction, UpdatePatientData } from "@/infrastructure/actions/patient.actions";
@@ -62,7 +63,7 @@ export function EditPatientModal({ isOpen, onClose, patient }: Props) {
       const result = await updatePatientAction(patient.id, data);
       
       if (result.success) {
-        alert("Paciente actualizado correctamente");
+        toast.success("Paciente actualizado correctamente");
         onClose();
       } else {
         setServerError(result.error || "Error al actualizar el paciente");

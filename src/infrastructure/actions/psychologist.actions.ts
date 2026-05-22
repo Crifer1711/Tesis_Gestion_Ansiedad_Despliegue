@@ -41,9 +41,10 @@ export async function createPsychologistAction(formData: CreatePsychologistData)
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Creado por el administrador: marcamos la cuenta como aprobada en la BD
     await client.query(
       `INSERT INTO users (name, email, password, role, status, especialidad, contacto) 
-       VALUES ($1, $2, $3, 'PSICOLOGO', 'Activo', $4, $5)`,
+       VALUES ($1, $2, $3, 'PSICOLOGO', 'aprobado', $4, $5)`,
       [name, email, hashedPassword, especialidad, contacto]
     );
 
@@ -85,15 +86,18 @@ export async function updatePsychologistAction(id: string, formData: UpdatePsych
 export async function togglePsychologistStatusAction(id: string, currentStatus: string) {
   const client = await pool.connect();
   try {
-    // Definimos el nuevo estado
-    const newStatus = currentStatus === 'Activo' ? 'Inactivo' : 'Activo';
+    // Alternamos entre 'aprobado' y 'pendiente' para cumplir la constraint
+    const lowered = (currentStatus || '').toString().toLowerCase();
+    const newStatus = (lowered === 'aprobado' || lowered === 'activo') ? 'pendiente' : 'aprobado';
 
     await client.query(
       'UPDATE users SET status = $1 WHERE id = $2 AND role = $3',
       [newStatus, id, 'PSICOLOGO']
     );
 
-    return { success: true, newStatus };
+    // Retornamos estado para UI
+    const uiStatus = newStatus === 'aprobado' ? 'Activo' : 'Pendiente';
+    return { success: true, newStatus: uiStatus };
   } catch (error: unknown) {
     console.error("Error al cambiar estado del psicólogo:", error);
     return { success: false, error: "No se pudo actualizar el estado" };

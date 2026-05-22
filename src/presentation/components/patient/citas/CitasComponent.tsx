@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Calendar, Clock, User, Send, CheckCircle, Lock, X } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 import { useSession } from 'next-auth/react';
 
 interface Cita {
@@ -46,9 +47,7 @@ export function CitasComponent() {
   const [psicologos, setPsicologos] = useState<Psicologo[]>([]);
   const [loading, setLoading] = useState(true);
   const [enviando, setEnviando] = useState(false);
-  const [citaConfirmada, setCitaConfirmada] = useState(false);
   const [horasOcupadas, setHorasOcupadas] = useState<string[]>([]);
-  const [notificacionAceptada, setNotificacionAceptada] = useState<Cita | null>(null);
   const [notificacionCerrada, setNotificacionCerrada] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -91,8 +90,7 @@ export function CitasComponent() {
           // Notificar si hay nuevas citas Aceptadas (y no fueron cerradas por el usuario)
           const citasAceptadas = citasFormateadas.filter(c => c.estado === 'Aceptada');
           if (citasAceptadas.length > 0 && !notificacionCerrada.has(citasAceptadas[0].id)) {
-            setNotificacionAceptada(citasAceptadas[0]);
-            setTimeout(() => setNotificacionAceptada(null), 7000);
+            showAcceptedToast(citasAceptadas[0]);
           }
         }
       } catch (error) {
@@ -141,7 +139,7 @@ export function CitasComponent() {
     e.preventDefault();
     
     if (!formData.psicologo || !formData.fecha || !formData.hora) {
-      alert('⚠️ Por favor completa: Psicólogo, Fecha y Hora');
+      toast.error('⚠️ Por favor completa: Psicólogo, Fecha y Hora');
       return;
     }
 
@@ -181,17 +179,47 @@ export function CitasComponent() {
           motivo: '',
         });
         
-        setCitaConfirmada(true);
-        setTimeout(() => setCitaConfirmada(false), 5000);
+        toast.success('✅ Cita Agendada Exitosamente — EN LISTA DE ESPERA');
       } else {
-        alert(`❌ Error: ${responseData.error || 'No se pudo agendar la cita'}`);
+        toast.error(`❌ Error: ${responseData.error || 'No se pudo agendar la cita'}`);
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('❌ Error al agendar la cita');
+      toast.error('❌ Error al agendar la cita');
     } finally {
       setEnviando(false);
     }
+  };
+
+  // Mostrar toast personalizado cuando una cita es aceptada
+  const showAcceptedToast = (cita: Cita) => {
+    if (!cita) return;
+
+    const id = toast.custom((t) => (
+      <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-500 text-blue-700 px-5 py-4 rounded-lg flex items-start gap-3 shadow-lg">
+        <CheckCircle size={22} className="flex-shrink-0 mt-0.5 text-blue-500" />
+        <div className="flex-1">
+          <p className="font-bold text-base">🎉 ¡Cita Aceptada!</p>
+          <p className="text-sm mt-1.5 text-blue-600">{
+            `El psicólogo ${cita.psicologo} ha aceptado tu cita para el ${parseDate(cita.fecha).toLocaleDateString('es-ES')} a las ${cita.hora}`
+          }</p>
+        </div>
+        <button
+          onClick={() => {
+            toast.dismiss(t.id);
+            setNotificacionCerrada(prev => new Set([...prev, cita.id]));
+          }}
+          className="flex-shrink-0 p-2 hover:bg-blue-200 rounded-lg transition text-blue-500 hover:text-blue-700"
+          aria-label="Cerrar notificación"
+        >
+          <X size={20} className="text-current" />
+        </button>
+      </div>
+    ), { duration: 7000 });
+
+    // auto-marcar como cerrada al expirar
+    setTimeout(() => setNotificacionCerrada(prev => new Set([...prev, cita.id])), 7000);
+    return id;
   };
 
   const getEstadoColor = (estado: string) => {
@@ -357,50 +385,7 @@ export function CitasComponent() {
           <div className="lg:col-span-2 space-y-5">
             <h2 className="text-2xl font-black text-[#1E4D8C]">Mis Citas</h2>
 
-            {/* MENSAJE DE CONFIRMACIÓN */}
-            {citaConfirmada && (
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-400 text-green-700 px-5 py-4 rounded-lg flex items-start gap-3 animate-pulse shadow-md">
-                <CheckCircle size={22} className="flex-shrink-0 mt-0.5 text-green-500" />
-                <div className="flex-1">
-                  <p className="font-bold text-base">✅ Cita Agendada Exitosamente</p>
-                  <p className="text-sm mt-1.5 text-green-600">
-                    ⏳ <strong>EN LISTA DE ESPERA</strong> - Tu cita está en espera hasta que el psicólogo acepte tu solicitud
-                  </p>
-                </div>
-                <button
-                  onClick={() => setCitaConfirmada(false)}
-                  className="flex-shrink-0 p-2 hover:bg-green-200 rounded-lg transition text-green-500 hover:text-green-700"
-                  aria-label="Cerrar notificación"
-                >
-                  <X size={20} className="text-current" />
-                </button>
-              </div>
-            )}
-
-            {/* NOTIFICACIÓN DE CITA ACEPTADA */}
-            {notificacionAceptada && (
-              <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-500 text-blue-700 px-5 py-4 rounded-lg flex items-start gap-3 animate-bounce shadow-lg">
-                <CheckCircle size={22} className="flex-shrink-0 mt-0.5 text-blue-500" />
-                <div className="flex-1">
-                  <p className="font-bold text-base">🎉 ¡Cita Aceptada!</p>
-                  <p className="text-sm mt-1.5 text-blue-600">
-                    El psicólogo <strong>{notificacionAceptada.psicologo}</strong> ha aceptado tu cita para el <strong>{parseDate(notificacionAceptada.fecha).toLocaleDateString('es-ES')}</strong> a las <strong>{notificacionAceptada.hora}</strong>
-                  </p>
-                </div>
-                <button
-                  onClick={() => {
-                    setNotificacionAceptada(null);
-                    if (notificacionAceptada) {
-                      setNotificacionCerrada(prev => new Set([...prev, notificacionAceptada.id]));
-                    }
-                  }}
-                  className="flex-shrink-0 p-2 hover:bg-blue-200 rounded-lg transition text-blue-500 hover:text-blue-700"
-                  aria-label="Cerrar notificación"
-                >
-                  <X size={20} className="text-current" />
-                </button>
-              </div>
-            )}
+            {/* Las notificaciones de cita ahora se muestran con react-hot-toast */}
 
             {/* LISTA DE CITAS */}
             {citasAgendadas.length === 0 ? (

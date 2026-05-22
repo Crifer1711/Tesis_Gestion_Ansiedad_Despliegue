@@ -44,9 +44,10 @@ export async function createPatientAction(formData: CreatePatientData) {
 
     // Nota: 'fecha_registro' se suele manejar con DEFAULT CURRENT_TIMESTAMP en la DB
     // Usamos el rol 'ESTUDIANTE' o 'PACIENTE' según tu lógica de negocio
+    // Al crear desde el administrador, marcamos la cuenta como aprobada en la BD
     await client.query(
       `INSERT INTO users (name, email, password, role, status, contacto) 
-       VALUES ($1, $2, $3, 'PACIENTE', 'Activo', $4)`,
+       VALUES ($1, $2, $3, 'PACIENTE', 'aprobado', $4)`,
       [name, email, hashedPassword, contacto]
     );
 
@@ -67,11 +68,13 @@ export async function updatePatientAction(id: string, formData: UpdatePatientDat
   const client = await pool.connect();
 
   try {
+    // Mapeamos los estados de la UI a los valores aceptados por la BD
+    const dbStatus = (estado === 'Activo' || estado === 'aprobado') ? 'aprobado' : 'pendiente';
     await client.query(
       `UPDATE users 
        SET name = $1, email = $2, contacto = $3, status = $4 
        WHERE id = $5`,
-      [name, email, contacto, estado, id]
+      [name, email, contacto, dbStatus, id]
     );
 
     revalidatePath('/dashboard/admin/pacientes');
@@ -86,15 +89,18 @@ export async function updatePatientAction(id: string, formData: UpdatePatientDat
 export async function togglePatientStatusAction(id: string, currentStatus: string) {
   const client = await pool.connect();
   try {
-    // Determinamos el nuevo estado
-    const newStatus = currentStatus === 'Activo' ? 'Inactivo' : 'Activo';
+    // Mapeamos y alternamos entre 'aprobado' y 'pendiente' para cumplir la constraint
+    const lowered = (currentStatus || '').toString().toLowerCase();
+    const newStatus = (lowered === 'aprobado' || lowered === 'activo') ? 'pendiente' : 'aprobado';
 
     await client.query(
       'UPDATE users SET status = $1 WHERE id = $2',
       [newStatus, id]
     );
 
-    return { success: true, newStatus };
+    // Devolvemos el nuevo estado en formato amigable para la UI
+    const uiStatus = newStatus === 'aprobado' ? 'Activo' : 'Pendiente';
+    return { success: true, newStatus: uiStatus };
   } catch (error: unknown) {
     console.error(error);
     return { success: false, error: "No se pudo cambiar el estado" };

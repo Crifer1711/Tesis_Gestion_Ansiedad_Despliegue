@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { Search, Edit2, Trash2, UserPlus } from "lucide-react";
+import { toast } from 'react-hot-toast';
 import { Psychologist } from "@/domain/dtos/psychologist.dto";
 // IMPORTANTE: Importamos la nueva acción
 import { deletePsychologistAction, togglePsychologistStatusAction } from "@/infrastructure/actions/psychologist.actions";
+import { useConfirm } from '@/presentation/components/common/ConfirmProvider';
 import { CreatePsychologistModal } from "./CreatePsychologistModal";
 import { EditPsychologistModal } from "./EditPsychologistModal";
 
@@ -18,6 +20,8 @@ export function PsychologistClient({ initialData }: Props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedPsychologist, setSelectedPsychologist] = useState<Psychologist | null>(null);
+
+  const confirm = useConfirm();
 
   // Lógica de filtrado
   const filteredData = psychologists.filter(doc => {
@@ -34,14 +38,19 @@ export function PsychologistClient({ initialData }: Props) {
         p.id === id ? { ...p, estado: result.newStatus as 'Activo' | 'Inactivo' | 'Pendiente' } : p
       ));
     } else {
-      alert(result.error);
+      toast.error(result.error || 'Error');
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm("¿Estás seguro de eliminar este psicólogo?")) {
+    const ok = await confirm({ title: 'Eliminar psicólogo', description: '¿Estás seguro de eliminar este psicólogo? Esta acción es irreversible.', confirmText: 'Eliminar', cancelText: 'Cancelar' });
+    if (!ok) return;
+    try {
       await deletePsychologistAction(id);
       setPsychologists(prev => prev.filter(p => p.id !== id));
+      toast.success('Psicólogo eliminado');
+    } catch (err) {
+      toast.error('No se pudo eliminar el psicólogo');
     }
   };
 

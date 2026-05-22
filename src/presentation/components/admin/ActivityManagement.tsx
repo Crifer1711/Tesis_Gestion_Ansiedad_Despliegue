@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Activity } from "@/domain/dtos/activity.dto";
 import { Search, Edit2, Eye, Trash2, Upload } from "lucide-react";
+import { useConfirm } from '@/presentation/components/common/ConfirmProvider';
 
 export function ActivityManagement({ initialActivities = [] }: { initialActivities: Activity[] }) {
   const [filter, setFilter] = useState('Todos');
@@ -24,6 +25,7 @@ export function ActivityManagement({ initialActivities = [] }: { initialActiviti
   const [assignLoading, setAssignLoading] = useState(false);
   const [assignMessage, setAssignMessage] = useState<string | null>(null);
   const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
+  const confirm = useConfirm();
 
   const categories = ['Todos', 'Respiración', 'Visualizacion', 'Sonidos', 'Interaccion', 'Otros'];
 
@@ -134,7 +136,8 @@ export function ActivityManagement({ initialActivities = [] }: { initialActiviti
                         }
                       }} className="h-4 w-4 cursor-pointer text-gray-700 hover:text-green-600" />
                       <Trash2 onClick={async () => {
-                        if (!confirm('Eliminar actividad? Esta acción es irreversible.')) return;
+                        const ok = await confirm({ title: 'Eliminar actividad', description: '¿Eliminar actividad? Esta acción es irreversible.', confirmText: 'Eliminar', cancelText: 'Cancelar' });
+                        if (!ok) return;
                         try {
                           const res = await fetch(`/api/actividades/${act.id}`, { method: 'DELETE' });
                           const data = await res.json();

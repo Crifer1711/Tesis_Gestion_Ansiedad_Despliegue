@@ -2,6 +2,7 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
+import { toast } from 'react-hot-toast';
 import { useEffect, useState } from 'react';
 import { CheckCircle, XCircle, Clock, User, Calendar as CalendarIcon, Search, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -101,7 +102,7 @@ export default function PsychologistCitasPage() {
       console.log(`Cita ${appointmentId} actualizada a ${newStatus}`);
     } catch (err) {
       console.error('Error:', err);
-      alert('Error al actualizar cita');
+      toast.error('Error al actualizar cita');
     }
   };
 
