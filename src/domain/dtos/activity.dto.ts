@@ -1,8 +1,10 @@
 export interface Activity {
   id: string | number;
   nombre: string;
-  categoria: 'Respiración' | 'Visualizacion' | 'Sonidos' | 'Todos';
+  categoria: 'Respiración' | 'Visualizacion' | 'Sonidos' | 'Interaccion' | 'Todos';
   duracion: string;
   usos: number;
-  estado: 'Activo' | 'Inactivo';
+  descripcion?: string;
+  estado: 'Aprobada' | 'Pendiente' | 'Rechazada' | 'Inactivo' | 'Activo';
+  embed_url?: string | null;
 }

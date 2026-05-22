@@ -372,7 +372,7 @@ export function CitasComponent() {
                   className="flex-shrink-0 p-2 hover:bg-green-200 rounded-lg transition text-green-500 hover:text-green-700"
                   aria-label="Cerrar notificación"
                 >
-                  <X size={20} />
+                  <X size={20} className="text-current" />
                 </button>
               </div>
             )}
@@ -397,7 +397,7 @@ export function CitasComponent() {
                   className="flex-shrink-0 p-2 hover:bg-blue-200 rounded-lg transition text-blue-500 hover:text-blue-700"
                   aria-label="Cerrar notificación"
                 >
-                  <X size={20} />
+                  <X size={20} className="text-current" />
                 </button>
               </div>
             )}

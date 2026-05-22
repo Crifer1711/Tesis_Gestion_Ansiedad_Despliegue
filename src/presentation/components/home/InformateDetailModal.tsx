@@ -35,7 +35,7 @@ export function InformateDetailModal({ isOpen, onClose, title, content }: Detail
             onClick={onClose}
             className="p-2 hover:bg-white/20 rounded-lg transition"
           >
-            <X size={32} />
+            <X size={32} className="text-white" />
           </button>
         </div>
 
