@@ -221,3 +221,88 @@ CREATE TABLE IF NOT EXISTS public.sus_responses (
 
 CREATE INDEX IF NOT EXISTS idx_sus_responses_user_id ON public.sus_responses(user_id);
 CREATE INDEX IF NOT EXISTS idx_sus_responses_score ON public.sus_responses(sus_score);
+
+-- 10. TABLA: ACTIVIDADES (Contenido multimedia / ejercicios de bienestar)
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+CREATE TABLE IF NOT EXISTS public.actividades (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    tipo text NOT NULL DEFAULT 'actividad-bienestar',
+    slug text NOT NULL,
+    titulo text NOT NULL,
+    descripcion text,
+    embed_url text NOT NULL,
+    indicaciones jsonb NOT NULL DEFAULT '[]'::jsonb,
+    finalizacion jsonb NOT NULL DEFAULT '{}'::jsonb,
+    eventos jsonb NOT NULL DEFAULT '{}'::jsonb,
+    persistencia_recomendada jsonb NOT NULL DEFAULT '{}'::jsonb,
+    manifest_original jsonb NOT NULL DEFAULT '{}'::jsonb,
+    estado text NOT NULL DEFAULT 'pendiente' CHECK (estado IN ('pendiente','aprobada','rechazada','invalida')),
+    source_type text NOT NULL DEFAULT 'zip' CHECK (source_type IN ('zip','url')),
+    source_url text,
+    source_filename text,
+    created_by integer NULL REFERENCES public.users(id) ON DELETE SET NULL,
+    categoria text NOT NULL DEFAULT 'Sin categoria',
+    usos integer NOT NULL DEFAULT 0,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    updated_at timestamptz NOT NULL DEFAULT now(),
+    UNIQUE (slug, embed_url)
+);
+
+CREATE INDEX IF NOT EXISTS idx_actividades_estado ON public.actividades(estado);
+CREATE INDEX IF NOT EXISTS idx_actividades_slug ON public.actividades(slug);
+CREATE INDEX IF NOT EXISTS idx_actividades_tipo ON public.actividades(tipo);
+CREATE INDEX IF NOT EXISTS idx_actividades_categoria ON public.actividades(categoria);
+
+-- 11. TABLA: ASIGNACIONES (bienestar_asignaciones)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'asignacion_estado') THEN
+        CREATE TYPE asignacion_estado AS ENUM ('asignada', 'en_progreso', 'completada', 'cancelada');
+    END IF;
+END
+$$;
+
+CREATE TABLE IF NOT EXISTS public.bienestar_asignaciones (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    actividad_id uuid NOT NULL REFERENCES public.actividades(id) ON DELETE CASCADE,
+    psicologo_id integer NOT NULL REFERENCES public.users(id) ON DELETE RESTRICT,
+    estudiante_id integer NOT NULL REFERENCES public.users(id) ON DELETE RESTRICT,
+    estado asignacion_estado NOT NULL DEFAULT 'asignada',
+    instrucciones_psicologo text,
+    metadata jsonb DEFAULT '{}'::jsonb,
+    fecha_asignacion timestamptz NOT NULL DEFAULT now(),
+    fecha_limite timestamptz,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'chk_fecha_limite') THEN
+        ALTER TABLE public.bienestar_asignaciones
+            ADD CONSTRAINT chk_fecha_limite CHECK (fecha_limite IS NULL OR fecha_limite >= fecha_asignacion);
+    END IF;
+END
+$$;
+
+CREATE INDEX IF NOT EXISTS idx_bienestar_asignaciones_actividad ON public.bienestar_asignaciones(actividad_id);
+CREATE INDEX IF NOT EXISTS idx_bienestar_asignaciones_psicologo ON public.bienestar_asignaciones(psicologo_id);
+CREATE INDEX IF NOT EXISTS idx_bienestar_asignaciones_estudiante ON public.bienestar_asignaciones(estudiante_id);
+CREATE INDEX IF NOT EXISTS idx_bienestar_asignaciones_estado ON public.bienestar_asignaciones(estado);
+
+-- Trigger helper to keep `updated_at` in bienestar_asignaciones
+CREATE OR REPLACE FUNCTION fn_update_updated_at_bienestar()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = now();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_asignaciones_update ON public.bienestar_asignaciones;
+CREATE TRIGGER trg_asignaciones_update
+BEFORE UPDATE ON public.bienestar_asignaciones
+FOR EACH ROW
+EXECUTE FUNCTION fn_update_updated_at_bienestar();
+
