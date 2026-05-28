@@ -178,7 +178,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, id: newId });
     } catch (err) {
       console.error('[import] error insertando en DB:', err);
-      return NextResponse.json({ error: 'Error interno al insertar actividad: ' + (err?.message || String(err)) }, { status: 500 });
+      const message = err instanceof Error ? err.message : String(err);
+      return NextResponse.json({ error: 'Error interno al insertar actividad: ' + message }, { status: 500 });
     }
   } catch (error) {
     console.error('Error importing actividad:', error);

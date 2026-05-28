@@ -4,7 +4,7 @@ Sistema web para la gestión de ansiedad en estudiantes universitarios. Incluye 
 
 ## Requisitos
 
-- Node.js 18 o superior
+- Node.js 20.9 o superior
 - npm
 - PostgreSQL
 
@@ -51,6 +51,29 @@ npm run build
 npm run start
 npm run lint
 ```
+
+## Despliegue en Render
+
+1. Crea una base de datos PostgreSQL en Render.
+2. Copia la cadena de conexión que te entrega Render y úsala como `DATABASE_URL`.
+3. Crea un Web Service conectado al repositorio.
+4. Configura estos valores de entorno en Render:
+
+```env
+DATABASE_URL=postgresql://...
+NEXTAUTH_URL=https://tu-app.onrender.com
+NEXTAUTH_SECRET=una_clave_larga_y_segura
+```
+
+5. Usa estos comandos:
+
+```bash
+Build: npm run build
+Start: npm start
+```
+
+6. Ejecuta primero el script SQL completo de este README en la base de datos de Render.
+7. Asegúrate de crear el usuario administrador inicial para poder entrar al panel de admin.
 
 ## Estructura general
 
@@ -305,6 +328,28 @@ CREATE TRIGGER trg_asignaciones_update
 BEFORE UPDATE ON public.bienestar_asignaciones
 FOR EACH ROW
 EXECUTE FUNCTION fn_update_updated_at_bienestar();
+
+-- 12. TABLA: INTENTOS DE BIENESTAR
+CREATE TABLE IF NOT EXISTS public.bienestar_intentos (
+    id SERIAL PRIMARY KEY,
+    intento_id TEXT NOT NULL,
+    actividad_slug TEXT NOT NULL,
+    estudiante_id INTEGER REFERENCES public.users(id) ON DELETE CASCADE,
+    asignacion_id UUID REFERENCES public.bienestar_asignaciones(id) ON DELETE SET NULL,
+    entrada_estudiante TEXT,
+    respuesta_ia JSONB,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    completed_at TIMESTAMPTZ,
+    duracion_segundos INTEGER,
+    culmino BOOLEAN DEFAULT false,
+    resumen JSONB
+);
+
+CREATE INDEX IF NOT EXISTS ix_bienestar_intentos_intento_id
+ON public.bienestar_intentos(intento_id);
+
+CREATE INDEX IF NOT EXISTS ix_bienestar_intentos_estudiante_id
+ON public.bienestar_intentos(estudiante_id);
 
 INSERT INTO users (name, email, password, role, contacto, status, especialidad) 
 VALUES (
