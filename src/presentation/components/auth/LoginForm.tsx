@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Mail, Lock, LogIn, Loader2 } from "lucide-react";
+import { Mail, Lock, LogIn, Loader2, Eye, EyeOff } from "lucide-react";
 import Image from 'next/image';
 import { signIn } from "next-auth/react";
 
@@ -22,6 +22,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export const LoginForm = () => {
   const [serverError, setServerError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
@@ -129,10 +130,18 @@ return (
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#194073]/50" size={16} />
             <input 
               {...register("password")}
-              type="password" 
+              type={showPassword ? "text" : "password"}
               placeholder="Contraseña"
-              className={`w-full pl-11 pr-4 py-3 bg-transparent border border-[#B8D0F5] rounded-lg outline-none focus:ring-2 focus:ring-[#85AEE0] text-[#194073] text-[13px] placeholder-[#194073]/50 transition-all ${errors.password ? 'ring-2 ring-red-300 border-transparent' : ''}`}
+              className={`w-full pl-11 pr-11 py-3 bg-transparent border border-[#B8D0F5] rounded-lg outline-none focus:ring-2 focus:ring-[#85AEE0] text-[#194073] text-[13px] placeholder-[#194073]/50 transition-all ${errors.password ? 'ring-2 ring-red-300 border-transparent' : ''}`}
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword((value) => !value)}
+              aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#194073]/60 hover:text-[#194073] transition-colors"
+            >
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
             {errors.password && (
               <p className="text-[10px] text-red-500 mt-1 ml-2 font-bold uppercase italic">
                 {errors.password.message}
