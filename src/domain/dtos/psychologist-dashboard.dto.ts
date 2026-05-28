@@ -6,10 +6,11 @@ export interface AppointmentDTO {
 }
 
 export interface ActivityDTO {
+  estudianteId: string | number;
   paciente: string;
-  actividad: string;
-  fechaLimite: string;
-  estado: string;
+  asignadas: number;
+  realizadas: number;
+  pendientes: number;
 }
 
 export interface PsychologistDashboardDTO {

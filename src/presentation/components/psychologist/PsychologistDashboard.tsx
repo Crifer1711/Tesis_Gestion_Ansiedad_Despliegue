@@ -96,7 +96,7 @@ export function PsychologistDashboard({ initialData }: DashboardProps) {
         </div>
       </div>
 
-      {/* ACTIVIDADES - Tabla */}
+      {/* ACTIVIDADES - Tabla por paciente */}
       <div className="border border-gray-300 rounded-lg overflow-hidden shadow-md bg-white">
         <div className="p-4 bg-gray-100 border-b border-gray-300">
           <h2 className="text-sm font-black text-gray-700 uppercase tracking-wider">Actividades</h2>
@@ -106,27 +106,31 @@ export function PsychologistDashboard({ initialData }: DashboardProps) {
             <thead className="bg-gray-200 border-b border-gray-300">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase">Paciente</th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase">Actividad</th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase">Fecha Límite</th>
-                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase">Estado</th>
+                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase">Actividades</th>
+                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase">Actividades Realizadas</th>
+                <th className="px-4 py-3 text-left text-xs font-bold text-gray-700 uppercase">Actividades Pendientes</th>
               </tr>
             </thead>
             <tbody>
               {recentActivities.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="px-4 py-8 text-center text-gray-500 italic">
-                    No hay actividades pendientes
+                    No hay actividades asignadas
                   </td>
                 </tr>
               ) : (
                 recentActivities.map((act, idx) => (
-                  <tr key={idx} className="border-b border-gray-200 hover:bg-blue-50 transition">
+                  <tr
+                    key={idx}
+                    className="border-b border-gray-200 hover:bg-blue-50 transition cursor-pointer"
+                    onClick={() => window.location.href = `/dashboard/psicologo/actividades/paciente/${act.estudianteId}`}
+                  >
                     <td className="px-4 py-3 text-sm font-semibold text-gray-800">{act.paciente}</td>
-                    <td className="px-4 py-3 text-sm text-gray-700">{act.actividad}</td>
-                    <td className="px-4 py-3 text-sm text-gray-700">{act.fechaLimite}</td>
+                    <td className="px-4 py-3 text-sm text-gray-700">{act.asignadas}</td>
+                    <td className="px-4 py-3 text-sm text-gray-700">{act.realizadas}</td>
                     <td className="px-4 py-3 text-sm">
                       <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded">
-                        {act.estado}
+                        {act.pendientes}
                       </span>
                     </td>
                   </tr>

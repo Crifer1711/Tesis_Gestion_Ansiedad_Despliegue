@@ -69,7 +69,8 @@ export async function updatePatientAction(id: string, formData: UpdatePatientDat
 
   try {
     // Mapeamos los estados de la UI a los valores aceptados por la BD
-    const dbStatus = (estado === 'Activo' || estado === 'aprobado') ? 'aprobado' : 'pendiente';
+    // UI usa 'Activo'/'Inactivo'/'Pendiente' — DB espera 'aprobado'|'pendiente'
+    const dbStatus = estado === 'Activo' ? 'aprobado' : 'pendiente';
     await client.query(
       `UPDATE users 
        SET name = $1, email = $2, contacto = $3, status = $4 

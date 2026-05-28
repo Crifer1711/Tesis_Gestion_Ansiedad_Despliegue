@@ -29,6 +29,22 @@ export class PgPsychologistRepository implements IPsychologistRepository {
     `;
     const appointmentsRes = await pool.query(appointmentsQuery, [psychologistId]);
 
+    // 3. Consulta para "ACTIVIDADES" agregadas por paciente
+    const activitiesQuery = `
+      SELECT 
+        u.id as "estudianteId",
+        u.name as paciente,
+        COUNT(ba.id)::int as asignadas,
+        COUNT(CASE WHEN ba.estado = 'completada' THEN 1 END)::int as realizadas,
+        COUNT(CASE WHEN ba.estado != 'completada' THEN 1 END)::int as pendientes
+      FROM bienestar_asignaciones ba
+      JOIN users u ON ba.estudiante_id = u.id
+      WHERE ba.psicologo_id = $1
+      GROUP BY u.id, u.name
+      ORDER BY u.name ASC
+    `;
+    const activitiesRes = await pool.query(activitiesQuery, [psychologistId]);
+
     return {
       stats: {
         totalPatients: Number.parseInt(statsRes.rows[0].total_patients || '0', 10),
@@ -36,7 +52,7 @@ export class PgPsychologistRepository implements IPsychologistRepository {
         acceptedAppointments: Number.parseInt(statsRes.rows[0].accepted_appointments || '0', 10),
       },
       nextAppointments: appointmentsRes.rows, // Aquí ya vienen los datos reales de la DB
-      recentActivities: [] // Pendiente de implementar según tu tabla de tareas
+      recentActivities: activitiesRes.rows
     };
   }
 }
