@@ -1,6 +1,13 @@
 import pool from "@/infrastructure/database/db";
 import { Patient } from "@/domain/dtos/patient.dto";
 
+const toUiStatus = (status: string | null | undefined) => {
+  const normalized = (status || '').toString().trim().toLowerCase();
+  if (normalized === 'activo' || normalized === 'aprobado') return 'Activo';
+  if (normalized === 'inactivo' || normalized === 'desactivado' || normalized === 'rechazado') return 'Inactivo';
+  return 'Pendiente';
+};
+
 export class PatientRepository {
   async getAll(): Promise<Patient[]> {
     const client = await pool.connect();
@@ -28,7 +35,7 @@ export class PatientRepository {
         contacto: row.contacto || "N/A", // Dato ejemplo hasta que agregues la columna
         fecha_registro: row.fecha_registro,
         // Mapear estado de BD a etiquetas UI
-        estado: (row.status === 'aprobado') ? 'Activo' : (row.status === 'pendiente' ? 'Pendiente' : row.status)
+        estado: toUiStatus(row.status)
       }));
     } catch (error: unknown) {
       console.error("Error en PatientRepository.getAll:", error);

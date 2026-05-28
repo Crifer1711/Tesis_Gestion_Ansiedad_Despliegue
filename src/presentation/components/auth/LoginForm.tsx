@@ -21,6 +21,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export const LoginForm = () => {
   const [serverError, setServerError] = useState("");
+  const [approvalWarning, setApprovalWarning] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
@@ -29,20 +30,51 @@ export const LoginForm = () => {
     resolver: zodResolver(loginSchema),
   });
 
+  const emailField = register("email", {
+    onChange: () => {
+      if (serverError) setServerError("");
+      if (approvalWarning) setApprovalWarning("");
+    },
+  });
+
+  const passwordField = register("password", {
+    onChange: () => {
+      if (serverError) setServerError("");
+      if (approvalWarning) setApprovalWarning("");
+    },
+  });
+
   const onSubmit = async (data: LoginFormData) => {
     setLoading(true);
     setServerError("");
+    setApprovalWarning("");
 
     try {
-      // 1. Usamos NextAuth en lugar de fetch manual
+      const checkResponse = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: data.email, password: data.password }),
+      });
+
+      if (!checkResponse.ok) {
+        const checkData = await checkResponse.json().catch(() => null);
+        if (checkData?.error?.includes("Usuario no aprobado")) {
+          setApprovalWarning("Usuario no ha sido aprobado");
+        } else {
+          setServerError("Credenciales incorrectas");
+        }
+        return;
+      }
+
+      // 1. Usamos NextAuth para crear la sesión solo cuando las credenciales ya fueron validadas
       const result = await signIn("credentials", {
         email: data.email,
         password: data.password,
-        redirect: false, // Lo manejamos manual para las redirecciones por rol
+        redirect: false,
       });
 
       if (result?.error) {
-        setServerError("Credenciales incorrectas o usuario no encontrado");
+        setServerError("Credenciales incorrectas");
         return;
       }
 
@@ -71,6 +103,13 @@ return (
     className="flex min-h-screen items-center justify-center bg-cover bg-center p-6"
     style={{ backgroundImage: "url('/images/fondoLogin.png')" }}
   >
+    {approvalWarning && (
+      <div className="fixed top-6 right-6 z-50 w-[320px] rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 shadow-lg shadow-amber-100">
+        <p className="text-sm font-bold text-amber-800">{approvalWarning}</p>
+        <p className="mt-1 text-xs text-amber-700">Tu cuenta aún no ha sido aprobada o está desactivada.</p>
+      </div>
+    )}
+
     {/* Contenedor Principal: items-stretch obliga a ambas cajas a tener la misma altura */}
     <div className="flex w-full max-w-[850px] flex-col md:flex-row items-stretch justify-center gap-4 md:gap-6">
       
@@ -113,7 +152,7 @@ return (
           <div className="relative">
             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#194073]/50" size={16} />
             <input 
-              {...register("email")}
+              {...emailField}
               type="email" 
               placeholder="Usuario (@espe.edu.ec)"
               className={`w-full pl-11 pr-4 py-3 bg-transparent border border-[#B8D0F5] rounded-lg outline-none focus:ring-2 focus:ring-[#85AEE0] text-[#194073] text-[13px] placeholder-[#194073]/50 transition-all ${errors.email ? 'ring-2 ring-red-300 border-transparent' : ''}`}
@@ -129,7 +168,7 @@ return (
           <div className="relative">
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#194073]/50" size={16} />
             <input 
-              {...register("password")}
+              {...passwordField}
               type={showPassword ? "text" : "password"}
               placeholder="Contraseña"
               className={`w-full pl-11 pr-11 py-3 bg-transparent border border-[#B8D0F5] rounded-lg outline-none focus:ring-2 focus:ring-[#85AEE0] text-[#194073] text-[13px] placeholder-[#194073]/50 transition-all ${errors.password ? 'ring-2 ring-red-300 border-transparent' : ''}`}

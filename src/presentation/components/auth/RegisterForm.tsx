@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { User, Mail, Lock, CheckCircle, Loader2, Phone } from "lucide-react"; // Añadido Phone
+import { User, Mail, Lock, CheckCircle, Loader2, Phone, Eye, EyeOff } from "lucide-react"; // Añadido Phone
 import Image from 'next/image';
 
 const registerSchema = z.object({
@@ -24,6 +24,8 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 export const RegisterForm = () => {
   const [serverError, setServerError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
 
   const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormData>({
@@ -126,10 +128,18 @@ export const RegisterForm = () => {
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#1E4D8C]/50" size={20} />
             <input 
               {...register("password")}
-              type="password" 
+              type={showPassword ? "text" : "password"} 
               placeholder="Contraseña"
-              className={`w-full pl-12 pr-4 py-3.5 rounded-2xl border-none outline-none focus:ring-2 focus:ring-blue-400 text-gray-700 placeholder-gray-400 shadow-inner ${errors.password ? 'ring-2 ring-red-300' : ''}`}
+              className={`w-full pl-12 pr-12 py-3.5 rounded-2xl border-none outline-none focus:ring-2 focus:ring-blue-400 text-gray-700 placeholder-gray-400 shadow-inner ${errors.password ? 'ring-2 ring-red-300' : ''}`}
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword((value) => !value)}
+              aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-[#1E4D8C]/60 hover:text-[#1E4D8C] transition-colors"
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
             {errors.password && <p className="text-[10px] text-red-500 mt-1 ml-2 font-bold uppercase italic">{errors.password.message}</p>}
           </div>
 
@@ -138,10 +148,18 @@ export const RegisterForm = () => {
             <CheckCircle className="absolute left-4 top-1/2 -translate-y-1/2 text-[#1E4D8C]/50" size={20} />
             <input 
               {...register("confirmPassword")}
-              type="password" 
+              type={showConfirmPassword ? "text" : "password"} 
               placeholder="Confirmar Contraseña"
-              className={`w-full pl-12 pr-4 py-3.5 rounded-2xl border-none outline-none focus:ring-2 focus:ring-blue-400 text-gray-700 placeholder-gray-400 shadow-inner ${errors.confirmPassword ? 'ring-2 ring-red-300' : ''}`}
+              className={`w-full pl-12 pr-12 py-3.5 rounded-2xl border-none outline-none focus:ring-2 focus:ring-blue-400 text-gray-700 placeholder-gray-400 shadow-inner ${errors.confirmPassword ? 'ring-2 ring-red-300' : ''}`}
             />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword((value) => !value)}
+              aria-label={showConfirmPassword ? "Ocultar confirmación" : "Mostrar confirmación"}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-[#1E4D8C]/60 hover:text-[#1E4D8C] transition-colors"
+            >
+              {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
             {errors.confirmPassword && <p className="text-[10px] text-red-500 mt-1 ml-2 font-bold uppercase italic">{errors.confirmPassword.message}</p>}
           </div>
 

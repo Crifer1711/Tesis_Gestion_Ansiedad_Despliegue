@@ -48,12 +48,6 @@ export default function CitasPage() {
               <ArrowLeft size={18} /> Volver a Inicio
             </button>
           </div>
-          <div className="max-w-4xl rounded-xl border border-blue-200 bg-white/70 px-5 py-4 shadow-sm mb-6">
-            <h2 className="text-xl font-bold text-[#1E4D8C] mb-2">Agendar una cita</h2>
-            <p className="text-slate-700 leading-relaxed">
-              En esta sección podrás reservar una cita con tu psicólogo. Elige al profesional que esté disponible, selecciona el día y la hora que mejor se adapten a tu horario y envía tu solicitud para que quede registrada. Si tu psicólogo tiene espacios habilitados, podrás verlos y escoger el que prefieras; si no está disponible, no aparecerán horarios para reservar hasta que vuelva a activar su agenda.
-            </p>
-          </div>
         </div>
         <CitasComponent />
       </div>

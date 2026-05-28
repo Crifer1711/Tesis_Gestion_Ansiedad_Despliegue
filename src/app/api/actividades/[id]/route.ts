@@ -18,6 +18,9 @@ export async function DELETE(request: Request, { params }: { params: any }) {
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error('Error deleting actividad:', err);
+    if ((err as any)?.code === '23503') {
+      return NextResponse.json({ error: 'No se puede eliminar porque la actividad ya está asignada o relacionada con otros registros.' }, { status: 409 });
+    }
     return NextResponse.json({ error: 'Error interno' }, { status: 500 });
   }
 }
@@ -44,7 +47,16 @@ export async function PATCH(request: Request, { params }: { params: any }) {
     if (embed_url !== undefined) { updates.push(`embed_url = $${idx++}`); values.push(embed_url); }
     if (tipo !== undefined) { updates.push(`tipo = $${idx++}`); values.push(tipo); }
     if (categoria !== undefined) { updates.push(`categoria = $${idx++}`); values.push(categoria); }
-    if (estado !== undefined) { updates.push(`estado = $${idx++}`); values.push(estado.toLowerCase()); }
+    if (estado !== undefined) {
+      const normalizedEstado = String(estado).toLowerCase();
+      const mappedEstado = normalizedEstado === 'activo' || normalizedEstado === 'aprobada'
+        ? 'aprobada'
+        : normalizedEstado === 'rechazada'
+          ? 'rechazada'
+          : 'pendiente';
+      updates.push(`estado = $${idx++}`);
+      values.push(mappedEstado);
+    }
     // duracion stored inside finalizacion JSON; we will set finalizacion to a minimal object containing duracion_minima_segundos
     if (duracion !== undefined) { updates.push(`finalizacion = $${idx++}`); values.push(JSON.stringify({ duracion_minima_segundos: String(duracion) })); }
     if (usos !== undefined) { updates.push(`usos = $${idx++}`); values.push(usos); }

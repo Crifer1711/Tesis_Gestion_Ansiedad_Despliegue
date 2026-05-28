@@ -5,7 +5,7 @@ import { User } from "@/domain/entities/user"; // Importa tu entidad
 
 export class PgAuthRepository implements IAuthRepository {
   async findByEmail(email: string): Promise<User | null> {
-    const query = "SELECT id, name, email, password, role FROM users WHERE email = $1";
+    const query = "SELECT id, name, email, password, role, status FROM users WHERE email = $1";
     const res = await pool.query(query, [email]);
 
     if (res.rows.length === 0) return null;
@@ -19,6 +19,7 @@ export class PgAuthRepository implements IAuthRepository {
       email: row.email,
       password: row.password,
       role: row.role,
+      status: row.status,
       // Si tu entidad User tiene más campos obligatorios, agrégalos aquí
     } as User; 
   }

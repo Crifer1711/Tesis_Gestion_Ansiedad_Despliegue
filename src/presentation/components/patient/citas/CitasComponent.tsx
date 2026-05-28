@@ -241,7 +241,9 @@ export function CitasComponent() {
         {/* Encabezado */}
         <div className="mb-8">
           <h1 className="text-4xl font-black text-[#1E4D8C] mb-2">Agendar Cita</h1>
-          <p className="text-slate-600 text-lg">Selecciona un psicólogo y un horario disponible entre las 07:00 y 18:00 horas</p>
+          <p className="text-slate-600 leading-relaxed text-lg">
+            En esta sección podrás reservar una cita con tu psicólogo. Elige al profesional que esté disponible, selecciona el día y la hora que mejor se adapten a tu horario y envía tu solicitud para que quede registrada. Si tu psicólogo tiene espacios habilitados, podrás verlos y escoger el que prefieras; si no está disponible, no aparecerán horarios para reservar hasta que vuelva a activar su agenda.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -354,7 +356,7 @@ export function CitasComponent() {
 
                 {/* Motivo */}
                 <div>
-                  <label className="block text-sm font-bold text-[#1E4D8C] mb-2">Motivo de la Consulta (Opcional)</label>
+                  <label className="block text-sm font-bold text-[#1E4D8C] mb-2">Motivo de la Consulta (Opcional mínimo 50 palabras)</label>
                   <textarea
                     value={formData.motivo}
                     onChange={(e) => setFormData({ ...formData, motivo: e.target.value })}

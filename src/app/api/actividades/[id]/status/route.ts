@@ -3,6 +3,13 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/infrastructure/auth/auth.options';
 import db from '@/infrastructure/database/db';
 
+const normalizeEstado = (value: unknown) => {
+  const text = String(value || '').trim().toLowerCase();
+  if (text === 'aprobada' || text === 'activo') return 'aprobada';
+  if (text === 'rechazada' || text === 'inactivo') return 'rechazada';
+  return 'pendiente';
+};
+
 export async function PATCH(request: Request, { params }: { params: any }) {
   try {
     const session = await getServerSession(authOptions);
@@ -14,11 +21,12 @@ export async function PATCH(request: Request, { params }: { params: any }) {
     const id = resolvedParams?.id;
     const body = await request.json().catch(() => ({}));
     const { estado } = body;
-    if (!estado || !['aprobada','rechazada','pendiente'].includes(estado)) {
+    const normalizedEstado = normalizeEstado(estado);
+    if (!estado) {
       return NextResponse.json({ error: 'Estado inválido' }, { status: 400 });
     }
 
-    const res = await db.query('UPDATE actividades SET estado = $1, updated_at = now() WHERE id = $2 RETURNING id, estado', [estado, id]);
+    const res = await db.query('UPDATE actividades SET estado = $1, updated_at = now() WHERE id = $2 RETURNING id, estado', [normalizedEstado, id]);
     if (res.rowCount === 0) return NextResponse.json({ error: 'Actividad no encontrada' }, { status: 404 });
 
     return NextResponse.json({ success: true, id: res.rows[0].id, estado: res.rows[0].estado });

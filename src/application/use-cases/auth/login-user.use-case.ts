@@ -15,6 +15,13 @@ export class LoginUserUseCase {
     const isPasswordValid = await bcrypt.compare(passwordPlan, user.password!);
     if (!isPasswordValid) throw new Error("Credenciales inválidas");
 
+    const normalizedStatus = (user.status || '').toString().trim().toLowerCase();
+    const isAccountEnabled = normalizedStatus === 'activo' || normalizedStatus === 'aprobado';
+
+    if (!isAccountEnabled) {
+      throw new Error("Usuario no aprobado o desactivado");
+    }
+
     // ============================================================
     // NUEVO: Registramos la fecha de inicio de sesión
     // Solo si el usuario es un PACIENTE (o puedes quitar el IF si quieres para todos)

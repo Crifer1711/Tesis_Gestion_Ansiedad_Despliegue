@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Activity } from "@/domain/dtos/activity.dto";
@@ -8,6 +8,7 @@ import { Search, Edit2, Eye, Trash2, Upload } from "lucide-react";
 import { useConfirm } from '@/presentation/components/common/ConfirmProvider';
 
 export function ActivityManagement({ initialActivities = [] }: { initialActivities: Activity[] }) {
+  const [activities, setActivities] = useState<Activity[]>(initialActivities);
   const [filter, setFilter] = useState('Todos');
   const [searchTerm, setSearchTerm] = useState('');
   const [showImportModal, setShowImportModal] = useState(false);
@@ -29,11 +30,34 @@ export function ActivityManagement({ initialActivities = [] }: { initialActiviti
 
   const categories = ['Todos', 'Respiración', 'Visualizacion', 'Sonidos', 'Interaccion', 'Otros'];
 
-  const filteredActivities = initialActivities.filter(a => {
+  useEffect(() => {
+    setActivities(initialActivities);
+  }, [initialActivities]);
+
+  const normalizeEstado = (estado: string) => {
+    const value = (estado || '').toString().trim().toLowerCase();
+    if (value === 'aprobada' || value === 'activo') return 'Aprobada';
+    if (value === 'rechazada' || value === 'inactivo') return 'Rechazada';
+    return 'Pendiente';
+  };
+
+  const isApproved = (estado: string) => normalizeEstado(estado) === 'Aprobada';
+
+  const updateActivity = (id: string | number, patch: Partial<Activity>) => {
+    setActivities(prev => prev.map(activity => (
+      activity.id === id ? { ...activity, ...patch } : activity
+    )));
+  };
+
+  const removeActivity = (id: string | number) => {
+    setActivities(prev => prev.filter(activity => activity.id !== id));
+  };
+
+  const filteredActivities = useMemo(() => activities.filter(a => {
     const matchesFilter = filter === 'Todos' ? true : (a.categoria === filter);
     const matchesSearch = a.nombre.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesFilter && matchesSearch;
-  });
+  }), [activities, filter, searchTerm]);
 
   return (
     <div className="p-6 bg-[#E3F2FD] min-h-screen space-y-6 font-sans">
@@ -105,7 +129,7 @@ export function ActivityManagement({ initialActivities = [] }: { initialActiviti
                     <td className="p-3 border-r-2 border-gray-200">{act.usos}</td>
                     <td className="p-3 border-r-2 border-gray-200">
                       {session?.user?.role === 'ADMINISTRADOR' ? (
-                        <select value={act.estado} onChange={async (e) => {
+                        <select value={normalizeEstado(act.estado)} onChange={async (e) => {
                           const newVal = e.target.value;
                           // map display to db value
                           const mapToDb = (v:string) => v.toLowerCase() === 'aprobada' ? 'aprobada' : v.toLowerCase() === 'rechazada' ? 'rechazada' : 'pendiente';
@@ -113,7 +137,11 @@ export function ActivityManagement({ initialActivities = [] }: { initialActiviti
                             const res = await fetch(`/api/actividades/${act.id}/status`, { method: 'PATCH', body: JSON.stringify({ estado: mapToDb(newVal) }), headers: { 'Content-Type': 'application/json' } });
                             const data = await res.json();
                             if (!res.ok) { setMessage(data.error || 'Error actualizando estado'); }
-                            else { setMessage(null); router.refresh(); }
+                            else {
+                              setMessage(null);
+                              updateActivity(act.id, { estado: normalizeEstado(data.estado || newVal) as Activity['estado'] });
+                              router.refresh();
+                            }
                           } catch (err) { console.error(err); setMessage('Error en la solicitud'); }
                         }} className="p-1 rounded text-xs border">
                           <option>Pendiente</option>
@@ -129,7 +157,7 @@ export function ActivityManagement({ initialActivities = [] }: { initialActiviti
                     <td className="p-3 flex justify-center gap-4">
                       <Edit2 onClick={() => { setEditingActivity(act); setMessage(null); }} className="h-4 w-4 cursor-pointer text-gray-700 hover:text-blue-600" />
                       <Eye onClick={() => {
-                        if (act.estado.toLowerCase() === 'aprobada') {
+                        if (isApproved(act.estado)) {
                           setViewingActivity(act);
                         } else {
                           setMessage('Solo actividades aprobadas se pueden ejecutar');
@@ -142,7 +170,11 @@ export function ActivityManagement({ initialActivities = [] }: { initialActiviti
                           const res = await fetch(`/api/actividades/${act.id}`, { method: 'DELETE' });
                           const data = await res.json();
                           if (!res.ok) setMessage(data.error || 'Error eliminando');
-                          else { router.refresh(); }
+                          else {
+                            removeActivity(act.id);
+                            setMessage(null);
+                            router.refresh();
+                          }
                         } catch (err) { console.error(err); setMessage('Error en la solicitud'); }
                       }} className="h-4 w-4 cursor-pointer text-gray-700 hover:text-red-600" />
                     </td>
@@ -256,10 +288,10 @@ export function ActivityManagement({ initialActivities = [] }: { initialActiviti
               <button onClick={() => setShowViewModal(false)} className="text-black font-bold">Cerrar ✕</button>
             </div>
             <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {initialActivities.filter(a => a.estado === 'Aprobada').length === 0 && (
+              {activities.filter(a => isApproved(a.estado)).length === 0 && (
                 <div className="p-6 text-center text-gray-500 col-span-full">No hay actividades aprobadas</div>
               )}
-              {initialActivities.filter(a => a.estado === 'Aprobada').map(act => (
+              {activities.filter(a => isApproved(a.estado)).map(act => (
                 <div key={act.id} className="border rounded-lg p-4 flex flex-col bg-gradient-to-br from-white via-slate-50 to-slate-100 shadow-sm hover:shadow-md transition-shadow">
                   <div className="flex items-start gap-3">
                     <div className="w-14 h-14 bg-blue-50 rounded-md flex items-center justify-center text-2xl text-blue-700 font-bold">{act.nombre?.charAt(0) || 'A'}</div>
@@ -378,7 +410,19 @@ export function ActivityManagement({ initialActivities = [] }: { initialActiviti
                     const res = await fetch(`/api/actividades/${editingActivity.id}`, { method: 'PATCH', headers: { 'Content-Type':'application/json' }, body: JSON.stringify(body) });
                     const data = await res.json();
                     if (!res.ok) { setMessage(data.error || 'Error actualizando'); }
-                    else { setEditingActivity(null); router.refresh(); }
+                    else {
+                      setEditingActivity(null);
+                      updateActivity(editingActivity.id, {
+                        nombre: titulo,
+                        categoria: categoria as Activity['categoria'],
+                        duracion,
+                        usos,
+                        estado: normalizeEstado(estado) as Activity['estado'],
+                        embed_url: embed,
+                      });
+                      setMessage(null);
+                      router.refresh();
+                    }
                   } catch (err) { console.error(err); setMessage('Error en la solicitud'); }
                 }} className="px-4 py-2 bg-blue-600 text-white rounded">Guardar</button>
               </div>

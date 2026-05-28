@@ -192,13 +192,10 @@ export default function TareasPage() {
               <ArrowLeft size={18} /> Volver a Inicio
             </button>
           </div>
-          <div className="max-w-4xl rounded-xl border border-blue-200 bg-white/70 px-5 py-4 shadow-sm mb-6">
-            <h2 className="text-xl font-bold text-[#1E4D8C] mb-2">Tus tareas asignadas</h2>
-            <p className="text-slate-700 leading-relaxed">
-              Aquí se muestran las actividades, ejercicios o tareas que tu psicólogo te haya asignado para acompañar tu proceso. Podrás abrir cada actividad, revisar sus instrucciones, ver su estado y la fecha límite, y completar el contenido desde esta misma pantalla. Si tu psicólogo aún no te ha asignado tareas, verás el aviso de que no tienes asignaciones disponibles.
-            </p>
-          </div>
-          <h1 className="text-4xl font-black text-[#1E4D8C] mb-8">Mis Tareas</h1>
+          <h1 className="text-4xl font-black text-[#1E4D8C] mb-4">Mis Tareas</h1>
+          <p className="text-slate-700 leading-relaxed mb-6">
+            Aquí se muestran las actividades, ejercicios o tareas que tu psicólogo te haya asignado para acompañar tu proceso. Podrás abrir cada actividad, revisar sus instrucciones, ver su estado y la fecha límite, y completar el contenido desde esta misma pantalla. Si tu psicólogo aún no te ha asignado tareas, verás el aviso de que no tienes asignaciones disponibles.
+          </p>
           <div className="mt-6">
             {loadingAsign ? (
               <div className="text-sm text-gray-600">Cargando asignaciones...</div>
