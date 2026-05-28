@@ -140,8 +140,10 @@ export async function POST(request: Request) {
     const titulo = manifest.titulo;
     const slug = manifest.slug;
     const embed_url = manifest.embed_url;
-    // 'categoria' may be provided as 'categoria' or 'category' in manifests
-    const categoria = manifest.categoria || manifest.category || null;
+    // 'categoria' may be provided as 'categoria' or 'category' in manifests.
+    // Fall back to a safe non-null value because the DB column is NOT NULL.
+    const categoria =
+      String(manifest.categoria || manifest.category || '').trim() || 'Sin categoría';
     const descripcion = manifest.descripcion || null;
     const indicaciones = manifest.indicaciones || [];
     const finalizacion = manifest.finalizacion || {};
