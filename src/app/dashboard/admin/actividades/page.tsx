@@ -1,6 +1,9 @@
 import { ActivityManagement } from "@/presentation/components/admin/ActivityManagement";
 import { ActivityRepository } from "@/infrastructure/repositories/activity.repository";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function ActividadesPage() {
   // 1. Instanciamos el repositorio (o puedes usar un UseCase si prefieres)
   const repository = new ActivityRepository();
