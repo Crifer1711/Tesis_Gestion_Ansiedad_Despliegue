@@ -77,9 +77,10 @@ return (
       <div className="flex-1 bg-white border border-gray-200 rounded-xl p-8 flex items-center justify-center">
         <div className="relative w-full aspect-square max-w-[320px]">
           <Image
-            src="/images/login1-.png"
+            src="/images/Login1-.png"
             alt="Ilustración Psicología"
             fill
+            priority
             className="object-contain"
           />
         </div>
@@ -91,10 +92,11 @@ return (
         {/* Logo Circular */}
         <div className="relative w-14 h-14 mb-4 bg-white rounded-full flex items-center justify-center shadow-sm border border-blue-100">
           <Image
-            src="/images/logo-.png"
+            src="/images/Logo-.png"
             alt="Logo"
             width={32}
             height={32}
+            priority
             className="object-contain"
           />
         </div>
