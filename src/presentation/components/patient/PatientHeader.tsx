@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { LogOut } from 'lucide-react';
 import { signOut } from 'next-auth/react';
-import { useEffect, useState } from 'react';
+import { NotificationBell } from '@/presentation/components/common/NotificationBell';
 
 interface PatientHeaderProps {
   activeSection?: string;
@@ -34,6 +34,7 @@ export function PatientHeader({ activeSection, onNavClick, userName = 'Paciente'
 
         {/* Navigation */}
         <div className="flex items-center gap-4">
+          <NotificationBell compact />
           <div className="text-right">
             <p className="font-bold text-[#1E4D8C] text-sm">Hola, {userName}</p>
             <p className="text-xs text-slate-500 uppercase font-semibold tracking-wide">{userRole}</p>

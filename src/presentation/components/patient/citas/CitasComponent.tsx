@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Calendar, Clock, User, Send, CheckCircle, Lock, X } from 'lucide-react';
+import { Calendar, Clock, User, Send, Lock } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useSession } from 'next-auth/react';
 
@@ -48,7 +48,6 @@ export function CitasComponent() {
   const [loading, setLoading] = useState(true);
   const [enviando, setEnviando] = useState(false);
   const [horasOcupadas, setHorasOcupadas] = useState<string[]>([]);
-  const [notificacionCerrada, setNotificacionCerrada] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const fetchPsicologos = async () => {
@@ -86,12 +85,6 @@ export function CitasComponent() {
             estado: apt.status as 'Pendiente' | 'Aceptada' | 'Cancelada',
           }));
           setCitasAgendadas(citasFormateadas);
-          
-          // Notificar si hay nuevas citas Aceptadas (y no fueron cerradas por el usuario)
-          const citasAceptadas = citasFormateadas.filter(c => c.estado === 'Aceptada');
-          if (citasAceptadas.length > 0 && !notificacionCerrada.has(citasAceptadas[0].id)) {
-            showAcceptedToast(citasAceptadas[0]);
-          }
         }
       } catch (error) {
         console.error('Error fetching patient appointments:', error);
@@ -104,7 +97,7 @@ export function CitasComponent() {
     // Re-fetch cada 5 segundos para detectar cambios (cuando psicólogo acepta)
     const interval = setInterval(fetchCitasDelPaciente, 5000);
     return () => clearInterval(interval);
-  }, [session?.user?.id, notificacionCerrada]);
+  }, [session?.user?.id]);
 
   // Cargar horas ocupadas cuando cambia psicólogo o fecha
   useEffect(() => {
@@ -189,37 +182,6 @@ export function CitasComponent() {
     } finally {
       setEnviando(false);
     }
-  };
-
-  // Mostrar toast personalizado cuando una cita es aceptada
-  const showAcceptedToast = (cita: Cita) => {
-    if (!cita) return;
-
-    const id = toast.custom((t) => (
-      <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-500 text-blue-700 px-5 py-4 rounded-lg flex items-start gap-3 shadow-lg">
-        <CheckCircle size={22} className="flex-shrink-0 mt-0.5 text-blue-500" />
-        <div className="flex-1">
-          <p className="font-bold text-base">🎉 ¡Cita Aceptada!</p>
-          <p className="text-sm mt-1.5 text-blue-600">{
-            `El psicólogo ${cita.psicologo} ha aceptado tu cita para el ${parseDate(cita.fecha).toLocaleDateString('es-ES')} a las ${cita.hora}`
-          }</p>
-        </div>
-        <button
-          onClick={() => {
-            toast.dismiss(t.id);
-            setNotificacionCerrada(prev => new Set([...prev, cita.id]));
-          }}
-          className="flex-shrink-0 p-2 hover:bg-blue-200 rounded-lg transition text-blue-500 hover:text-blue-700"
-          aria-label="Cerrar notificación"
-        >
-          <X size={20} className="text-current" />
-        </button>
-      </div>
-    ), { duration: 7000 });
-
-    // auto-marcar como cerrada al expirar
-    setTimeout(() => setNotificacionCerrada(prev => new Set([...prev, cita.id])), 7000);
-    return id;
   };
 
   const getEstadoColor = (estado: string) => {

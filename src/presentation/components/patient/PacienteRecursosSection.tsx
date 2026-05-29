@@ -42,6 +42,7 @@ export function PacienteRecursosSection() {
               onButtonClick={
                 index === 0 ? () => router.push('/paciente/biblioteca') :
                 index === 1 ? () => router.push('/paciente/videos') :
+                index === 2 ? () => router.push('/tecnicas-rapidas') :
                 undefined
               }
             />

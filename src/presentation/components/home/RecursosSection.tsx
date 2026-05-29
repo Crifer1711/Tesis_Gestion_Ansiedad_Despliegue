@@ -42,6 +42,7 @@ export function RecursosSection() {
               onButtonClick={
                 index === 0 ? () => router.push('/biblioteca') :
                 index === 1 ? () => router.push('/videos') :
+                index === 2 ? () => router.push('/tecnicas-rapidas') :
                 undefined
               }
             />
