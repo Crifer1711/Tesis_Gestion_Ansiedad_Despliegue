@@ -45,14 +45,15 @@ export async function createPatientAction(formData: CreatePatientData) {
     // Nota: 'fecha_registro' se suele manejar con DEFAULT CURRENT_TIMESTAMP en la DB
     // Usamos el rol 'ESTUDIANTE' o 'PACIENTE' según tu lógica de negocio
     // Al crear desde el administrador, marcamos la cuenta como aprobada en la BD
-    await client.query(
+    const result = await client.query(
       `INSERT INTO users (name, email, password, role, status, contacto) 
-       VALUES ($1, $2, $3, 'PACIENTE', 'Activo', $4)`,
+       VALUES ($1, $2, $3, 'PACIENTE', 'Activo', $4)
+       RETURNING id, TO_CHAR(created_at, 'DD/MM/YY') AS fecha_registro`,
       [name, email, hashedPassword, contacto]
     );
 
     revalidatePath('/dashboard/admin/pacientes');
-    return { success: true };
+    return { success: true, id: result.rows[0]?.id, fecha_registro: result.rows[0]?.fecha_registro };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : "Error desconocido";
     return { success: false, error: errorMessage };

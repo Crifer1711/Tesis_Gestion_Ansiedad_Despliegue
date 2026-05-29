@@ -7,6 +7,7 @@ import { createPsychologistAction } from "@/infrastructure/actions/psychologist.
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { Psychologist } from "@/domain/dtos/psychologist.dto";
 
 // 1. Definimos el esquema de validación con Zod
 const psychologistSchema = z.object({
@@ -20,7 +21,13 @@ const psychologistSchema = z.object({
 // Inferimos el tipo a partir del esquema
 type PsychologistFormData = z.infer<typeof psychologistSchema>;
 
-export function CreatePsychologistModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
+interface Props {
+  isOpen: boolean;
+  onClose: () => void;
+  onCreated?: (psychologist: Psychologist) => void;
+}
+
+export function CreatePsychologistModal({ isOpen, onClose, onCreated }: Props) {
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState("");
 
@@ -46,6 +53,15 @@ export function CreatePsychologistModal({ isOpen, onClose }: { isOpen: boolean, 
       
       if (result.success) {
         toast.success("Psicólogo creado con éxito");
+        onCreated?.({
+          id: String(result.id || Date.now()),
+          name: data.name,
+          email: data.email,
+          contacto: data.contacto,
+          especialidad: data.especialidad,
+          pacientes: 0,
+          estado: 'Activo',
+        });
         reset(); // Limpiamos el formulario tras el éxito
         onClose();
       } else {

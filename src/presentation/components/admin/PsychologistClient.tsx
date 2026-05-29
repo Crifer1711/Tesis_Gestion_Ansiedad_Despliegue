@@ -65,6 +65,9 @@ export function PsychologistClient({ initialData }: Props) {
       <CreatePsychologistModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
+        onCreated={(psychologist) => {
+          setPsychologists(prev => [psychologist, ...prev]);
+        }}
       />
       
       <EditPsychologistModal 
@@ -74,6 +77,9 @@ export function PsychologistClient({ initialData }: Props) {
           setSelectedPsychologist(null);
         }} 
         psychologist={selectedPsychologist}
+        onUpdated={(updatedPsychologist) => {
+          setPsychologists(prev => prev.map(p => p.id === updatedPsychologist.id ? updatedPsychologist : p));
+        }}
       />
 
       {/* Encabezado */}

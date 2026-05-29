@@ -26,9 +26,10 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   patient: Patient | null;
+  onUpdated?: (patient: Patient) => void;
 }
 
-export function EditPatientModal({ isOpen, onClose, patient }: Props) {
+export function EditPatientModal({ isOpen, onClose, patient, onUpdated }: Props) {
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState("");
 
@@ -64,6 +65,13 @@ export function EditPatientModal({ isOpen, onClose, patient }: Props) {
       
       if (result.success) {
         toast.success("Paciente actualizado correctamente");
+        onUpdated?.({
+          ...patient,
+          name: data.name,
+          email: data.email,
+          contacto: data.contacto,
+          estado: data.estado,
+        });
         onClose();
       } else {
         setServerError(result.error || "Error al actualizar el paciente");

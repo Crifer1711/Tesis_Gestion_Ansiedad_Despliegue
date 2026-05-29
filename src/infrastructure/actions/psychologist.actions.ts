@@ -42,14 +42,15 @@ export async function createPsychologistAction(formData: CreatePsychologistData)
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Creado por el administrador: marcamos la cuenta como aprobada en la BD
-    await client.query(
+    const result = await client.query(
       `INSERT INTO users (name, email, password, role, status, especialidad, contacto) 
-       VALUES ($1, $2, $3, 'PSICOLOGO', 'Activo', $4, $5)`,
+       VALUES ($1, $2, $3, 'PSICOLOGO', 'Activo', $4, $5)
+       RETURNING id`,
       [name, email, hashedPassword, especialidad, contacto]
     );
 
     revalidatePath('/dashboard/admin/psicologos');
-    return { success: true };
+    return { success: true, id: result.rows[0]?.id };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : "Error desconocido";
     console.error("Error al crear psicólogo:", errorMessage);
