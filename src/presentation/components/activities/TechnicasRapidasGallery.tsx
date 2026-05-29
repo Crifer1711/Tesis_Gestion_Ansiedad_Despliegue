@@ -9,14 +9,28 @@ type Props = {
   activities: Activity[];
 };
 
-const categoryOrder = ['Todos', 'Respiración', 'Visualizacion', 'Sonidos', 'Interaccion'] as const;
+const categoryOptions = [
+  { value: 'Todos', label: 'Todos' },
+  { value: 'Respiración', label: 'Respiración' },
+  { value: 'Visualizacion', label: 'Visualización' },
+  { value: 'Sonidos', label: 'Sonidos' },
+  { value: 'Interaccion', label: 'Interactividad' },
+] as const;
 
 const accentByCategory: Record<string, string> = {
-  'Respiración': 'from-cyan-500 to-blue-600',
-  'Visualizacion': 'from-emerald-500 to-teal-600',
-  'Sonidos': 'from-violet-500 to-indigo-600',
-  'Interaccion': 'from-amber-500 to-orange-600',
-  'Todos': 'from-slate-500 to-slate-700',
+  'Respiración': 'from-sky-400 to-blue-500',
+  'Visualizacion': 'from-blue-400 to-cyan-500',
+  'Sonidos': 'from-indigo-400 to-sky-600',
+  'Interaccion': 'from-cyan-400 to-blue-600',
+  'Todos': 'from-sky-500 to-blue-600',
+};
+
+const categoryLabels: Record<string, string> = {
+  'Respiración': 'Respiración',
+  'Visualizacion': 'Visualización',
+  'Sonidos': 'Sonidos',
+  'Interaccion': 'Interactividad',
+  'Todos': 'Todos',
 };
 
 export function TechnicasRapidasGallery({ activities }: Props) {
@@ -67,13 +81,13 @@ export function TechnicasRapidasGallery({ activities }: Props) {
           <div className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-slate-600 shadow-sm border border-slate-200">
             <Filter size={16} /> Filtrar por categoría
           </div>
-          {categoryOrder.map((item) => (
+          {categoryOptions.map((item) => (
             <button
-              key={item}
-              onClick={() => setCategory(item as any)}
-              className={`rounded-full border px-4 py-2 text-sm font-black transition ${category === item ? 'border-[#1E4D8C] bg-[#1E4D8C] text-white shadow-md' : 'border-blue-200 bg-white text-[#1E4D8C] hover:bg-blue-50'}`}
+              key={item.value}
+              onClick={() => setCategory(item.value as any)}
+              className={`rounded-full border px-4 py-2 text-sm font-black transition ${category === item.value ? 'border-[#1E4D8C] bg-[#1E4D8C] text-white shadow-md' : 'border-blue-200 bg-white text-[#1E4D8C] hover:bg-blue-50'}`}
             >
-              {item}
+              {item.label}
             </button>
           ))}
         </div>
@@ -92,7 +106,7 @@ export function TechnicasRapidasGallery({ activities }: Props) {
                 <div className={`h-36 bg-gradient-to-br ${accentByCategory[activity.categoria] || accentByCategory.Todos} p-6 text-white`}>
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <div className="inline-flex rounded-full bg-white/20 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em]">{activity.categoria}</div>
+                      <div className="inline-flex rounded-full bg-white/20 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em]">{categoryLabels[activity.categoria] || activity.categoria}</div>
                       <h2 className="mt-4 text-2xl font-black leading-tight">{activity.nombre}</h2>
                     </div>
                     <div className="rounded-2xl bg-white/15 p-3 backdrop-blur-sm">
