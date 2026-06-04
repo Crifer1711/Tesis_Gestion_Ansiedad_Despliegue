@@ -1,16 +1,25 @@
 import { IAuthRepository } from "@/domain/repositories/auth.repository";
+import bcrypt from "bcryptjs";
 
-export class LoginUseCase {
+export class LoginUserUseCase {
   constructor(private authRepository: IAuthRepository) {}
 
   async execute(email: string, passwordPlan: string) {
     const user = await this.authRepository.findByEmail(email);
     
-    if (!user) throw new Error("Credenciales inválidas");
+    // 1. Si no existe el usuario, el correo está mal
+    if (!user) throw new Error("Correo incorrecto");
 
-    // NOTA: Aquí compararemos el password cifrado más adelante con bcrypt
-    if (user.password !== passwordPlan) throw new Error("Contraseña incorrecta");
+    // 2. Si existe, comparamos la contraseña
+    const isPasswordValid = await bcrypt.compare(passwordPlan, user.password!);
+    
+    // 3. Si la contraseña no coincide
+    if (!isPasswordValid) throw new Error("Contraseña incorrecta");
 
-    return { id: user.id, email: user.email, role: user.role };
+    return {
+      id: user.id,
+      role: user.role,
+      name: user.name,
+    };
   }
 }

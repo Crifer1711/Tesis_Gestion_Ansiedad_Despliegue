@@ -7,14 +7,23 @@ export class LoginUserUseCase {
   constructor(private authRepository: IAuthRepository) {}
 
   async execute(email: string, passwordPlan: string) {
+    // 1. Buscamos el usuario por correo
     const user = await this.authRepository.findByEmail(email);
     
-    if (!user) throw new Error("Credenciales inválidas");
+    // Si no existe, lanzamos el error específico de correo
+    if (!user) {
+      throw new Error("Correo incorrecto");
+    }
 
-    // Comparación segura con el hash de la base de datos (PostgreSQL)
+    // 2. Comparación segura con el hash de la base de datos
     const isPasswordValid = await bcrypt.compare(passwordPlan, user.password!);
-    if (!isPasswordValid) throw new Error("Credenciales inválidas");
+    
+    // Si la contraseña no coincide, lanzamos el error específico de contraseña
+    if (!isPasswordValid) {
+      throw new Error("Contraseña incorrecta");
+    }
 
+    // 3. Verificación de estado de cuenta
     const normalizedStatus = (user.status || '').toString().trim().toLowerCase();
     const isAccountEnabled = normalizedStatus === 'activo' || normalizedStatus === 'aprobado';
 
@@ -22,15 +31,12 @@ export class LoginUserUseCase {
       throw new Error("Usuario no aprobado o desactivado");
     }
 
-    // ============================================================
-    // NUEVO: Registramos la fecha de inicio de sesión
-    // Solo si el usuario es un PACIENTE (o puedes quitar el IF si quieres para todos)
+    // 4. Registro de fecha de último inicio de sesión
     if (user.role === "PACIENTE") {
       await this.authRepository.updateLastLogin(user.id);
     }
-    // ============================================================
 
-    // Retornamos el rol para la redirección
+    // Retornamos los datos necesarios para la sesión
     return { 
       id: user.id,
       role: user.role, 
