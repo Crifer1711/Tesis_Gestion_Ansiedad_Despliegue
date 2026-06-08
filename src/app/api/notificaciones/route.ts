@@ -44,6 +44,18 @@ export async function GET() {
         [userId]
       );
 
+      const meetingLinkRes = await pool.query(
+        `SELECT ap.id::text AS id, COALESCE(p.name, 'Psicólogo') AS title,
+                ap.updated_at AS created_at,
+                'El psicólogo ha compartido el enlace de la sesión: ' || COALESCE(ap.meeting_link, '') AS message
+         FROM appointments ap
+         LEFT JOIN users p ON p.id = ap.psychologist_id
+         WHERE ap.patient_id = $1 AND ap.meeting_link IS NOT NULL
+         ORDER BY ap.updated_at DESC
+         LIMIT 5`,
+        [userId]
+      );
+
       items.push(
         ...tasksRes.rows.map((row) => ({
           id: `task-${row.id}`,
@@ -56,6 +68,13 @@ export async function GET() {
           id: `apt-${row.id}`,
           type: 'appointment' as const,
           title: row.title || 'Cita aceptada',
+          message: row.message,
+          created_at: row.created_at,
+        })),
+        ...meetingLinkRes.rows.map((row) => ({
+          id: `link-${row.id}`,
+          type: 'appointment' as const,
+          title: row.title || 'Enlace compartido',
           message: row.message,
           created_at: row.created_at,
         }))

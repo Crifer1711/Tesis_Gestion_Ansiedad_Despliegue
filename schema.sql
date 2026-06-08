@@ -81,6 +81,8 @@ CREATE TABLE IF NOT EXISTS public.appointments (
     appointment_time VARCHAR(5) NOT NULL,
     modality VARCHAR(50) NOT NULL CHECK (modality IN ('Presencial', 'Virtual')),
     reason TEXT,
+    request_link BOOLEAN NOT NULL DEFAULT FALSE,
+    meeting_link TEXT,
     status VARCHAR(50) NOT NULL DEFAULT 'Pendiente' CHECK (status IN ('Pendiente', 'Aceptada', 'Rechazada', 'Cancelada')),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),

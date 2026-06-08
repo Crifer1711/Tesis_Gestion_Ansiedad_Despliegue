@@ -16,11 +16,26 @@ interface Appointment {
   hora: string;
   modalidad: string;
   motivo: string;
-  status: 'Pendiente' | 'Aceptada' | 'Rechazada';
+  requestLink?: boolean;
+  meetingLink?: string | null;
+  status: 'Pendiente' | 'Aceptada' | 'Rechazada' | 'Cancelada';
 }
 
 // Función para parsear fecha sin timezone issues
 const parseDate = (dateStr: string) => {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  return new Date(year, month - 1, day);
+};
+
+// Formatea una fecha local a YYYY-MM-DD usando componentes locales
+const getLocalDateString = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const parseDateFromYYYYMMDD = (dateStr: string) => {
   const [year, month, day] = dateStr.split('-').map(Number);
   return new Date(year, month - 1, day);
 };
@@ -31,9 +46,11 @@ export default function PsychologistCitasPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState<string>(getLocalDateString(new Date()));
   const [expandedAppointments, setExpandedAppointments] = useState<Set<string>>(new Set());
   const [calendarMonth, setCalendarMonth] = useState<Date>(new Date()); // Para navegar entre meses
+  const [meetingLinkDrafts, setMeetingLinkDrafts] = useState<Record<string, string>>({});
+  const [savingLinkIds, setSavingLinkIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -53,18 +70,18 @@ export default function PsychologistCitasPage() {
         
         const data = await response.json();
         setAppointments(Array.isArray(data) ? data : []);
-        
-        // Si hay citas, seleccionar la primera fecha con citas pendientes
-        if (Array.isArray(data) && data.length > 0) {
-          // Buscar primera cita pendiente
-          const pendingAppointment = data.find((apt: any) => apt.status === 'Pendiente');
-          if (pendingAppointment) {
-            setSelectedDate(pendingAppointment.fecha);
-          } else if (data.length > 0) {
-            // Si no hay pendientes, usar la primera cita
-            setSelectedDate(data[0].fecha);
+        setMeetingLinkDrafts((prev) => {
+          const next: Record<string, string> = {};
+          for (const apt of Array.isArray(data) ? data : []) {
+            next[apt.id] = apt.meetingLink || prev[apt.id] || '';
           }
-        }
+          return next;
+        });
+        
+        // Siempre iniciar en la fecha actual local y en el mes actual
+        const todayStr = getLocalDateString(new Date());
+        setSelectedDate(todayStr);
+        setCalendarMonth(new Date());
         
         setError(null);
       } catch (err) {
@@ -106,11 +123,74 @@ export default function PsychologistCitasPage() {
     }
   };
 
+  const handleSaveMeetingLink = async (appointmentId: string) => {
+    const meetingLink = (meetingLinkDrafts[appointmentId] || '').trim();
+
+    // marcar como guardando
+    setSavingLinkIds(prev => new Set(prev).add(appointmentId));
+
+    try {
+      const response = await fetch(`/api/appointments/${appointmentId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ meetingLink: meetingLink || null }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al guardar enlace');
+      }
+
+      // Actualizar el estado local de citas y el draft
+      setAppointments(prev =>
+        prev.map(apt => apt.id === appointmentId ? { ...apt, meetingLink: data.meetingLink || null } : apt)
+      );
+      setMeetingLinkDrafts(prev => ({ ...prev, [appointmentId]: data.meetingLink || '' }));
+
+      toast.success(meetingLink ? '✅ Enlace guardado' : '✅ Enlace eliminado');
+    } catch (err) {
+      console.error('Error:', err);
+      toast.error(err instanceof Error ? err.message : 'Error al guardar el enlace');
+    } finally {
+      // quitar flag de guardando
+      setSavingLinkIds(prev => {
+        const next = new Set(prev);
+        next.delete(appointmentId);
+        return next;
+      });
+    }
+  };
+
+
   // Calcular estadísticas
   const pendingCount = appointments.filter(a => a.status === 'Pendiente').length;
   const acceptedCount = appointments.filter(a => a.status === 'Aceptada').length;
   const uniquePatients = new Set(appointments.map(a => a.patientId)).size;
-  const todayAppointments = appointments.filter(a => a.fecha === selectedDate);
+  // Obtener hoy en formato YYYY-MM-DD (local)
+  const today = getLocalDateString(new Date());
+
+  // Filtrar citas para la fecha seleccionada, excluyendo citas que ya pasaron
+  const now = new Date();
+  const isAppointmentInFuture = (fecha: string, hora: string) => {
+    try {
+      const [hour, minute] = hora.split(':').map(Number);
+      const dt = parseDateFromYYYYMMDD(fecha);
+      dt.setHours(hour ?? 0, minute ?? 0, 0, 0);
+      return dt >= now;
+    } catch (e) {
+      return true;
+    }
+  };
+
+  const todayAppointments = appointments.filter(a => {
+    if (a.fecha !== selectedDate) return false;
+    // Si la fecha seleccionada es anterior a hoy, no mostrar citas
+    if (selectedDate < today) return false;
+    // Si la fecha es hoy, mostrar solo citas en el futuro o ahora
+    if (selectedDate === today) return isAppointmentInFuture(a.fecha, a.hora);
+    // Fecha futura: mostrar todas las citas
+    return true;
+  });
   
   // Filtrar citas por búsqueda y fecha
   const filteredAppointments = todayAppointments.filter(apt =>
@@ -130,8 +210,7 @@ export default function PsychologistCitasPage() {
   for (let i = 0; i < firstDay; i++) days.push(null);
   for (let i = 1; i <= daysInMonth; i++) days.push(i);
 
-  // Obtener hoy en formato YYYY-MM-DD
-  const today = new Date().toISOString().split('T')[0];
+  
   
   // Obtener días que tienen citas (usando la fecha directa en formato YYYY-MM-DD)
   const daysWithAppointments = new Set(
@@ -222,30 +301,34 @@ export default function PsychologistCitasPage() {
                 {['D', 'L', 'M', 'X', 'J', 'V', 'S'].map(day => (
                   <div key={day} className="text-center font-bold text-gray-600 py-1">{day}</div>
                 ))}
-                {days.map((day, idx) => {
+                  {days.map((day, idx) => {
                   const dateStr = day ? getDayDateStr(day) : '';
                   const isToday = dateStr === today;
                   const hasAppointments = day && daysWithAppointments.has(dateStr);
                   const isSelected = dateStr === selectedDate;
-                  
+                  const isPast = dateStr && dateStr < today;
+
                   return (
                     <div key={idx} className="text-center py-1">
                       {day ? (
                         <button
-                          onClick={() => setSelectedDate(dateStr)}
-                          className={`w-full h-7 rounded text-sm font-semibold transition relative ${
+                          onClick={() => !isPast && setSelectedDate(dateStr)}
+                          disabled={isPast}
+                          className={`w-full h-8 rounded text-sm font-semibold transition relative flex items-center justify-center ${
                             isSelected
                               ? 'bg-[#71A5D9] text-white shadow-lg'
                               : isToday
-                              ? 'bg-red-500 text-white font-black'
-                              : hasAppointments
-                              ? 'bg-blue-100 text-[#1E4D8C] border-2 border-[#71A5D9]'
+                              ? 'ring-2 ring-[#71A5D9] bg-[#EAF6FF] text-[#1E4D8C] font-bold'
+                              : hasAppointments && !isPast
+                              ? 'bg-[#E3F2FF] text-[#0F3B5E] border-2 border-[#9CC7EE]'
+                              : isPast
+                              ? 'text-gray-300 bg-transparent cursor-not-allowed opacity-60'
                               : 'text-gray-700 hover:bg-gray-200'
                           }`}
                         >
-                          {day}
-                          {hasAppointments && !isSelected && !isToday && (
-                            <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-[#71A5D9] rounded-full"></span>
+                          <span className="select-none">{day}</span>
+                          {hasAppointments && !isSelected && !isToday && !isPast && (
+                            <span className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-[#71A5D9] rounded-full"></span>
                           )}
                         </button>
                       ) : null}
@@ -360,6 +443,11 @@ export default function PsychologistCitasPage() {
                                 Rechazada
                               </span>
                             )}
+                            {apt.status === 'Cancelada' && (
+                              <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-bold rounded-full">
+                                Cancelada
+                              </span>
+                            )}
                             <ChevronDown 
                               size={20} 
                               className={`text-gray-600 transition transform ${isExpanded ? 'rotate-180' : ''}`}
@@ -402,6 +490,46 @@ export default function PsychologistCitasPage() {
                               <p className="text-sm text-gray-800 capitalize">{apt.modalidad}</p>
                             </div>
 
+                            {apt.modalidad === 'Virtual' && (
+                              <div className="bg-sky-50 rounded-lg p-3 border border-sky-200">
+                                <p className="text-xs font-bold text-sky-700 uppercase mb-2">Videollamada</p>
+                                <p className="text-sm text-sky-800 mb-3">
+                                  {apt.requestLink ? 'El paciente solicitó enlace de Google Meet.' : 'Cita virtual sin solicitud de enlace.'}
+                                </p>
+                                <div className="space-y-2">
+                                  <input
+                                    type="url"
+                                    value={meetingLinkDrafts[apt.id] ?? apt.meetingLink ?? ''}
+                                    onChange={(e) => setMeetingLinkDrafts(prev => ({ ...prev, [apt.id]: e.target.value }))}
+                                    placeholder="Pega aquí el enlace de Google Meet"
+                                    className="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-300 bg-white"
+                                  />
+                                  <div className="flex flex-wrap gap-2">
+                                    {/* Se eliminó el botón de generación automática por petición: el psicólogo debe pegar el enlace manualmente */}
+                                    {apt.meetingLink ? (
+                                      <a
+                                        href={apt.meetingLink}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="inline-flex items-center gap-2 px-3 py-2 bg-white text-sky-700 border border-sky-200 rounded-lg text-sm font-semibold hover:bg-sky-50"
+                                      >
+                                        <CalendarIcon size={14} />
+                                        Abrir enlace
+                                      </a>
+                                    ) : null}
+                                    <button
+                                      type="button"
+                                      onClick={() => handleSaveMeetingLink(apt.id)}
+                                      disabled={savingLinkIds.has(apt.id)}
+                                      className={`inline-flex items-center gap-2 px-3 py-2 ${savingLinkIds.has(apt.id) ? 'bg-slate-300 text-white cursor-wait' : 'bg-sky-600 text-white hover:bg-sky-700'} rounded-lg text-sm font-semibold`}
+                                    >
+                                      {savingLinkIds.has(apt.id) ? 'Guardando...' : 'Guardar enlace'}
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
                             {/* Motivo expandible como modal */}
                             {apt.motivo && (
                               <div className="bg-white rounded-lg p-3 border-l-4 border-[#71A5D9]">
@@ -428,6 +556,14 @@ export default function PsychologistCitasPage() {
                                 <XCircle size={16} />
                                 Rechazar
                               </button>
+                            </div>
+                          )}
+
+                          {apt.status !== 'Pendiente' && apt.modalidad === 'Virtual' && (
+                            <div className="mt-3 flex justify-end">
+                              <p className="text-xs text-slate-500">
+                                Usa el botón superior para guardar o actualizar el enlace.
+                              </p>
                             </div>
                           )}
                         </div>

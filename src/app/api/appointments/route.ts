@@ -4,6 +4,46 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/infrastructure/auth/auth.options';
 import db from '@/infrastructure/database/db';
 
+const MAX_MOTIVO_WORDS = 200;
+
+const countWords = (text: string) => {
+  const trimmed = text.trim();
+  if (!trimmed) {
+    return 0;
+  }
+
+  return trimmed.split(/\s+/).filter(Boolean).length;
+};
+
+const getLocalDateString = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const isPastAppointment = (fecha: string, hora: string) => {
+  const [year, month, day] = fecha.split('-').map(Number);
+  const [hour] = hora.split(':').map(Number);
+  const slot = new Date(year, month - 1, day, hour, 0, 0, 0);
+  return slot < new Date();
+};
+
+const getAppointmentColumnFlags = async () => {
+  const result = await db.query(
+    `SELECT column_name
+     FROM information_schema.columns
+     WHERE table_schema = 'public'
+       AND table_name = 'appointments'`
+  );
+
+  const columns = new Set(result.rows.map((row: any) => row.column_name));
+  return {
+    hasRequestLink: columns.has('request_link'),
+    hasMeetingLink: columns.has('meeting_link'),
+  };
+};
+
 export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -19,6 +59,14 @@ export async function GET(request: Request) {
     const psychologistId = searchParams.get('psychologistId');
     const patientId = searchParams.get('patientId');
     const fecha = searchParams.get('fecha');
+    const { hasRequestLink, hasMeetingLink } = await getAppointmentColumnFlags();
+
+    const requestLinkSelect = hasRequestLink
+      ? 'a.request_link as "requestLink"'
+      : 'NULL::boolean as "requestLink"';
+    const meetingLinkSelect = hasMeetingLink
+      ? 'a.meeting_link as "meetingLink"'
+      : 'NULL::text as "meetingLink"';
 
     // Si se pasa psychologistId, obtener citas del psicólogo
     if (psychologistId) {
@@ -32,6 +80,8 @@ export async function GET(request: Request) {
           a.appointment_time,
           a.modality,
           a.reason as motivo,
+          ${requestLinkSelect},
+          ${meetingLinkSelect},
           a.status,
           u.name as "patientName",
           u.email as "patientEmail"
@@ -66,6 +116,8 @@ export async function GET(request: Request) {
             hora: apt.appointment_time,
             modalidad: apt.modality,
             motivo: apt.motivo,
+            requestLink: apt.requestLink,
+            meetingLink: apt.meetingLink,
             status: apt.status,
             patientName: apt.patientName,
             patientEmail: apt.patientEmail
@@ -85,6 +137,8 @@ export async function GET(request: Request) {
           a.appointment_time,
           a.modality,
           a.reason as motivo,
+          ${requestLinkSelect},
+          ${meetingLinkSelect},
           a.status,
           p.name as "psychologistName",
           p.email as "psychologistEmail"
@@ -119,6 +173,8 @@ export async function GET(request: Request) {
             hora: apt.appointment_time,
             modalidad: apt.modality,
             motivo: apt.motivo,
+            requestLink: apt.requestLink,
+            meetingLink: apt.meetingLink,
             status: apt.status,
             psychologistName: apt.psychologistName,
             psychologistEmail: apt.psychologistEmail
@@ -158,7 +214,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const { psychologistId, fecha, hora, modalidad, motivo } = await request.json();
+    const { psychologistId, fecha, hora, modalidad, motivo, requestLink, meetingLink } = await request.json();
+    const motivoNormalizado = typeof motivo === 'string' ? motivo.trim() : '';
+    const motivoWords = countWords(motivoNormalizado);
+    const hoy = getLocalDateString(new Date());
+  const { hasRequestLink, hasMeetingLink } = await getAppointmentColumnFlags();
 
     if (!psychologistId || !fecha || !hora || !modalidad) {
       return NextResponse.json(
@@ -167,12 +227,42 @@ export async function POST(request: Request) {
       );
     }
 
-    const result = await db.query(
-      `INSERT INTO appointments (patient_id, psychologist_id, appointment_date, appointment_time, modality, reason, status, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
-       RETURNING id, patient_id, psychologist_id, appointment_date, appointment_time, modality, reason, status`,
-      [session.user.id, psychologistId, fecha, hora, modalidad, motivo, 'Pendiente']
-    );
+    if (fecha < hoy || isPastAppointment(fecha, hora)) {
+      return NextResponse.json(
+        { error: 'No puedes agendar una cita en una fecha u hora que ya pasó' },
+        { status: 400 }
+      );
+    }
+
+    if (motivoWords > MAX_MOTIVO_WORDS) {
+      return NextResponse.json(
+        { error: `El motivo no puede superar las ${MAX_MOTIVO_WORDS} palabras` },
+        { status: 400 }
+      );
+    }
+
+    const insertColumns = ['patient_id', 'psychologist_id', 'appointment_date', 'appointment_time', 'modality', 'reason'];
+    const insertValues = [session.user.id, psychologistId, fecha, hora, modalidad, motivoNormalizado || 'Sin especificar'];
+
+    if (hasRequestLink) {
+      insertColumns.push('request_link');
+      insertValues.push(Boolean(requestLink));
+    }
+
+    if (hasMeetingLink) {
+      const value = typeof meetingLink === 'string' && meetingLink.trim() ? meetingLink.trim() : null;
+      insertColumns.push('meeting_link');
+      insertValues.push(value);
+    }
+
+    insertColumns.push('status');
+    insertValues.push('Pendiente');
+
+    const query = `INSERT INTO appointments (${insertColumns.join(', ')})
+       VALUES (${insertValues.map((_, index) => `$${index + 1}`).join(', ')})
+       RETURNING id, patient_id, psychologist_id, appointment_date, appointment_time, modality, reason${hasRequestLink ? ', request_link' : ''}${hasMeetingLink ? ', meeting_link' : ''}, status`;
+
+    const result = await db.query(query, insertValues);
 
     const appointment = result.rows[0];
     return NextResponse.json(
@@ -184,6 +274,8 @@ export async function POST(request: Request) {
         hora: appointment.appointment_time,
         modalidad: appointment.modality,
         motivo: appointment.reason,
+        requestLink: hasRequestLink ? appointment.request_link : Boolean(requestLink),
+        meetingLink: hasMeetingLink ? appointment.meeting_link : (typeof meetingLink === 'string' ? meetingLink.trim() || null : null),
         status: appointment.status
       },
       { status: 201 }
