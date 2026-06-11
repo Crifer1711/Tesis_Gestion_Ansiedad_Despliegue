@@ -1,10 +1,10 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { LogOut } from 'lucide-react';
 import { signOut } from 'next-auth/react';
-import { useEffect, useState } from 'react';
 
 interface PatientHeaderProps {
   activeSection?: string;
@@ -14,33 +14,53 @@ interface PatientHeaderProps {
 }
 
 export function PatientHeader({ activeSection, onNavClick, userName = 'Paciente', userRole = 'ESTUDIANTE' }: PatientHeaderProps) {
+  const [isVisible, setIsVisible] = useState(true);
+  const lastScrollYRef = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollYRef.current && currentScrollY > 20) {
+        setIsVisible(false);
+      } else {
+        setIsVisible(true);
+      }
+      lastScrollYRef.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur shadow-md border-b-2 border-[#71A5D9]">
-      <div className="flex items-center justify-between px-8 py-4">
-        {/* Logo */}
+    <header className={`fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/50 backdrop-blur-xl transition-transform duration-300 ${
+      isVisible ? 'translate-y-0' : '-translate-y-full'
+    }`}>
+      <div className="flex items-center justify-between px-5 py-4 md:px-8 md:py-5">
         <Link href="/dashboard/paciente" className="flex items-center gap-3 hover:opacity-80 transition">
-          <div className="relative h-12 w-12">
-            <Image 
-              src="/images/Logo-.png" 
-              alt="MindPeace" 
-              fill 
+          <div className="relative h-10 w-10 overflow-hidden rounded-2xl bg-white/90 p-1 shadow-inner">
+            <Image
+              src="/images/Logo-.png"
+              alt="MindPeace"
+              fill
               className="object-contain"
-              sizes="48px"
+              sizes="40px"
               priority
             />
           </div>
-          <span className="font-black text-xl text-[#1E4D8C]">MindPeace</span>
+          <span className="text-3xl font-semibold tracking-tight text-white [font-family:Georgia,serif]">
+            MindPeace
+          </span>
         </Link>
 
-        {/* Navigation */}
         <div className="flex items-center gap-4">
           <div className="text-right">
-            <p className="font-bold text-[#1E4D8C] text-sm">Hola, {userName}</p>
-            <p className="text-xs text-slate-500 uppercase font-semibold tracking-wide">{userRole}</p>
+            <p className="font-bold text-white text-sm">Hola, {userName}</p>
+            <p className="text-xs text-white/60 uppercase font-semibold tracking-wide">{userRole}</p>
           </div>
           <button
             onClick={() => signOut({ callbackUrl: '/login' })}
-            className="flex items-center gap-2 bg-red-50 text-red-600 px-4 py-2 rounded-lg hover:bg-red-100 transition font-semibold"
+            className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition font-semibold"
           >
             <LogOut size={18} />
             Salir
