@@ -1,29 +1,32 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { ArrowRight, ArrowLeft } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
-import { scrollToIdWithOffset, navigateAndScroll } from '@/presentation/utils/scrollWithOffset';
+import { navigateAndScroll } from '@/presentation/utils/scrollWithOffset';
 
 export default function AnsiedadPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isModal = searchParams.get('modal') === '1';
 
   const handleVolver = () => {
-    // navigate to home and scroll to info section with offset
     navigateAndScroll(router, '/#info', 'info', 100);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 py-16">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="mb-6">
-          <button
-            onClick={handleVolver}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-white text-[#1E4D8C] font-semibold rounded-lg shadow-sm border border-[#71A5D9] hover:bg-[#71A5D9] hover:text-white transition"
-          >
-            <ArrowLeft size={18} /> Volver a Infórmate
-          </button>
-        </div>
+        {!isModal && (
+          <div className="mb-6">
+            <button
+              onClick={handleVolver}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white text-[#1E4D8C] font-semibold rounded-lg shadow-sm border border-[#71A5D9] hover:bg-[#71A5D9] hover:text-white transition"
+            >
+              <ArrowLeft size={18} /> Volver a Infórmate
+            </button>
+          </div>
+        )}
         {/* Header Centrado */}
         <div className="text-center mb-16">
           <h1 className="text-6xl font-black text-[#1E4D8C] mb-4">Ansiedad</h1>
@@ -93,7 +96,7 @@ export default function AnsiedadPage() {
         </div>
 
         {/* Estrategias */}
-        <div className="mb-16">
+        <div id="tecnicas" className="mb-16 scroll-mt-24">
           <h2 className="text-3xl font-black text-[#1E4D8C] mb-8">Estrategias que funcionan</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {[
