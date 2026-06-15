@@ -29,33 +29,28 @@ export const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
-  // Activamos validación en vivo al igual que en el registro
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     mode: "onChange",
   });
 
-const onSubmit = async (data: LoginFormData) => {
+  const onSubmit = async (data: LoginFormData) => {
     setLoading(true);
     setServerError("");
     setApprovalWarning("");
 
     try {
-      // 1. Usamos NextAuth para intentar iniciar sesión
       const result = await signIn("credentials", {
         email: data.email,
         password: data.password,
         redirect: false,
       });
 
-      // 2. Evaluamos el error específico
       if (result?.error) {
-        // result.error ahora contendrá "Correo incorrecto" o "Contraseña incorrecta"
         setServerError(result.error);
         return;
       }
 
-      // 3. Si pasó el login, verificamos la sesión y redirigimos
       const sessionRes = await fetch("/api/auth/session");
       const session = await sessionRes.json();
 
@@ -74,7 +69,6 @@ const onSubmit = async (data: LoginFormData) => {
     }
   };
 
-  // Función auxiliar para limpiar errores al escribir
   const clearErrorsOnType = () => {
     if (serverError) setServerError("");
     if (approvalWarning) setApprovalWarning("");
@@ -82,131 +76,158 @@ const onSubmit = async (data: LoginFormData) => {
 
   return (
     <div 
-      className="flex min-h-screen items-center justify-center bg-cover bg-center p-6"
+      className="flex min-h-screen items-center justify-center bg-cover bg-center p-4 relative"
       style={{ backgroundImage: "url('/images/fondoLogin.png')" }}
     >
+      {/* Capa de superposición para contraste */}
+      <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm z-0"></div>
+
+      {/* Alerta de aprobación flotante estilo Toast */}
       {approvalWarning && (
-        <div className="fixed top-6 right-6 z-50 w-[320px] rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 shadow-lg shadow-amber-100">
-          <p className="text-sm font-bold text-amber-800">{approvalWarning}</p>
-          <p className="mt-1 text-xs text-amber-700">Tu cuenta aún no ha sido aprobada o está desactivada.</p>
+        <div className="fixed top-6 right-6 z-50 w-80 rounded-xl border border-amber-200 bg-amber-50 p-4 shadow-lg shadow-amber-900/10 animate-fade-in">
+          <div className="flex items-start">
+            <div className="ml-3 w-0 flex-1 pt-0.5">
+              <p className="text-sm font-bold text-amber-800">{approvalWarning}</p>
+              <p className="mt-1 text-xs text-amber-700">Tu cuenta aún no ha sido aprobada o está desactivada.</p>
+            </div>
+          </div>
         </div>
       )}
 
-      <div className="flex w-full max-w-[850px] flex-col md:flex-row items-stretch justify-center gap-4 md:gap-6">
+      {/* Tarjeta Principal */}
+      <div className="z-10 flex w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100 flex-col md:flex-row">
         
-        {/* Columna Izquierda: Ilustración */}
-        <div className="flex-1 bg-white border border-gray-200 rounded-xl p-8 flex items-center justify-center">
-          <div className="relative w-full aspect-square max-w-[320px]">
+        {/* Columna Izquierda: Ilustración (Se oculta en móviles) */}
+        <div className="hidden md:flex md:w-1/2 bg-slate-50 items-center justify-center p-12 relative border-r border-gray-100">
+          <div className="relative w-full aspect-square max-w-[340px]">
             <Image
               src="/images/Login1-.png"
               alt="Ilustración Psicología"
               fill
               priority
-              className="object-contain"
+              className="object-contain drop-shadow-md"
+              sizes="(max-width: 768px) 100vw, 50vw"
             />
           </div>
         </div>
 
         {/* Columna Derecha: Formulario */}
-        <div className="flex-1 bg-[#E9F2FF] border border-[#D0E2FB] rounded-xl p-8 md:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.08)] flex flex-col justify-center items-center">
+        <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-white">
           
-          <div className="relative w-14 h-14 mb-4 bg-white rounded-full flex items-center justify-center shadow-sm border border-blue-100">
-            <Image
-              src="/images/Logo-.png"
-              alt="Logo"
-              width={32}
-              height={32}
-              priority
-              className="object-contain"
-            />
+          {/* Logo y Encabezado */}
+          <div className="flex flex-col items-center mb-8">
+            <div className="relative w-14 h-14 rounded-xl overflow-hidden shadow-sm border border-gray-100 mb-4 bg-white p-1">
+              <Image
+                src="/images/Logo-.png"
+                alt="Logo"
+                fill
+                priority
+                className="object-contain"
+                sizes="56px"
+              />
+            </div>
+            <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Bienvenido de nuevo</h1>
+            <p className="text-sm text-gray-500 mt-1 font-medium">Ingresa a tu cuenta de MINDPEACE</p>
           </div>
           
-          <h1 className="text-[15px] font-bold text-[#194073] mb-8 tracking-[0.15em] uppercase">
-            MINDPEACE
-          </h1>
-          
-          <form className="w-full space-y-4" onSubmit={handleSubmit(onSubmit)}>
+          <form className="w-full space-y-5" onSubmit={handleSubmit(onSubmit)}>
             
             {/* CAMPO: EMAIL */}
-            <div className="relative">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#194073]/50" size={16} />
-              <input 
-                {...register("email", {
-                  onChange: (e) => {
-                    clearErrorsOnType();
-                    // Intercepta teclado: quita espacios y caracteres extraños, fuerza minúsculas
-                    const sanitized = e.target.value.toLowerCase().replace(/[^a-z0-9@._-]/g, "");
-                    setValue("email", sanitized, { shouldValidate: true });
-                  }
-                })}
-                type="email" 
-                maxLength={60}
-                placeholder="Usuario (@espe.edu.ec)"
-                className={`w-full pl-11 pr-4 py-3 bg-transparent border border-[#B8D0F5] rounded-lg outline-none focus:ring-2 focus:ring-[#85AEE0] text-[#194073] text-[13px] placeholder-[#194073]/50 transition-all ${errors.email ? 'ring-2 ring-red-300 border-transparent' : ''}`}
-              />
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                Correo Institucional
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                  <Mail size={18} />
+                </div>
+                <input 
+                  {...register("email", {
+                    onChange: (e) => {
+                      clearErrorsOnType();
+                      const sanitized = e.target.value.toLowerCase().replace(/[^a-z0-9@._-]/g, "");
+                      setValue("email", sanitized, { shouldValidate: true });
+                    }
+                  })}
+                  type="email" 
+                  maxLength={60}
+                  placeholder="usuario@espe.edu.ec"
+                  className={`w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border bg-gray-50/50 transition-all outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 text-gray-800 placeholder-gray-400 font-medium ${errors.email ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'}`}
+                />
+              </div>
               {errors.email && (
-                <p className="text-[10px] text-red-500 mt-1 ml-2 font-bold uppercase italic">
+                <p className="text-red-500 text-xs mt-1 font-medium pl-1">
                   {errors.email.message}
                 </p>
               )}
             </div>
             
             {/* CAMPO: CONTRASEÑA */}
-            <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#194073]/50" size={16} />
-              <input 
-                {...register("password", {
-                  onChange: (e) => {
-                    clearErrorsOnType();
-                    // Evita espacios y caracteres especiales de inyección
-                    const sanitized = e.target.value.replace(/[^a-zA-Z0-9]/g, "");
-                    setValue("password", sanitized, { shouldValidate: true });
-                  }
-                })}
-                type={showPassword ? "text" : "password"}
-                maxLength={30}
-                placeholder="Contraseña"
-                className={`w-full pl-11 pr-11 py-3 bg-transparent border border-[#B8D0F5] rounded-lg outline-none focus:ring-2 focus:ring-[#85AEE0] text-[#194073] text-[13px] placeholder-[#194073]/50 transition-all ${errors.password ? 'ring-2 ring-red-300 border-transparent' : ''}`}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((value) => !value)}
-                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#194073]/60 hover:text-[#194073] transition-colors"
-              >
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+                Contraseña
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                  <Lock size={18} />
+                </div>
+                <input 
+                  {...register("password", {
+                    onChange: (e) => {
+                      clearErrorsOnType();
+                      const sanitized = e.target.value.replace(/[^a-zA-Z0-9]/g, "");
+                      setValue("password", sanitized, { shouldValidate: true });
+                    }
+                  })}
+                  type={showPassword ? "text" : "password"}
+                  maxLength={30}
+                  placeholder="Ingresa tu contraseña"
+                  className={`w-full pl-10 pr-10 py-2.5 text-sm rounded-xl border bg-gray-50/50 transition-all outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 text-gray-800 placeholder-gray-400 font-medium ${errors.password ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((value) => !value)}
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-slate-600 transition-colors"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
               {errors.password && (
-                <p className="text-[10px] text-red-500 mt-1 ml-2 font-bold uppercase italic">
+                <p className="text-red-500 text-xs mt-1 font-medium pl-1">
                   {errors.password.message}
                 </p>
               )}
             </div>
 
-            <div className="text-right pt-1 pb-2">
-              <Link href="#" className="text-[11px] text-[#194073]/70 italic hover:underline">
+            {/* OLVIDASTE CONTRASEÑA */}
+            <div className="flex justify-end pt-1">
+              <Link href="#" className="text-xs font-semibold text-[#1E4D8C] hover:text-[#163B6B] transition-colors hover:underline">
                 ¿Olvidaste tu contraseña?
               </Link>
             </div>
 
+            {/* ERRORES DEL SERVIDOR */}
             {serverError && (
-              <p className="text-[11px] text-red-600 bg-red-50 p-2 rounded-lg text-center font-bold border border-red-100 uppercase italic">
+              <p className="text-red-600 text-center font-semibold text-xs bg-red-50 p-2.5 rounded-xl border border-red-200 shadow-sm animate-fade-in">
                 {serverError}
               </p>
             )}
 
+            {/* BOTÓN DE LOGIN */}
             <button 
               type="submit"
               disabled={loading}
-              className="w-full bg-[#7CA8DC] hover:bg-[#6292C7] text-white py-3 rounded-lg text-[13px] font-semibold shadow-md transition-all active:scale-95 flex items-center justify-center gap-2"
+              className="w-full bg-[#1E4D8C] hover:bg-[#163B6B] active:bg-[#0f2a4f] text-white py-3 rounded-xl font-semibold text-sm shadow-md hover:shadow-lg transition-all duration-150 flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none mt-4"
             >
-              {loading ? <Loader2 className="animate-spin" size={16} /> : "Iniciar Sesión"}
+              {loading ? <Loader2 className="animate-spin" size={18} /> : "Iniciar Sesión"}
             </button>
             
-            <div className="text-center pt-4">
-              <p className="text-[11px] text-[#194073]/70 italic">
+            {/* LINK A REGISTRO */}
+            <div className="text-center pt-4 border-t border-gray-100 mt-6">
+              <p className="text-xs text-gray-500 font-medium">
                 ¿No tienes cuenta? 
-                <Link href="/register" className="text-[#194073] font-bold ml-1 hover:underline not-italic">
+                <Link href="/register" className="text-[#1E4D8C] font-semibold ml-1 hover:underline hover:text-[#163B6B]">
                   Crear cuenta
                 </Link>
               </p>
