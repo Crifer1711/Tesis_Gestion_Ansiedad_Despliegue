@@ -200,12 +200,7 @@ export const LoginForm = () => {
               )}
             </div>
 
-            {/* OLVIDASTE CONTRASEÑA */}
-            <div className="flex justify-end pt-1">
-              <Link href="#" className="text-xs font-semibold text-[#1E4D8C] hover:text-[#163B6B] transition-colors hover:underline">
-                ¿Olvidaste tu contraseña?
-              </Link>
-            </div>
+           
 
             {/* ERRORES DEL SERVIDOR */}
             {serverError && (
