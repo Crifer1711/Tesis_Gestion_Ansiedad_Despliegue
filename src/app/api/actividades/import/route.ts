@@ -84,7 +84,7 @@ export async function POST(request: Request) {
         const text = await resp.text();
         const titleMatch = text.match(/<title>(.*?)<\/title>/i);
         const pageTitle = titleMatch ? titleMatch[1].trim() : sourceUrl;
-        const makeSlug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+        const makeSlug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
         const generatedSlug = makeSlug(pageTitle || sourceUrl) || String(Date.now());
 
         // set manifest directly
@@ -94,10 +94,24 @@ export async function POST(request: Request) {
           slug: generatedSlug,
           embed_url: sourceUrl,
           descripcion: '',
+          indicaciones: [],
           finalizacion: {},
           eventos: {},
           persistencia_recomendada: {}
-        }
+        };
+      }
+    }
+
+    // If zipBuffer is present, parse ZIP and read manifest.json
+    if (zipBuffer) {
+      const jszip = new JSZip();
+      let zip: any;
+      try {
+        zip = await jszip.loadAsync(zipBuffer);
+      } catch (err) {
+        console.error('[import] error parseando ZIP:', err);
+        return NextResponse.json({ error: 'ZIP inválido o corrupto' }, { status: 400 });
+      }
 
       const manifestFile = zip.file('manifest.json') || zip.file('./manifest.json');
       if (!manifestFile) {
@@ -126,10 +140,8 @@ export async function POST(request: Request) {
     const titulo = manifest.titulo;
     const slug = manifest.slug;
     const embed_url = manifest.embed_url;
-    // 'categoria' may be provided as 'categoria' or 'category' in manifests.
-    // Fall back to a safe non-null value because the DB column is NOT NULL.
-    const categoria =
-      String(manifest.categoria || manifest.category || '').trim() || 'Sin categoría';
+    // 'categoria' may be provided as 'categoria' or 'category' in manifests
+    const categoria = manifest.categoria || manifest.category || null;
     const descripcion = manifest.descripcion || null;
     const indicaciones = manifest.indicaciones || [];
     const finalizacion = manifest.finalizacion || {};

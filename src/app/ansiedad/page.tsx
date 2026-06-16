@@ -1,11 +1,24 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
 import { navigateAndScroll } from '@/presentation/utils/scrollWithOffset';
 
 export default function AnsiedadPage() {
+  return (
+    <Suspense fallback={<AnsiedadLoading />}>
+      <AnsiedadContent />
+    </Suspense>
+  );
+}
+
+function AnsiedadLoading() {
+  return <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100" />;
+}
+
+function AnsiedadContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isModal = searchParams.get('modal') === '1';

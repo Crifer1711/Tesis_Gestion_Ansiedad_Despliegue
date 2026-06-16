@@ -1,11 +1,24 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Heart, Lightbulb, AlertCircle, TrendingUp, ArrowRight, ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
 import { navigateAndScroll } from '@/presentation/utils/scrollWithOffset';
 
 export default function SaludMentalPage() {
+  return (
+    <Suspense fallback={<SaludMentalLoading />}>
+      <SaludMentalContent />
+    </Suspense>
+  );
+}
+
+function SaludMentalLoading() {
+  return <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100" />;
+}
+
+function SaludMentalContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isModal = searchParams.get('modal') === '1';
