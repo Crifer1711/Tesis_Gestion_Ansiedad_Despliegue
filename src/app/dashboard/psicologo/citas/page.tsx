@@ -3,8 +3,8 @@
 
 import { useSession } from 'next-auth/react';
 import { toast } from 'react-hot-toast';
-import { useEffect, useState } from 'react';
-import { CheckCircle, XCircle, Clock, User, Calendar as CalendarIcon, Search, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { CheckCircle, XCircle, Clock, User, Calendar as CalendarIcon, Search, ChevronDown, ChevronLeft, ChevronRight, MessageSquareText, TriangleAlert, ArrowRight } from 'lucide-react';
 
 interface Appointment {
   id: string;
@@ -18,6 +18,7 @@ interface Appointment {
   motivo: string;
   requestLink?: boolean;
   meetingLink?: string | null;
+  cancelReason?: string | null;
   status: 'Pendiente' | 'Aceptada' | 'Rechazada' | 'Cancelada';
 }
 
@@ -40,6 +41,13 @@ const parseDateFromYYYYMMDD = (dateStr: string) => {
   return new Date(year, month - 1, day);
 };
 
+const getAppointmentDateTime = (fecha: string, hora: string) => {
+  const dt = parseDateFromYYYYMMDD(fecha);
+  const [hour, minute] = hora.split(':').map(Number);
+  dt.setHours(hour ?? 0, minute ?? 0, 0, 0);
+  return dt;
+};
+
 export default function PsychologistCitasPage() {
   const { data: session } = useSession();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -47,10 +55,16 @@ export default function PsychologistCitasPage() {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDate, setSelectedDate] = useState<string>(getLocalDateString(new Date()));
-  const [expandedAppointments, setExpandedAppointments] = useState<Set<string>>(new Set());
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
   const [calendarMonth, setCalendarMonth] = useState<Date>(new Date()); // Para navegar entre meses
   const [meetingLinkDrafts, setMeetingLinkDrafts] = useState<Record<string, string>>({});
   const [savingLinkIds, setSavingLinkIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    setLoading(true);
+    setSelectedDate(getLocalDateString(new Date()));
+    setCalendarMonth(new Date());
+  }, [session?.user?.id]);
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -59,9 +73,8 @@ export default function PsychologistCitasPage() {
           setLoading(false);
           return;
         }
-        
-        setLoading(true);
-        const response = await fetch(`/api/appointments?psychologistId=${session.user.id}`);
+
+        const response = await fetch(`/api/appointments?psychologistId=${session.user.id}`, { cache: 'no-store' });
         
         if (!response.ok) {
           const errorData = await response.json();
@@ -78,11 +91,6 @@ export default function PsychologistCitasPage() {
           return next;
         });
         
-        // Siempre iniciar en la fecha actual local y en el mes actual
-        const todayStr = getLocalDateString(new Date());
-        setSelectedDate(todayStr);
-        setCalendarMonth(new Date());
-        
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Error desconocido');
@@ -93,6 +101,8 @@ export default function PsychologistCitasPage() {
     };
 
     fetchAppointments();
+    const interval = setInterval(fetchAppointments, 5000);
+    return () => clearInterval(interval);
   }, [session?.user?.id]);
 
   const handleStatusChange = async (appointmentId: string, newStatus: 'Aceptada' | 'Rechazada') => {
@@ -109,13 +119,8 @@ export default function PsychologistCitasPage() {
         prev.map(apt => apt.id === appointmentId ? { ...apt, status: newStatus } : apt)
       );
       
-      // Cerrar la tarjeta expandida
-      setExpandedAppointments(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(appointmentId);
-        return newSet;
-      });
-      
+      setSelectedAppointmentId((current) => (current === appointmentId ? null : current));
+
       console.log(`Cita ${appointmentId} actualizada a ${newStatus}`);
     } catch (err) {
       console.error('Error:', err);
@@ -166,6 +171,10 @@ export default function PsychologistCitasPage() {
   const pendingCount = appointments.filter(a => a.status === 'Pendiente').length;
   const acceptedCount = appointments.filter(a => a.status === 'Aceptada').length;
   const uniquePatients = new Set(appointments.map(a => a.patientId)).size;
+  const pendingAppointments = appointments
+    .filter((a) => a.status === 'Pendiente')
+    .sort((a, b) => getAppointmentDateTime(a.fecha, a.hora).getTime() - getAppointmentDateTime(b.fecha, b.hora).getTime());
+  const nextPendingAppointment = pendingAppointments[0] ?? null;
   // Obtener hoy en formato YYYY-MM-DD (local)
   const today = getLocalDateString(new Date());
 
@@ -191,12 +200,43 @@ export default function PsychologistCitasPage() {
     // Fecha futura: mostrar todas las citas
     return true;
   });
+
+  const upcomingAppointments = appointments
+    .filter((a) => a.status !== 'Cancelada' && isAppointmentInFuture(a.fecha, a.hora))
+    .sort((a, b) => {
+      const aDate = parseDateFromYYYYMMDD(a.fecha);
+      const bDate = parseDateFromYYYYMMDD(b.fecha);
+      const [aHour, aMinute] = a.hora.split(':').map(Number);
+      const [bHour, bMinute] = b.hora.split(':').map(Number);
+      aDate.setHours(aHour ?? 0, aMinute ?? 0, 0, 0);
+      bDate.setHours(bHour ?? 0, bMinute ?? 0, 0, 0);
+      return aDate.getTime() - bDate.getTime();
+    });
+
+  const nextAppointment = upcomingAppointments[0] ?? null;
+  const todayAppointmentsCount = appointments.filter(
+    (a) => a.fecha === today && a.status !== 'Cancelada'
+  ).length;
   
   // Filtrar citas por búsqueda y fecha
   const filteredAppointments = todayAppointments.filter(apt =>
     apt.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     apt.patientEmail.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ).sort((a, b) => {
+    const order: Record<Appointment['status'], number> = {
+      Pendiente: 0,
+      Aceptada: 1,
+      Rechazada: 2,
+      Cancelada: 3,
+    };
+
+    const statusDiff = order[a.status] - order[b.status];
+    if (statusDiff !== 0) {
+      return statusDiff;
+    }
+
+    return getAppointmentDateTime(a.fecha, a.hora).getTime() - getAppointmentDateTime(b.fecha, b.hora).getTime();
+  });
 
   // Generar calendario
   const getDaysInMonth = (date: Date) => new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
@@ -216,6 +256,17 @@ export default function PsychologistCitasPage() {
   const daysWithAppointments = new Set(
     appointments.map(apt => apt.fecha) // apt.fecha ya está en formato YYYY-MM-DD
   );
+
+  const selectedAppointment = useMemo(
+    () => filteredAppointments.find((apt) => apt.id === selectedAppointmentId) ?? null,
+    [filteredAppointments, selectedAppointmentId]
+  );
+
+  useEffect(() => {
+    if (selectedAppointmentId && !filteredAppointments.some((apt) => apt.id === selectedAppointmentId)) {
+      setSelectedAppointmentId(null);
+    }
+  }, [filteredAppointments, selectedAppointmentId]);
   
   // Función para generar fecha en formato YYYY-MM-DD desde día del calendario
   const getDayDateStr = (day: number) => {
@@ -250,22 +301,80 @@ export default function PsychologistCitasPage() {
       </div>
 
       {/* Estadísticas */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
-          <p className="text-sm font-bold text-gray-600 mb-2">Pacientes Totales</p>
+      <div className="rounded-3xl border border-sky-100 bg-gradient-to-r from-sky-50 via-white to-emerald-50 p-4 md:p-5 shadow-sm">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-700">Gestión de agenda clínica</p>
+              <h2 className="text-xl md:text-2xl font-black text-[#1E4D8C] mt-1">Revisa y responde las citas recién agendadas</h2>
+              <p className="text-sm text-slate-600 mt-1 max-w-2xl">
+                Infórmate sobre las citas recién agendadas que aún están pendientes de tu respuesta.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <div className="rounded-2xl border border-amber-200 bg-white px-4 py-3 shadow-sm min-w-[180px]">
+              <p className="text-[11px] font-black uppercase tracking-wider text-amber-700 flex items-center gap-2">
+                <MessageSquareText size={14} />
+                Pendientes por responder
+              </p>
+              <p className="mt-1 text-3xl font-black text-amber-600">{pendingCount}</p>
+            </div>
+            <div className="rounded-2xl border border-emerald-200 bg-white px-4 py-3 shadow-sm min-w-[240px]">
+              <p className="text-[11px] font-black uppercase tracking-wider text-emerald-700">Siguiente cita pendiente</p>
+              {nextPendingAppointment ? (
+                <>
+                  <p className="mt-1 text-base font-black text-emerald-700">
+                    {nextPendingAppointment.hora} · {nextPendingAppointment.patientName}
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    {parseDate(nextPendingAppointment.fecha).toLocaleDateString('es-ES', {
+                      weekday: 'short',
+                      day: '2-digit',
+                      month: 'short',
+                    })}
+                  </p>
+                </>
+              ) : (
+                <p className="mt-1 text-sm text-slate-500">No hay solicitudes nuevas esperando respuesta.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div className="rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-white p-4 shadow-sm ring-1 ring-amber-100/60">
+          <p className="text-sm font-bold text-slate-600 mb-2 flex items-center gap-2">
+            <TriangleAlert size={16} className="text-amber-600" />
+            Pendientes por responder
+          </p>
+          <p className="text-3xl font-black text-amber-600">{pendingCount}</p>
+        </div>
+        <div className="rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-4 shadow-sm">
+          <p className="text-sm font-bold text-slate-600 mb-2">Próxima cita</p>
+          <p className="text-lg font-black text-emerald-700 leading-tight">
+            {nextAppointment
+              ? `${nextAppointment.hora} · ${nextAppointment.patientName}`
+              : 'Sin citas próximas'}
+          </p>
+          <p className="text-xs text-slate-500 mt-1">
+            {nextAppointment
+              ? parseDate(nextAppointment.fecha).toLocaleDateString('es-ES', { weekday: 'short', day: '2-digit', month: 'short' })
+              : 'Revisa el calendario para ver más detalles'}
+          </p>
+        </div>
+        <div className="rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50 to-white p-4 shadow-sm">
+          <p className="text-sm font-bold text-slate-600 mb-2">Citas de hoy</p>
+          <p className="text-3xl font-black text-violet-700">{todayAppointmentsCount}</p>
+        </div>
+        <div className="rounded-2xl border border-sky-200 bg-gradient-to-br from-sky-50 to-white p-4 shadow-sm">
+          <p className="text-sm font-bold text-slate-600 mb-2 flex items-center gap-2">
+            <User size={16} className="text-sky-600" />
+            Pacientes totales
+          </p>
           <p className="text-3xl font-black text-[#1E4D8C]">{uniquePatients}</p>
-        </div>
-        <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4">
-          <p className="text-sm font-bold text-gray-600 mb-2">Citas Pendientes</p>
-          <p className="text-3xl font-black text-yellow-600">{pendingCount}</p>
-        </div>
-        <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
-          <p className="text-sm font-bold text-gray-600 mb-2">Citas Aceptadas</p>
-          <p className="text-3xl font-black text-green-600">{acceptedCount}</p>
-        </div>
-        <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-4">
-          <p className="text-sm font-bold text-gray-600 mb-2">Hoy</p>
-          <p className="text-3xl font-black text-purple-600">{todayAppointments.length}</p>
         </div>
       </div>
 
@@ -343,7 +452,7 @@ export default function PsychologistCitasPage() {
         {/* Columna Derecha - Citas del Día */}
         <div className="md:col-span-2">
           <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-            <div className="mb-4">
+            <div className="mb-4 sticky top-0 z-10 bg-white/95 backdrop-blur-sm pb-3">
               <h3 className="text-lg font-black text-[#1E4D8C] mb-4">CITAS DEL DÍA</h3>
               
               {/* Buscador */}
@@ -382,25 +491,23 @@ export default function PsychologistCitasPage() {
                 <p className="text-gray-500 font-semibold">No hay citas para esta fecha</p>
               </div>
             ) : (
-              <div className="space-y-3 max-h-96 overflow-y-auto">
+              <div className="space-y-3 max-h-[34rem] overflow-y-auto pr-1">
                 {filteredAppointments.map(apt => {
                   // Estadísticas del paciente
                   const appointmentsForPatient = appointments.filter(a => a.patientId === apt.patientId);
                   const pendingForPatient = appointmentsForPatient.filter(a => a.status === 'Pendiente').length;
                   const totalForPatient = appointmentsForPatient.length;
-                  const isExpanded = expandedAppointments.has(apt.id);
+                  const isSelected = selectedAppointment?.id === apt.id;
 
                   return (
                     <div 
                       key={apt.id} 
-                      className="border-2 border-gray-200 rounded-lg overflow-hidden hover:border-[#71A5D9] hover:shadow-md transition bg-white"
+                      className={`border-2 rounded-lg overflow-hidden hover:border-[#71A5D9] hover:shadow-md transition bg-white ${isSelected ? 'border-[#71A5D9] shadow-md' : 'border-gray-200'}`}
                     >
-                      {/* Header de Cita - Clickeable para expandir */}
+                      {/* Header de Cita - abre modal centrado */}
                       <div 
-                        className="p-4 hover:bg-gray-50 cursor-pointer transition"
-                        onClick={() => setExpandedAppointments(prev => 
-                          new Set(prev.has(apt.id) ? Array.from(prev).filter(id => id !== apt.id) : [...prev, apt.id])
-                        )}
+                        className={`p-4 hover:bg-gray-50 cursor-pointer transition ${isSelected ? 'bg-sky-50' : ''}`}
+                        onClick={() => setSelectedAppointmentId(prev => (prev === apt.id ? null : apt.id))}
                       >
                         <div className="flex items-center justify-between">
                           {/* Paciente Info */}
@@ -444,13 +551,13 @@ export default function PsychologistCitasPage() {
                               </span>
                             )}
                             {apt.status === 'Cancelada' && (
-                              <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-bold rounded-full">
-                                Cancelada
+                                <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full">
+                                  Cancelada por el estudiante
                               </span>
                             )}
                             <ChevronDown 
                               size={20} 
-                              className={`text-gray-600 transition transform ${isExpanded ? 'rotate-180' : ''}`}
+                              className={`text-gray-600 transition transform ${isSelected ? 'rotate-180' : ''}`}
                             />
                           </div>
                         </div>
@@ -472,102 +579,6 @@ export default function PsychologistCitasPage() {
                         </div>
                       </div>
 
-                      {/* Contenido Expandible */}
-                      {isExpanded && (
-                        <div className="border-t border-gray-200 p-4 bg-blue-50">
-                          {/* Detalles completos */}
-                          <div className="space-y-3 mb-4">
-                            <div>
-                              <p className="text-xs font-bold text-gray-600 uppercase mb-1">FECHA DE LA CITA</p>
-                              <p className="text-sm text-gray-800">{parseDate(apt.fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                            </div>
-                            <div>
-                              <p className="text-xs font-bold text-gray-600 uppercase mb-1">HORA</p>
-                              <p className="text-sm text-gray-800">{apt.hora}</p>
-                            </div>
-                            <div>
-                              <p className="text-xs font-bold text-gray-600 uppercase mb-1">TIPO</p>
-                              <p className="text-sm text-gray-800 capitalize">{apt.modalidad}</p>
-                            </div>
-
-                            {apt.modalidad === 'Virtual' && (
-                              <div className="bg-sky-50 rounded-lg p-3 border border-sky-200">
-                                <p className="text-xs font-bold text-sky-700 uppercase mb-2">Videollamada</p>
-                                <p className="text-sm text-sky-800 mb-3">
-                                  {apt.requestLink ? 'El paciente solicitó enlace de Google Meet.' : 'Cita virtual sin solicitud de enlace.'}
-                                </p>
-                                <div className="space-y-2">
-                                  <input
-                                    type="url"
-                                    value={meetingLinkDrafts[apt.id] ?? apt.meetingLink ?? ''}
-                                    onChange={(e) => setMeetingLinkDrafts(prev => ({ ...prev, [apt.id]: e.target.value }))}
-                                    placeholder="Pega aquí el enlace de Google Meet"
-                                    className="w-full px-3 py-2 border border-sky-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-300 bg-white"
-                                  />
-                                  <div className="flex flex-wrap gap-2">
-                                    {/* Se eliminó el botón de generación automática por petición: el psicólogo debe pegar el enlace manualmente */}
-                                    {apt.meetingLink ? (
-                                      <a
-                                        href={apt.meetingLink}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="inline-flex items-center gap-2 px-3 py-2 bg-white text-sky-700 border border-sky-200 rounded-lg text-sm font-semibold hover:bg-sky-50"
-                                      >
-                                        <CalendarIcon size={14} />
-                                        Abrir enlace
-                                      </a>
-                                    ) : null}
-                                    <button
-                                      type="button"
-                                      onClick={() => handleSaveMeetingLink(apt.id)}
-                                      disabled={savingLinkIds.has(apt.id)}
-                                      className={`inline-flex items-center gap-2 px-3 py-2 ${savingLinkIds.has(apt.id) ? 'bg-slate-300 text-white cursor-wait' : 'bg-sky-600 text-white hover:bg-sky-700'} rounded-lg text-sm font-semibold`}
-                                    >
-                                      {savingLinkIds.has(apt.id) ? 'Guardando...' : 'Guardar enlace'}
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Motivo expandible como modal */}
-                            {apt.motivo && (
-                              <div className="bg-white rounded-lg p-3 border-l-4 border-[#71A5D9]">
-                                <p className="text-xs font-bold text-gray-600 uppercase mb-2">MOTIVO DE LA CONSULTA</p>
-                                <p className="text-sm text-gray-800 italic">{apt.motivo}</p>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Botones Acción */}
-                          {apt.status === 'Pendiente' && (
-                            <div className="flex gap-2 pt-3 border-t border-gray-200 mt-3">
-                              <button
-                                onClick={() => handleStatusChange(apt.id, 'Aceptada')}
-                                className="flex-1 px-3 py-2 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition flex items-center justify-center gap-2 text-sm"
-                              >
-                                <CheckCircle size={16} />
-                                Aceptar
-                              </button>
-                              <button
-                                onClick={() => handleStatusChange(apt.id, 'Rechazada')}
-                                className="flex-1 px-3 py-2 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 transition flex items-center justify-center gap-2 text-sm"
-                              >
-                                <XCircle size={16} />
-                                Rechazar
-                              </button>
-                            </div>
-                          )}
-
-                          {apt.status !== 'Pendiente' && apt.modalidad === 'Virtual' && (
-                            <div className="mt-3 flex justify-end">
-                              <p className="text-xs text-slate-500">
-                                Usa el botón superior para guardar o actualizar el enlace.
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      )}
                     </div>
                   );
                 })}
@@ -576,6 +587,128 @@ export default function PsychologistCitasPage() {
           </div>
         </div>
       </div>
+
+      {selectedAppointment && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 px-4 py-6 backdrop-blur-sm" onClick={() => setSelectedAppointmentId(null)}>
+          <div
+            className="w-full max-w-3xl rounded-3xl bg-white shadow-2xl border border-slate-200 overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-4 border-b border-slate-100 bg-gradient-to-r from-sky-50 to-white px-6 py-5">
+              <div>
+                <p className="text-xs font-black uppercase tracking-wider text-sky-700">Detalle de cita</p>
+                <h3 className="mt-1 text-2xl font-black text-[#1E4D8C]">{selectedAppointment.patientName}</h3>
+                <p className="text-sm text-slate-600">{selectedAppointment.patientEmail}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedAppointmentId(null)}
+                className="rounded-full border border-sky-200 bg-white px-4 py-2 text-sm font-semibold text-sky-700 hover:bg-sky-50"
+              >
+                Cerrar
+              </button>
+            </div>
+
+            <div className="max-h-[80vh] overflow-y-auto px-6 py-5">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                <div className="rounded-2xl bg-slate-50 p-4 border border-slate-100">
+                  <p className="text-xs font-bold text-slate-500 uppercase">Fecha</p>
+                  <p className="mt-1 font-semibold text-slate-900">
+                    {parseDate(selectedAppointment.fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-slate-50 p-4 border border-slate-100">
+                  <p className="text-xs font-bold text-slate-500 uppercase">Hora</p>
+                  <p className="mt-1 font-semibold text-slate-900">{selectedAppointment.hora}</p>
+                </div>
+                <div className="rounded-2xl bg-slate-50 p-4 border border-slate-100">
+                  <p className="text-xs font-bold text-slate-500 uppercase">Tipo</p>
+                  <p className="mt-1 font-semibold text-slate-900 capitalize">{selectedAppointment.modalidad}</p>
+                </div>
+              </div>
+
+              {selectedAppointment.status === 'Cancelada' && selectedAppointment.cancelReason && (
+                <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4">
+                  <p className="text-xs font-black uppercase text-red-700 mb-1">Cancelada por el estudiante</p>
+                  <p className="text-sm text-red-800">{selectedAppointment.cancelReason}</p>
+                </div>
+              )}
+
+              {selectedAppointment.modalidad === 'Virtual' && (
+                <div className="mt-4 rounded-2xl border border-sky-200 bg-sky-50 p-4">
+                  <p className="text-xs font-black uppercase text-sky-700 mb-2">Videollamada</p>
+                  <p className="text-sm text-slate-700 mb-3">
+                    {selectedAppointment.requestLink ? 'El paciente solicitó enlace de Google Meet.' : 'Cita virtual sin solicitud de enlace.'}
+                  </p>
+                  <div className="space-y-2">
+                    <input
+                      type="url"
+                      value={meetingLinkDrafts[selectedAppointment.id] ?? selectedAppointment.meetingLink ?? ''}
+                      onChange={(e) => setMeetingLinkDrafts(prev => ({ ...prev, [selectedAppointment.id]: e.target.value }))}
+                      placeholder="Pega aquí el enlace de Google Meet"
+                      className="w-full px-4 py-3 border border-sky-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-300 bg-white"
+                    />
+                    <div className="flex flex-wrap gap-2">
+                      {selectedAppointment.meetingLink ? (
+                        <a
+                          href={selectedAppointment.meetingLink}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-white text-sky-700 border border-sky-200 rounded-xl text-sm font-semibold hover:bg-sky-50"
+                        >
+                          <CalendarIcon size={14} />
+                          Abrir enlace
+                        </a>
+                      ) : null}
+                      <button
+                        type="button"
+                        onClick={() => handleSaveMeetingLink(selectedAppointment.id)}
+                        disabled={savingLinkIds.has(selectedAppointment.id)}
+                        className={`inline-flex items-center gap-2 px-4 py-2 ${savingLinkIds.has(selectedAppointment.id) ? 'bg-slate-300 text-white cursor-wait' : 'bg-sky-600 text-white hover:bg-sky-700'} rounded-xl text-sm font-semibold`}
+                      >
+                        {savingLinkIds.has(selectedAppointment.id) ? 'Guardando...' : 'Guardar enlace'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {selectedAppointment.motivo && (
+                <div className="mt-4 rounded-2xl bg-white p-4 border-l-4 border-[#71A5D9] border border-slate-100">
+                  <p className="text-xs font-black text-gray-600 uppercase mb-2">Motivo de la consulta</p>
+                  <p className="text-sm text-gray-800 italic">{selectedAppointment.motivo}</p>
+                </div>
+              )}
+
+              <div className="mt-5 flex flex-wrap gap-3">
+                {selectedAppointment.status === 'Pendiente' && (
+                  <>
+                    <button
+                      onClick={() => handleStatusChange(selectedAppointment.id, 'Aceptada')}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition"
+                    >
+                      <CheckCircle size={16} />
+                      Aceptar cita
+                    </button>
+                    <button
+                      onClick={() => handleStatusChange(selectedAppointment.id, 'Rechazada')}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition"
+                    >
+                      <XCircle size={16} />
+                      Rechazar cita
+                    </button>
+                  </>
+                )}
+                {selectedAppointment.status !== 'Pendiente' && selectedAppointment.modalidad === 'Virtual' && (
+                  <p className="text-xs text-slate-500 self-center">
+                    Usa el campo superior para guardar o actualizar el enlace.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

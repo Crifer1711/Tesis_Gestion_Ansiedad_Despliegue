@@ -18,6 +18,7 @@ export interface PsychologistDashboardDTO {
     totalPatients: number;
     pendingAppointments: number;
     acceptedAppointments: number;
+    todayAppointments: number;
   };
   nextAppointments: AppointmentDTO[];
   recentActivities: ActivityDTO[];

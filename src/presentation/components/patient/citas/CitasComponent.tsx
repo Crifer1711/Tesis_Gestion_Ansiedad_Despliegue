@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Calendar, Clock, User, Send, Lock, Video, Link2, XCircle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useSession } from 'next-auth/react';
@@ -12,9 +12,10 @@ interface Cita {
   psicologo: string;
   modalidad: 'Presencial' | 'Virtual';
   motivo: string;
-  estado: 'Pendiente' | 'Aceptada' | 'Cancelada';
+  estado: 'Pendiente' | 'Aceptada' | 'Rechazada' | 'Cancelada';
   requestLink?: boolean;
   meetingLink?: string | null;
+  cancelReason?: string | null;
 }
 
 interface Psicologo {
@@ -53,6 +54,24 @@ const parseDate = (dateStr: string) => {
   return new Date(year, month - 1, day);
 };
 
+const normalizeAppointmentStatus = (status: string | null | undefined): Cita['estado'] => {
+  const value = (status || '').trim().toLowerCase();
+
+  if (value === 'aceptada') {
+    return 'Aceptada';
+  }
+
+  if (value === 'cancelada') {
+    return 'Cancelada';
+  }
+
+  if (value === 'rechazada') {
+    return 'Rechazada';
+  }
+
+  return 'Pendiente';
+};
+
 export function CitasComponent() {
   const { data: session } = useSession();
   const [formData, setFormData] = useState({
@@ -70,9 +89,10 @@ export function CitasComponent() {
   const [horasOcupadas, setHorasOcupadas] = useState<string[]>([]);
   const [now, setNow] = useState(() => new Date());
   const [activeTab, setActiveTab] = useState<'proximas' | 'historial'>('proximas');
-  const [historyFilter, setHistoryFilter] = useState<'Todas' | 'Pendiente' | 'Aceptada' | 'Cancelada'>('Todas');
+  const [historyFilter, setHistoryFilter] = useState<'Todas' | 'Pendiente' | 'Aceptada' | 'Rechazada' | 'Cancelada'>('Todas');
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [cancelDialogId, setCancelDialogId] = useState<string | null>(null);
+  const [cancelReason, setCancelReason] = useState('');
 
   const today = getLocalDateString(now);
   const motivoWords = countWords(formData.motivo);
@@ -96,7 +116,7 @@ export function CitasComponent() {
 
   const isAppointmentUpcoming = (cita: Cita) => {
     const dt = getAppointmentDateTime(cita.fecha, cita.hora);
-    return dt >= now && cita.estado !== 'Cancelada';
+    return dt >= now && cita.estado !== 'Cancelada' && cita.estado !== 'Rechazada';
   };
 
   const isAppointmentRecentHistory = (cita: Cita) => {
@@ -114,7 +134,7 @@ export function CitasComponent() {
     .sort((a, b) => getAppointmentDateTime(a.fecha, a.hora).getTime() - getAppointmentDateTime(b.fecha, b.hora).getTime());
 
   const historyAppointments = citasAgendadas
-    .filter((cita) => !isAppointmentUpcoming(cita) && (cita.estado === 'Cancelada' || isAppointmentRecentHistory(cita)))
+    .filter((cita) => cita.estado === 'Cancelada' || cita.estado === 'Aceptada')
     .filter((cita) => historyFilter === 'Todas' || cita.estado === historyFilter)
     .sort((a, b) => getAppointmentDateTime(b.fecha, b.hora).getTime() - getAppointmentDateTime(a.fecha, a.hora).getTime());
 
@@ -150,40 +170,40 @@ export function CitasComponent() {
     fetchPsicologos();
   }, []);
 
+  const fetchCitasDelPaciente = useCallback(async () => {
+    if (!session?.user?.id) return;
+
+    try {
+      const res = await fetch(`/api/appointments?patientId=${session.user.id}`, { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        const citasFormateadas: Cita[] = data.map((apt: any) => ({
+          id: apt.id,
+          fecha: apt.fecha,
+          hora: apt.hora,
+          psicologo: apt.psychologistName || 'Psicólogo',
+          modalidad: apt.modalidad,
+          motivo: apt.motivo || 'Sin especificar',
+          estado: normalizeAppointmentStatus(apt.status),
+          requestLink: apt.requestLink,
+          meetingLink: apt.meetingLink,
+          cancelReason: apt.cancelReason || null,
+        }));
+        setCitasAgendadas(citasFormateadas);
+      }
+    } catch (error) {
+      console.error('Error fetching patient appointments:', error);
+    }
+  }, [session?.user?.id]);
+
   // Cargar citas del paciente desde el servidor
   useEffect(() => {
-    const fetchCitasDelPaciente = async () => {
-      if (!session?.user?.id) return;
-      
-      try {
-        const res = await fetch(`/api/appointments?patientId=${session.user.id}`);
-        if (res.ok) {
-          const data = await res.json();
-          const citasFormateadas: Cita[] = data.map((apt: any) => ({
-            id: apt.id,
-            fecha: apt.fecha,
-            hora: apt.hora,
-            psicologo: apt.psychologistName || 'Psicólogo',
-            modalidad: apt.modalidad,
-            motivo: apt.motivo || 'Sin especificar',
-            estado: apt.status === 'Aceptada' || apt.status === 'Cancelada' ? apt.status : 'Pendiente',
-            requestLink: apt.requestLink,
-            meetingLink: apt.meetingLink,
-          }));
-          setCitasAgendadas(citasFormateadas);
-        }
-      } catch (error) {
-        console.error('Error fetching patient appointments:', error);
-      }
-    };
-
-    // Fetch inicial
     fetchCitasDelPaciente();
-    
-    // Re-fetch cada 5 segundos para detectar cambios (cuando psicólogo acepta)
+
+    // Re-fetch cada 5 segundos para detectar cambios (cuando psicólogo acepta o se cancela)
     const interval = setInterval(fetchCitasDelPaciente, 5000);
     return () => clearInterval(interval);
-  }, [session?.user?.id]);
+  }, [fetchCitasDelPaciente]);
 
   // Cargar horas ocupadas cuando cambia psicólogo o fecha
   useEffect(() => {
@@ -268,12 +288,14 @@ export function CitasComponent() {
 
         setCitasAgendadas([nuevaCita, ...citasAgendadas]);
         setFormData({
-          psicologo: '',
-          fecha: '',
+          psicologo: formData.psicologo,
+          fecha: formData.fecha,
           hora: '',
-          modalidad: 'Presencial',
+          modalidad: formData.modalidad,
           motivo: '',
         });
+
+        await fetchCitasDelPaciente();
         
         toast.success('✅ Cita Agendada Exitosamente — EN LISTA DE ESPERA');
       } else {
@@ -287,13 +309,13 @@ export function CitasComponent() {
     }
   };
 
-  const handleCancelAppointment = async (appointmentId: string) => {
+  const handleCancelAppointment = async (appointmentId: string, reason: string) => {
     setCancellingId(appointmentId);
     try {
       const res = await fetch(`/api/appointments/${appointmentId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'Cancelada' }),
+        body: JSON.stringify({ status: 'Cancelada', cancelReason: reason }),
       });
 
       const data = await res.json();
@@ -301,7 +323,8 @@ export function CitasComponent() {
         throw new Error(data.error || 'No se pudo cancelar la cita');
       }
 
-      setCitasAgendadas((prev) => prev.map((cita) => (cita.id === appointmentId ? { ...cita, estado: 'Cancelada' } : cita)));
+      setCitasAgendadas((prev) => prev.map((cita) => (cita.id === appointmentId ? { ...cita, estado: 'Cancelada', cancelReason: reason } : cita)));
+      await fetchCitasDelPaciente();
       toast.success('✅ Cita cancelada correctamente');
     } catch (error) {
       console.error(error);
@@ -313,18 +336,20 @@ export function CitasComponent() {
 
   const openCancelDialog = (appointmentId: string) => {
     setCancelDialogId(appointmentId);
+    setCancelReason('');
   };
 
   const closeCancelDialog = () => {
     if (cancellingId) return;
     setCancelDialogId(null);
+    setCancelReason('');
   };
 
   const confirmCancelDialog = async () => {
     if (!cancelDialogId) return;
     const appointmentId = cancelDialogId;
     setCancelDialogId(null);
-    await handleCancelAppointment(appointmentId);
+    await handleCancelAppointment(appointmentId, cancelReason.trim());
   };
 
   const getEstadoColor = (estado: string) => {
@@ -335,6 +360,8 @@ export function CitasComponent() {
         return 'bg-yellow-100 text-yellow-700 border-yellow-300';
       case 'Cancelada':
         return 'bg-red-100 text-red-700 border-red-300';
+      case 'Rechazada':
+        return 'bg-rose-100 text-rose-700 border-rose-300';
       default:
         return 'bg-gray-100 text-gray-700 border-gray-300';
     }
@@ -352,10 +379,10 @@ export function CitasComponent() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:items-start">
           {/* FORMULARIO */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-lg border border-blue-100 p-6 sticky top-24 overflow-hidden">
+          <div className="lg:col-span-1 lg:sticky lg:top-24 self-start">
+            <div className="bg-white rounded-2xl shadow-lg border border-blue-100 p-6 overflow-hidden">
               <div className="-mx-6 -mt-6 mb-6 bg-gradient-to-r from-[#71A5D9] to-[#9DC3E6] px-6 py-5 text-white">
                 <h2 className="text-xl font-black">Completa tu solicitud</h2>
                 <p className="text-sm text-white/90 mt-1">Selecciona un espacio disponible y describe, si lo deseas, el motivo de la consulta.</p>
@@ -520,7 +547,8 @@ export function CitasComponent() {
           </div>
 
           {/* CITAS AGENDADAS */}
-          <div className="lg:col-span-2 space-y-5">
+          <div className="lg:col-span-2 lg:sticky lg:top-24 self-start">
+            <div className="space-y-5 rounded-2xl bg-transparent lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto lg:pr-1">
             <div className="flex items-end justify-between gap-4 flex-wrap">
               <h2 className="text-2xl font-black text-[#1E4D8C]">Mis Citas</h2>
               <div className="inline-flex rounded-xl border border-blue-100 bg-white p-1 shadow-sm">
@@ -611,6 +639,22 @@ export function CitasComponent() {
                         </div>
                       )}
 
+                      {cita.estado === 'Cancelada' && cita.cancelReason && (
+                        <div className="mt-3 bg-red-50 p-3.5 rounded-lg border border-red-200">
+                          <p className="text-xs font-bold text-red-700 uppercase">Cancelada por ti</p>
+                          <p className="text-sm text-red-800 mt-1.5">{cita.cancelReason}</p>
+                        </div>
+                      )}
+
+                      {cita.estado === 'Rechazada' && (
+                        <div className="mt-3 bg-rose-50 p-3.5 rounded-lg border border-rose-200">
+                          <p className="text-xs font-bold text-rose-700 uppercase">Rechazada por la psicóloga</p>
+                          <p className="text-sm text-rose-800 mt-1.5">
+                            La cita fue rechazada y no podrá continuar.
+                          </p>
+                        </div>
+                      )}
+
                       <div className="mt-4 flex justify-end">
                         <button
                           type="button"
@@ -628,15 +672,14 @@ export function CitasComponent() {
               )
             ) : (
               <div className="space-y-4">
-                <div className="flex items-center justify-between gap-3 flex-wrap">
-                  <p className="text-sm text-slate-600">Aquí verás las citas de los últimos 30 días.</p>
+                <div className="sticky top-0 z-10 flex items-center justify-between gap-3 flex-wrap bg-[#f5f9ff] pb-3 pt-1">
+                  <p className="text-sm text-slate-600">Aquí verás tus citas aceptadas y canceladas.</p>
                   <select
                     value={historyFilter}
-                    onChange={(e) => setHistoryFilter(e.target.value as 'Todas' | 'Pendiente' | 'Aceptada' | 'Cancelada')}
+                    onChange={(e) => setHistoryFilter(e.target.value as 'Todas' | 'Aceptada' | 'Cancelada')}
                     className="px-3 py-2 rounded-lg border border-blue-100 bg-white text-sm text-slate-700"
                   >
                     <option>Todas</option>
-                    <option>Pendiente</option>
                     <option>Aceptada</option>
                     <option>Cancelada</option>
                   </select>
@@ -645,8 +688,8 @@ export function CitasComponent() {
                 {historyAppointments.length === 0 ? (
                   <div className="bg-white rounded-xl shadow-md border border-gray-200 p-8 text-center">
                     <Calendar size={52} className="mx-auto text-slate-300 mb-4" />
-                    <p className="text-gray-700 text-base font-semibold">No hay citas en los últimos 30 días</p>
-                    <p className="text-gray-500 text-sm mt-2">Cuando tengas citas recientes, aparecerán aquí</p>
+                    <p className="text-gray-700 text-base font-semibold">No hay citas en este historial</p>
+                    <p className="text-gray-500 text-sm mt-2">Cuando se acepten o cancelen, aparecerán aquí</p>
                   </div>
                 ) : (
                   historyAppointments.map((cita) => (
@@ -695,11 +738,13 @@ export function CitasComponent() {
                           </a>
                         </div>
                       )}
+
                     </div>
                   ))
                 )}
               </div>
             )}
+            </div>
           </div>
         </div>
       </div>
@@ -720,6 +765,28 @@ export function CitasComponent() {
 
           <p className="text-sm text-slate-700 mb-6">¿Deseas cancelar esta cita?</p>
 
+          <div className="mb-4">
+            <label className="block text-xs font-bold text-slate-700 uppercase mb-2">
+              Motivo de cancelación
+            </label>
+            <textarea
+              value={cancelReason}
+              onChange={(e) => {
+                const nextValue = e.target.value;
+                if (countWords(nextValue) <= MAX_MOTIVO_WORDS) {
+                  setCancelReason(nextValue);
+                }
+              }}
+              rows={4}
+              placeholder="Explica brevemente por qué cancelas esta cita"
+              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-800 outline-none focus:border-[#71A5D9] focus:ring-2 focus:ring-[#71A5D9]/20"
+            />
+            <div className="mt-2 flex items-center justify-between text-xs text-slate-500">
+              <span>Requerido para cancelar la cita.</span>
+              <span>{countWords(cancelReason)}/{MAX_MOTIVO_WORDS}</span>
+            </div>
+          </div>
+
           <div className="flex justify-end gap-3">
             <button
               type="button"
@@ -731,7 +798,8 @@ export function CitasComponent() {
             <button
               type="button"
               onClick={confirmCancelDialog}
-              className="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700"
+              disabled={!cancelReason.trim() || cancellingId === cancelDialogId}
+              className="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Sí, cancelar
             </button>

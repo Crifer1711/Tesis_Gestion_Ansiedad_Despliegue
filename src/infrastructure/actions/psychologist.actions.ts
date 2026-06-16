@@ -116,7 +116,7 @@ export async function getDashboardAction(psychologistId: string) {
     console.error("Error en getDashboardAction:", error);
     // Devolvemos datos vacíos para que la UI no rompa si falla la DB
     return {
-      stats: { totalPatients: 0, pendingAppointments: 0, acceptedAppointments: 0 },
+      stats: { totalPatients: 0, pendingAppointments: 0, acceptedAppointments: 0, todayAppointments: 0 },
       nextAppointments: [],
       recentActivities: []
     };

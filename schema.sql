@@ -83,11 +83,15 @@ CREATE TABLE IF NOT EXISTS public.appointments (
     reason TEXT,
     request_link BOOLEAN NOT NULL DEFAULT FALSE,
     meeting_link TEXT,
+    cancel_reason TEXT,
     status VARCHAR(50) NOT NULL DEFAULT 'Pendiente' CHECK (status IN ('Pendiente', 'Aceptada', 'Rechazada', 'Cancelada')),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
-    UNIQUE(psychologist_id, appointment_date, appointment_time)
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_appointments_active_slot
+    ON public.appointments(psychologist_id, appointment_date, appointment_time)
+    WHERE status NOT IN ('Cancelada', 'Rechazada');
 
 CREATE INDEX IF NOT EXISTS idx_appointments_patient_id ON public.appointments(patient_id);
 CREATE INDEX IF NOT EXISTS idx_appointments_psychologist_id ON public.appointments(psychologist_id);

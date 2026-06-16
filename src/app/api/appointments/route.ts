@@ -41,6 +41,7 @@ const getAppointmentColumnFlags = async () => {
   return {
     hasRequestLink: columns.has('request_link'),
     hasMeetingLink: columns.has('meeting_link'),
+    hasCancelReason: columns.has('cancel_reason'),
   };
 };
 
@@ -59,7 +60,7 @@ export async function GET(request: Request) {
     const psychologistId = searchParams.get('psychologistId');
     const patientId = searchParams.get('patientId');
     const fecha = searchParams.get('fecha');
-    const { hasRequestLink, hasMeetingLink } = await getAppointmentColumnFlags();
+    const { hasRequestLink, hasMeetingLink, hasCancelReason } = await getAppointmentColumnFlags();
 
     const requestLinkSelect = hasRequestLink
       ? 'a.request_link as "requestLink"'
@@ -67,6 +68,9 @@ export async function GET(request: Request) {
     const meetingLinkSelect = hasMeetingLink
       ? 'a.meeting_link as "meetingLink"'
       : 'NULL::text as "meetingLink"';
+    const cancelReasonSelect = hasCancelReason
+      ? 'a.cancel_reason as "cancelReason"'
+      : 'NULL::text as "cancelReason"';
 
     // Si se pasa psychologistId, obtener citas del psicólogo
     if (psychologistId) {
@@ -82,6 +86,7 @@ export async function GET(request: Request) {
           a.reason as motivo,
           ${requestLinkSelect},
           ${meetingLinkSelect},
+          ${cancelReasonSelect},
           a.status,
           u.name as "patientName",
           u.email as "patientEmail"
@@ -118,6 +123,7 @@ export async function GET(request: Request) {
             motivo: apt.motivo,
             requestLink: apt.requestLink,
             meetingLink: apt.meetingLink,
+            cancelReason: apt.cancelReason,
             status: apt.status,
             patientName: apt.patientName,
             patientEmail: apt.patientEmail
@@ -129,7 +135,7 @@ export async function GET(request: Request) {
     // Si es paciente, obtener sus citas
     if (session.user.role === 'PACIENTE' || patientId) {
       const id = patientId || session.user.id;
-      let query = `SELECT 
+        let query = `SELECT 
           a.id, 
           a.patient_id,
           a.psychologist_id,
@@ -139,6 +145,7 @@ export async function GET(request: Request) {
           a.reason as motivo,
           ${requestLinkSelect},
           ${meetingLinkSelect},
+          ${cancelReasonSelect},
           a.status,
           p.name as "psychologistName",
           p.email as "psychologistEmail"
@@ -175,6 +182,7 @@ export async function GET(request: Request) {
             motivo: apt.motivo,
             requestLink: apt.requestLink,
             meetingLink: apt.meetingLink,
+            cancelReason: apt.cancelReason,
             status: apt.status,
             psychologistName: apt.psychologistName,
             psychologistEmail: apt.psychologistEmail
@@ -214,11 +222,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const { psychologistId, fecha, hora, modalidad, motivo, requestLink, meetingLink } = await request.json();
+    const { psychologistId, fecha, hora, modalidad, motivo, requestLink } = await request.json();
     const motivoNormalizado = typeof motivo === 'string' ? motivo.trim() : '';
     const motivoWords = countWords(motivoNormalizado);
     const hoy = getLocalDateString(new Date());
-  const { hasRequestLink, hasMeetingLink } = await getAppointmentColumnFlags();
+    const { hasRequestLink } = await getAppointmentColumnFlags();
 
     if (!psychologistId || !fecha || !hora || !modalidad) {
       return NextResponse.json(
@@ -241,6 +249,73 @@ export async function POST(request: Request) {
       );
     }
 
+    const existingSlot = await db.query(
+      `SELECT id, status
+       FROM appointments
+       WHERE psychologist_id = $1
+         AND appointment_date = $2
+         AND appointment_time = $3
+       ORDER BY updated_at DESC
+       LIMIT 1`,
+      [psychologistId, fecha, hora]
+    );
+
+    const existingAppointment = existingSlot.rows[0];
+
+    if (existingAppointment && !['Cancelada', 'Rechazada'].includes(existingAppointment.status)) {
+      return NextResponse.json(
+        { error: 'Ese horario ya está reservado' },
+        { status: 409 }
+      );
+    }
+
+    if (existingAppointment && ['Cancelada', 'Rechazada'].includes(existingAppointment.status)) {
+      const updateColumns = [
+        'patient_id = $1',
+        'psychologist_id = $2',
+        'appointment_date = $3',
+        'appointment_time = $4',
+        'modality = $5',
+        'reason = $6',
+        'status = $7',
+        'cancel_reason = NULL',
+        'updated_at = NOW()'
+      ];
+      const updateValues = [session.user.id, psychologistId, fecha, hora, modalidad, motivoNormalizado || 'Sin especificar', 'Pendiente', existingAppointment.id];
+
+      if (hasRequestLink) {
+        updateColumns.splice(6, 0, 'request_link = $7');
+        updateColumns[7] = 'status = $8';
+        updateValues.splice(6, 0, Boolean(requestLink));
+        updateValues[7] = 'Pendiente';
+      }
+
+      const rebookQuery = `UPDATE appointments
+        SET ${updateColumns.join(', ')}
+        WHERE id = $${updateValues.length}
+        RETURNING id, patient_id, psychologist_id, appointment_date, appointment_time, modality, reason${hasRequestLink ? ', request_link' : ''}, status`;
+
+      const rebookResult = await db.query(rebookQuery, updateValues);
+      const rebooked = rebookResult.rows[0];
+
+      return NextResponse.json(
+        {
+          id: rebooked.id,
+          patientId: rebooked.patient_id,
+          psychologistId: rebooked.psychologist_id,
+          fecha: rebooked.appointment_date,
+          hora: rebooked.appointment_time,
+          modalidad: rebooked.modality,
+          motivo: rebooked.reason,
+          requestLink: hasRequestLink ? rebooked.request_link : Boolean(requestLink),
+          meetingLink: null,
+          status: rebooked.status,
+          rebooked: true,
+        },
+        { status: 200 }
+      );
+    }
+
     const insertColumns = ['patient_id', 'psychologist_id', 'appointment_date', 'appointment_time', 'modality', 'reason'];
     const insertValues = [session.user.id, psychologistId, fecha, hora, modalidad, motivoNormalizado || 'Sin especificar'];
 
@@ -249,18 +324,12 @@ export async function POST(request: Request) {
       insertValues.push(Boolean(requestLink));
     }
 
-    if (hasMeetingLink) {
-      const value = typeof meetingLink === 'string' && meetingLink.trim() ? meetingLink.trim() : null;
-      insertColumns.push('meeting_link');
-      insertValues.push(value);
-    }
-
     insertColumns.push('status');
     insertValues.push('Pendiente');
 
     const query = `INSERT INTO appointments (${insertColumns.join(', ')})
        VALUES (${insertValues.map((_, index) => `$${index + 1}`).join(', ')})
-       RETURNING id, patient_id, psychologist_id, appointment_date, appointment_time, modality, reason${hasRequestLink ? ', request_link' : ''}${hasMeetingLink ? ', meeting_link' : ''}, status`;
+       RETURNING id, patient_id, psychologist_id, appointment_date, appointment_time, modality, reason${hasRequestLink ? ', request_link' : ''}, status`;
 
     const result = await db.query(query, insertValues);
 
@@ -275,13 +344,19 @@ export async function POST(request: Request) {
         modalidad: appointment.modality,
         motivo: appointment.reason,
         requestLink: hasRequestLink ? appointment.request_link : Boolean(requestLink),
-        meetingLink: hasMeetingLink ? appointment.meeting_link : (typeof meetingLink === 'string' ? meetingLink.trim() || null : null),
+        meetingLink: null,
         status: appointment.status
       },
       { status: 201 }
     );
   } catch (error) {
     console.error('Error creating appointment:', error);
+    if (error instanceof Error && (error as any).code === '23505') {
+      return NextResponse.json(
+        { error: 'Ese horario ya estaba ocupado por una cita anterior. Intenta refrescar la página y volver a seleccionarlo.' },
+        { status: 409 }
+      );
+    }
     return NextResponse.json(
       { error: 'Error al crear cita' },
       { status: 500 }

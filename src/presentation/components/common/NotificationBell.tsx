@@ -121,7 +121,7 @@ export function NotificationBell({ compact = false }: Props) {
         <div className="absolute right-0 top-12 z-50 w-[340px] overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-xl">
           <div className="border-b border-blue-100 bg-[#EAF2FF] px-4 py-3">
             <p className="text-sm font-black text-[#1E4D8C]">Notificaciones</p>
-            <p className="text-[11px] text-slate-600">Tareas asignadas y citas aceptadas</p>
+            <p className="text-[11px] text-slate-600">Tareas, citas aceptadas, rechazadas y enlaces</p>
           </div>
           <div className="max-h-96 overflow-y-auto p-2">
             {items.length === 0 ? (

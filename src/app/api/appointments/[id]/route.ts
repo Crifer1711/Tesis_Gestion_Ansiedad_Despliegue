@@ -16,11 +16,16 @@ const getAppointmentColumnFlags = async () => {
   return {
     hasRequestLink: columns.has('request_link'),
     hasMeetingLink: columns.has('meeting_link'),
+    hasCancelReason: columns.has('cancel_reason'),
   };
 };
 
 const ensureMeetingLinkColumn = async () => {
   await db.query('ALTER TABLE appointments ADD COLUMN IF NOT EXISTS meeting_link TEXT');
+};
+
+const ensureCancelReasonColumn = async () => {
+  await db.query('ALTER TABLE appointments ADD COLUMN IF NOT EXISTS cancel_reason TEXT');
 };
 
 export async function PATCH(
@@ -38,12 +43,17 @@ export async function PATCH(
       );
     }
 
-    const { status, meetingLink } = await request.json();
-    let { hasMeetingLink } = await getAppointmentColumnFlags();
+    const { status, meetingLink, cancelReason } = await request.json();
+    let { hasMeetingLink, hasCancelReason } = await getAppointmentColumnFlags();
 
     if (typeof meetingLink !== 'undefined' && !hasMeetingLink) {
       await ensureMeetingLinkColumn();
       ({ hasMeetingLink } = await getAppointmentColumnFlags());
+    }
+
+    if (typeof cancelReason !== 'undefined' && !hasCancelReason) {
+      await ensureCancelReasonColumn();
+      ({ hasCancelReason } = await getAppointmentColumnFlags());
     }
 
     // Verificar que el psicólogo es el dueño de la cita
@@ -75,15 +85,25 @@ export async function PATCH(
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 
+      const cancelReasonValue = typeof cancelReason === 'string' ? cancelReason.trim() : '';
+      if (!cancelReasonValue) {
+        return NextResponse.json({ error: 'Debes indicar el motivo de la cancelación' }, { status: 400 });
+      }
+
+      const cancelParams = hasCancelReason ? [status, cancelReasonValue, id] : [status, id];
+
       const result = await db.query(
-        'UPDATE appointments SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *',
-        [status, id]
+        hasCancelReason
+          ? 'UPDATE appointments SET status = $1, cancel_reason = $2, updated_at = NOW() WHERE id = $3 RETURNING *'
+          : 'UPDATE appointments SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *',
+        cancelParams
       );
 
       const updated = result.rows[0];
       return NextResponse.json({
         id: updated.id,
         status: updated.status,
+        cancelReason: updated.cancel_reason,
         meetingLink: updated.meeting_link,
         message: 'Cita actualizada'
       });
@@ -116,6 +136,11 @@ export async function PATCH(
       setClauses.push(`meeting_link = $${updateValues.length}`);
     }
 
+    if (typeof cancelReason !== 'undefined' && hasCancelReason) {
+      updateValues.push(typeof cancelReason === 'string' ? cancelReason.trim() || null : null);
+      setClauses.push(`cancel_reason = $${updateValues.length}`);
+    }
+
     if (setClauses.length === 0) {
       return NextResponse.json({ error: 'No hay campos para actualizar' }, { status: 400 });
     }
@@ -134,6 +159,7 @@ export async function PATCH(
     return NextResponse.json({
       id: updated.id,
       status: updated.status,
+      cancelReason: hasCancelReason ? updated.cancel_reason : null,
       meetingLink: hasMeetingLink ? updated.meeting_link : null,
       message: 'Cita actualizada'
     });
@@ -152,7 +178,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const { hasRequestLink, hasMeetingLink } = await getAppointmentColumnFlags();
+    const { hasRequestLink, hasMeetingLink, hasCancelReason } = await getAppointmentColumnFlags();
 
     const requestLinkSelect = hasRequestLink
       ? 'request_link'
@@ -160,6 +186,9 @@ export async function GET(
     const meetingLinkSelect = hasMeetingLink
       ? 'meeting_link'
       : 'NULL::text as meeting_link';
+    const cancelReasonSelect = hasCancelReason
+      ? 'cancel_reason'
+      : 'NULL::text as cancel_reason';
     const result = await db.query(
       `SELECT 
         id, 
@@ -171,6 +200,7 @@ export async function GET(
         reason, 
         ${requestLinkSelect},
         ${meetingLinkSelect},
+        ${cancelReasonSelect},
         status
        FROM appointments 
        WHERE id = $1`,
@@ -195,6 +225,7 @@ export async function GET(
       motivo: apt.reason,
       requestLink: apt.request_link,
       meetingLink: apt.meeting_link,
+      cancelReason: apt.cancel_reason,
       status: apt.status
     });
   } catch (error) {

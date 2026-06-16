@@ -10,7 +10,8 @@ export class PgPsychologistRepository implements IPsychologistRepository {
       SELECT 
         (SELECT COUNT(DISTINCT patient_id) FROM appointments WHERE psychologist_id = $1) as total_patients,
         (SELECT COUNT(*) FROM appointments WHERE psychologist_id = $1 AND status = 'Pendiente') as pending_appointments,
-        (SELECT COUNT(*) FROM appointments WHERE psychologist_id = $1 AND status = 'Aceptada') as accepted_appointments
+        (SELECT COUNT(*) FROM appointments WHERE psychologist_id = $1 AND status = 'Aceptada') as accepted_appointments,
+        (SELECT COUNT(*) FROM appointments WHERE psychologist_id = $1 AND appointment_date = CURRENT_DATE AND status <> 'Cancelada') as today_appointments
     `;
     const statsRes = await pool.query(statsQuery, [psychologistId]);
 
@@ -50,6 +51,7 @@ export class PgPsychologistRepository implements IPsychologistRepository {
         totalPatients: Number.parseInt(statsRes.rows[0].total_patients || '0', 10),
         pendingAppointments: Number.parseInt(statsRes.rows[0].pending_appointments || '0', 10),
         acceptedAppointments: Number.parseInt(statsRes.rows[0].accepted_appointments || '0', 10),
+        todayAppointments: Number.parseInt(statsRes.rows[0].today_appointments || '0', 10),
       },
       nextAppointments: appointmentsRes.rows, // Aquí ya vienen los datos reales de la DB
       recentActivities: activitiesRes.rows

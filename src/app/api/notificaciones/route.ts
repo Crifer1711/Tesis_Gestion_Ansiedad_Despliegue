@@ -35,10 +35,15 @@ export async function GET() {
       const appointmentsRes = await pool.query(
         `SELECT ap.id::text AS id, COALESCE(p.name, 'Psicólogo') AS title,
                 ap.updated_at AS created_at,
-                'Tu cita con ' || COALESCE(p.name, 'tu psicólogo') || ' fue aceptada para ' || TO_CHAR(ap.appointment_date, 'DD/MM/YYYY') || ' a las ' || ap.appointment_time AS message
+                CASE
+                  WHEN ap.status = 'Aceptada' THEN 'Tu cita con ' || COALESCE(p.name, 'tu psicólogo') || ' fue aceptada para ' || TO_CHAR(ap.appointment_date, 'DD/MM/YYYY') || ' a las ' || ap.appointment_time
+                  WHEN ap.status = 'Rechazada' THEN 'La psicóloga rechazó tu cita del ' || TO_CHAR(ap.appointment_date, 'DD/MM/YYYY') || ' a las ' || ap.appointment_time
+                  WHEN ap.status = 'Cancelada' THEN 'Tu cita del ' || TO_CHAR(ap.appointment_date, 'DD/MM/YYYY') || ' a las ' || ap.appointment_time || ' fue cancelada'
+                  ELSE 'Actualización en tu cita con ' || COALESCE(p.name, 'tu psicólogo')
+                END AS message
          FROM appointments ap
          LEFT JOIN users p ON p.id = ap.psychologist_id
-         WHERE ap.patient_id = $1 AND ap.status = 'Aceptada'
+         WHERE ap.patient_id = $1 AND ap.status IN ('Aceptada', 'Rechazada', 'Cancelada')
          ORDER BY ap.updated_at DESC
          LIMIT 5`,
         [userId]
@@ -67,7 +72,7 @@ export async function GET() {
         ...appointmentsRes.rows.map((row) => ({
           id: `apt-${row.id}`,
           type: 'appointment' as const,
-          title: row.title || 'Cita aceptada',
+          title: row.title || 'Cita actualizada',
           message: row.message,
           created_at: row.created_at,
         })),
