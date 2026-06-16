@@ -94,24 +94,10 @@ export async function POST(request: Request) {
           slug: generatedSlug,
           embed_url: sourceUrl,
           descripcion: '',
-          indicaciones: [],
           finalizacion: {},
           eventos: {},
           persistencia_recomendada: {}
-        };
-      }
-    }
-
-    // If zipBuffer is present, parse ZIP and read manifest.json
-    if (zipBuffer) {
-      const jszip = new JSZip();
-      let zip: any;
-      try {
-        zip = await jszip.loadAsync(zipBuffer);
-      } catch (err) {
-        console.error('[import] error parseando ZIP:', err);
-        return NextResponse.json({ error: 'ZIP inválido o corrupto' }, { status: 400 });
-      }
+        }
 
       const manifestFile = zip.file('manifest.json') || zip.file('./manifest.json');
       if (!manifestFile) {
