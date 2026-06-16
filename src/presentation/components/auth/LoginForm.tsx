@@ -175,8 +175,7 @@ export const LoginForm = () => {
                   {...register("password", {
                     onChange: (e) => {
                       clearErrorsOnType();
-                      const sanitized = e.target.value.replace(/[^a-zA-Z0-9]/g, "");
-                      setValue("password", sanitized, { shouldValidate: true });
+                      setValue("password", e.target.value, { shouldValidate: true });
                     }
                   })}
                   type={showPassword ? "text" : "password"}
