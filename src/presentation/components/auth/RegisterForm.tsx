@@ -45,7 +45,6 @@ const registerSchema = z.object({
   password: z.string()
     .min(8, "La contraseña debe tener al menos 8 caracteres")
     .max(30, "La contraseña no puede exceder los 30 caracteres")
-    .regex(/^[a-zA-Z0-9]+$/, "No se permiten caracteres especiales (solo letras y números)")
     .regex(/[A-Z]/, "Debe incluir al menos una letra mayúscula")
     .regex(/[a-z]/, "Debe incluir al menos una letra minúscula")
     .regex(/[0-9]/, "Debe incluir al menos un número"),
@@ -113,7 +112,7 @@ export const RegisterForm = () => {
         {/* LOGO & ENCABEZADO */}
         <div className="flex flex-col items-center mb-6">
           <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-sm border border-gray-100 mb-3 bg-white p-1">
-            <Image src="/images/logo-.png" alt="Logo" fill className="object-contain" sizes="48px" priority />
+            <Image src="/images/Logo.png" alt="Logo" fill className="object-contain" sizes="48px" priority />
           </div>
           <h1 className="text-xl font-bold text-slate-800 tracking-tight">Crear una cuenta</h1>
           <p className="text-xs text-gray-500 mt-1">Ingresa tus datos institucionales para registrarte</p>
@@ -224,12 +223,11 @@ export const RegisterForm = () => {
               <input
                 {...register("password", {
                   onChange: (e) => {
-                    const sanitized = e.target.value.replace(/[^a-zA-Z0-9]/g, "");
-                    setValue("password", sanitized, { shouldValidate: true });
+                    setValue("password", e.target.value, { shouldValidate: true });
                   }
                 })}
                 type={showPassword ? "text" : "password"}
-                placeholder="Mínimo 8 caracteres alfanuméricos"
+                placeholder="Mínimo 8 caracteres con letras, números y símbolos"
                 maxLength={30}
                 className={`w-full pl-10 pr-10 py-2.5 text-sm rounded-xl border bg-gray-50/50 transition-all outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 text-gray-800 placeholder-gray-400 font-medium ${errors.password ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'}`}
               />

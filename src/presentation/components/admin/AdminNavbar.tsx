@@ -32,7 +32,7 @@ export function AdminNavbar() {
       <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-blue-100 px-8 py-3 flex items-center justify-between">
         <div className="flex items-center gap-10">
           <div className="flex flex-col items-center">
-            <Image src="/images/Logo-.png" alt="Mindpeace Logo" width={50} height={50} className="rounded-full" />
+            <Image src="/images/Logo.png" alt="Mindpeace Logo" width={50} height={50} className="rounded-full" />
             <span className="text-[10px] font-bold text-blue-800 uppercase tracking-tighter">Mindpeace</span>
           </div>
 
