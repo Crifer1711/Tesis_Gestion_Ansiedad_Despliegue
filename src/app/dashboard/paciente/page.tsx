@@ -122,7 +122,7 @@ function DashboardContent() {
 
   const SECTION_HEIGHT = 'min-h-[calc(100dvh-72px)]';
 
-  if (!session || status === 'loading') {
+  if (!session) {
     return null;
   }
 

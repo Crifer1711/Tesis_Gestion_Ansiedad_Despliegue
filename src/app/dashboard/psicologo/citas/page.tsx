@@ -413,9 +413,9 @@ export default function PsychologistCitasPage() {
                   {days.map((day, idx) => {
                   const dateStr = day ? getDayDateStr(day) : '';
                   const isToday = dateStr === today;
-                  const hasAppointments = day && daysWithAppointments.has(dateStr);
+                    const hasAppointments = Boolean(day && daysWithAppointments.has(dateStr));
                   const isSelected = dateStr === selectedDate;
-                  const isPast = dateStr && dateStr < today;
+                    const isPast = Boolean(dateStr && dateStr < today);
 
                   return (
                     <div key={idx} className="text-center py-1">

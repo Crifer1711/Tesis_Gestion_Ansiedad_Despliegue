@@ -5,6 +5,12 @@ import { BookOpen, Play, Zap } from 'lucide-react';
 import { InfoCard } from './InfoCard';
 import { InformateDetailModal } from './InformateDetailModal';
 
+type RecursosSectionProps = {
+  description?: string;
+  transparent?: boolean;
+  onModalChange?: (isOpen: boolean) => void;
+};
+
 const RESOURCE_CARDS = [
   {
     icon: <BookOpen size={56} />,
@@ -28,12 +34,6 @@ const RESOURCE_CARDS = [
     path: '/ansiedad#tecnicas',
   },
 ];
-
-interface RecursosSectionProps {
-  description?: string;
-  transparent?: boolean;
-  onModalChange?: (isOpen: boolean) => void;
-}
 
 export function RecursosSection({ description, transparent = false, onModalChange }: RecursosSectionProps = {}) {
   const [selectedCard, setSelectedCard] = useState<(typeof RESOURCE_CARDS)[number] | null>(null);
