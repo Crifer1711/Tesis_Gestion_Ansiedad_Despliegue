@@ -40,8 +40,8 @@ const registerSchema = z.object({
     .max(60, "El correo electrónico es demasiado largo")
     .endsWith("@espe.edu.ec", "Debe ser obligatoriamente un correo institucional @espe.edu.ec"),
   contacto: z.string()
-    .length(12, "El número debe tener exactamente 12 dígitos (Ej: 5939XXXXXXXX)")
-    .regex(/^5939\d{8}$/, "Formato ecuatoriano inválido. Debe empezar con 593..."),
+    .length(9, "El número debe tener exactamente 9 dígitos (Ej: 9XXXXXXXX)")
+    .regex(/^9\d{8}$/, "Debe empezar con el número 9"),
   password: z.string()
     .min(8, "La contraseña debe tener al menos 8 caracteres")
     .max(30, "La contraseña no puede exceder los 30 caracteres")
@@ -60,8 +60,6 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 export const RegisterForm = () => {
   const [serverError, setServerError] = useState("");
   const [loading, setLoading] = useState(false);
-  
-  // 1. ESTADOS PARA MOSTRAR/OCULTAR CONTRASEÑAS AÑADIDOS
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
@@ -75,11 +73,18 @@ export const RegisterForm = () => {
   const onSubmit = async (data: RegisterFormData) => {
     setLoading(true);
     setServerError("");
+
+    // Reconstruimos el formato de 12 dígitos requerido por el backend
+    const dataToSend = {
+      ...data,
+      contacto: `593${data.contacto}`
+    };
+
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(dataToSend),
       });
 
       if (res.ok) {
@@ -97,24 +102,31 @@ export const RegisterForm = () => {
   
   return (
     <div 
-      className="flex min-h-screen items-center justify-center bg-cover bg-center p-6"
+      className="flex min-h-screen items-center justify-center bg-cover bg-center p-4 relative"
       style={{ backgroundImage: "url('/images/fondoLogin.png')" }}
     >
-      <div className="flex w-full max-w-5xl flex-col md:flex-row items-center justify-center gap-16">
-        <div className="w-full max-w-[600px] bg-[#D9E9FF] p-10 rounded-[45px] shadow-xl flex flex-col items-center border border-white/50">
-          
-          <div className="relative w-14 h-14 rounded-full overflow-hidden shadow-md border border-blue-200 mb-4">
-            <Image src="/images/logo-.png" alt="Logo" fill className="object-cover" sizes="56px" priority />
+      {/* Capa de superposición para mejorar el contraste del formulario frente a la imagen */}
+      <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm z-0"></div>
+
+      <div className="z-10 w-full max-w-md bg-white p-8 rounded-2xl shadow-2xl border border-gray-100 flex flex-col items-center">
+        
+        {/* LOGO & ENCABEZADO */}
+        <div className="flex flex-col items-center mb-6">
+          <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-sm border border-gray-100 mb-3 bg-white p-1">
+            <Image src="/images/logo-.png" alt="Logo" fill className="object-contain" sizes="48px" priority />
           </div>
+          <h1 className="text-xl font-bold text-slate-800 tracking-tight">Crear una cuenta</h1>
+          <p className="text-xs text-gray-500 mt-1">Ingresa tus datos institucionales para registrarte</p>
+        </div>
+        
+        <form className="w-full space-y-4" onSubmit={handleSubmit(onSubmit)}>
           
-          <h1 className="text-2xl font-bold text-[#1E4D8C] mb-8 tracking-widest uppercase">Registro</h1>
-          
-          <form className="w-full space-y-4" onSubmit={handleSubmit(onSubmit)}>
-            
-            {/* CAMPO: NOMBRES */}
+          {/* CAMPO: NOMBRES */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Nombres</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                <User size={20} />
+                <User size={18} />
               </div>
               <input
                 {...register("name", {
@@ -124,17 +136,20 @@ export const RegisterForm = () => {
                   }
                 })}
                 type="text"
-                placeholder="NOMBRES (SOLO MAYÚSCULAS)"
+                placeholder="EJ. JUAN CARLOS"
                 maxLength={40}
-                className={`w-full pl-12 pr-4 py-3.5 rounded-2xl border outline-none focus:ring-2 focus:ring-blue-400 text-gray-700 placeholder-gray-400 shadow-inner ${errors.name ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-200'}`}
+                className={`w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border bg-gray-50/50 transition-all outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 text-gray-800 placeholder-gray-400 font-medium ${errors.name ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'}`}
               />
-              {errors.name && <p className="text-red-500 text-xs mt-1 pl-2 font-medium">{errors.name.message}</p>}
             </div>
+            {errors.name && <p className="text-red-500 text-xs mt-1 font-medium pl-1">{errors.name.message}</p>}
+          </div>
 
-            {/* CAMPO: APELLIDOS */}
+          {/* CAMPO: APELLIDOS */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Apellidos</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                <User size={20} />
+                <User size={18} />
               </div>
               <input
                 {...register("lastname", {
@@ -144,17 +159,20 @@ export const RegisterForm = () => {
                   }
                 })}
                 type="text"
-                placeholder="APELLIDOS (SOLO MAYÚSCULAS)"
+                placeholder="EJ. PEREZ ANDRADE"
                 maxLength={40}
-                className={`w-full pl-12 pr-4 py-3.5 rounded-2xl border outline-none focus:ring-2 focus:ring-blue-400 text-gray-700 placeholder-gray-400 shadow-inner ${errors.lastname ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-200'}`}
+                className={`w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border bg-gray-50/50 transition-all outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 text-gray-800 placeholder-gray-400 font-medium ${errors.lastname ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'}`}
               />
-              {errors.lastname && <p className="text-red-500 text-xs mt-1 pl-2 font-medium">{errors.lastname.message}</p>}
             </div>
+            {errors.lastname && <p className="text-red-500 text-xs mt-1 font-medium pl-1">{errors.lastname.message}</p>}
+          </div>
 
-            {/* CAMPO: EMAIL */}
+          {/* CAMPO: EMAIL */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Correo Institucional</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                <Mail size={20} />
+                <Mail size={18} />
               </div>
               <input
                 {...register("email", {
@@ -164,17 +182,21 @@ export const RegisterForm = () => {
                   }
                 })}
                 type="text"
-                placeholder="ejemplo@espe.edu.ec"
+                placeholder="usuario@espe.edu.ec"
                 maxLength={60}
-                className={`w-full pl-12 pr-4 py-3.5 rounded-2xl border outline-none focus:ring-2 focus:ring-blue-400 text-gray-700 placeholder-gray-400 shadow-inner ${errors.email ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-200'}`}
+                className={`w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border bg-gray-50/50 transition-all outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 text-gray-800 placeholder-gray-400 font-medium ${errors.email ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'}`}
               />
-              {errors.email && <p className="text-red-500 text-xs mt-1 pl-2 font-medium">{errors.email.message}</p>}
             </div>
+            {errors.email && <p className="text-red-500 text-xs mt-1 font-medium pl-1">{errors.email.message}</p>}
+          </div>
 
-            {/* CAMPO: NÚMERO DE CONTACTO */}
-            <div className="relative">
+          {/* CAMPO: NÚMERO DE CONTACTO */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Número de Contacto</label>
+            <div className="relative flex items-center">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                <Phone size={20} />
+                <Phone size={18} />
+                <span className="ml-2 font-bold text-slate-800 text-sm border-r border-gray-300 pr-2">+593</span>
               </div>
               <input
                 {...register("contacto", {
@@ -184,17 +206,20 @@ export const RegisterForm = () => {
                   }
                 })}
                 type="text"
-                placeholder="5939XXXXXXXX"
-                maxLength={12}
-                className={`w-full pl-12 pr-4 py-3.5 rounded-2xl border outline-none focus:ring-2 focus:ring-blue-400 text-gray-700 placeholder-gray-400 shadow-inner ${errors.contacto ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-200'}`}
+                placeholder="9XXXXXXXX"
+                maxLength={9}
+                className={`w-full pl-24 pr-4 py-2.5 text-sm rounded-xl border bg-gray-50/50 transition-all outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 text-gray-800 placeholder-gray-400 font-medium tracking-wide ${errors.contacto ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'}`}
               />
-              {errors.contacto && <p className="text-red-500 text-xs mt-1 pl-2 font-medium">{errors.contacto.message}</p>}
             </div>
+            {errors.contacto && <p className="text-red-500 text-xs mt-1 font-medium pl-1">{errors.contacto.message}</p>}
+          </div>
 
-            {/* CAMPO: CONTRASEÑA */}
+          {/* CAMPO: CONTRASEÑA */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Contraseña</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                <Lock size={20} />
+                <Lock size={18} />
               </div>
               <input
                 {...register("password", {
@@ -203,68 +228,74 @@ export const RegisterForm = () => {
                     setValue("password", sanitized, { shouldValidate: true });
                   }
                 })}
-                type={showPassword ? "text" : "password"} // <-- CAMBIO DINÁMICO
-                placeholder="Contraseña (Alfanumérica)"
+                type={showPassword ? "text" : "password"}
+                placeholder="Mínimo 8 caracteres alfanuméricos"
                 maxLength={30}
-                className={`w-full pl-12 pr-12 py-3.5 rounded-2xl border outline-none focus:ring-2 focus:ring-blue-400 text-gray-700 placeholder-gray-400 shadow-inner ${errors.password ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-200'}`}
+                className={`w-full pl-10 pr-10 py-2.5 text-sm rounded-xl border bg-gray-50/50 transition-all outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 text-gray-800 placeholder-gray-400 font-medium ${errors.password ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'}`}
               />
-              {/* BOTÓN OJO */}
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-blue-500 transition-colors"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-slate-600 transition-colors"
                 aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
               >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
-              {errors.password && <p className="text-red-500 text-xs mt-1 pl-2 font-medium">{errors.password.message}</p>}
             </div>
+            {errors.password && <p className="text-red-500 text-xs mt-1 font-medium pl-1">{errors.password.message}</p>}
+          </div>
 
-            {/* CAMPO: CONFIRMAR CONTRASEÑA */}
+          {/* CAMPO: CONFIRMAR CONTRASEÑA */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Confirmar Contraseña</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                <Lock size={20} />
+                <Lock size={18} />
               </div>
               <input
                 {...register("confirmPassword")}
-                type={showConfirmPassword ? "text" : "password"} // <-- CAMBIO DINÁMICO
-                placeholder="Confirmar Contraseña"
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="Repite tu contraseña"
                 maxLength={30}
-                className={`w-full pl-12 pr-12 py-3.5 rounded-2xl border outline-none focus:ring-2 focus:ring-blue-400 text-gray-700 placeholder-gray-400 shadow-inner ${errors.confirmPassword ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-200'}`}
+                className={`w-full pl-10 pr-10 py-2.5 text-sm rounded-xl border bg-gray-50/50 transition-all outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 text-gray-800 placeholder-gray-400 font-medium ${errors.confirmPassword ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'}`}
               />
-              {/* BOTÓN OJO */}
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-blue-500 transition-colors"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-slate-600 transition-colors"
                 aria-label={showConfirmPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
               >
-                {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
-              {errors.confirmPassword && <p className="text-red-500 text-xs mt-1 pl-2 font-medium">{errors.confirmPassword.message}</p>}
             </div>
+            {errors.confirmPassword && <p className="text-red-500 text-xs mt-1 font-medium pl-1">{errors.confirmPassword.message}</p>}
+          </div>
 
-            {serverError && <p className="text-red-500 text-center font-bold text-sm bg-red-50 p-2 rounded-xl border border-red-200">{serverError}</p>}
+          {serverError && (
+            <p className="text-red-600 text-center font-semibold text-xs bg-red-50 p-2.5 rounded-xl border border-red-200 shadow-sm animate-fade-in">
+              {serverError}
+            </p>
+          )}
 
-            {/* BOTÓN DE ENVÍO */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-[#71A5D9] hover:bg-[#1E4D8C] text-white py-4 rounded-2xl font-bold shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50"
-            >
-              {loading ? <Loader2 className="animate-spin" /> : "Registrar Usuario"}
-            </button>
-            
-            <div className="text-center mt-6">
-              <p className="text-xs text-[#1E4D8C]/70 italic font-medium">
-                ¿Ya tienes una cuenta?  
-                <Link href="/login" className="text-[#1E4D8C] font-bold ml-1 hover:underline">
-                  Inicia Sesión
-                </Link>
-              </p>
-            </div>
-          </form>
-        </div>
+          {/* BOTÓN DE ENVÍO */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-[#1E4D8C] hover:bg-[#163B6B] active:bg-[#0f2a4f] text-white py-3 rounded-xl font-semibold text-sm shadow-md hover:shadow-lg transition-all duration-150 flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none mt-2"
+          >
+            {loading ? <Loader2 className="animate-spin" size={18} /> : "Registrarse"}
+          </button>
+          
+          {/* LINK INVERSIÓN */}
+          <div className="text-center pt-2">
+            <p className="text-xs text-gray-500 font-medium">
+              ¿Ya tienes una cuenta?  
+              <Link href="/login" className="text-[#1E4D8C] font-semibold ml-1 hover:underline hover:text-[#163B6B]">
+                Inicia Sesión
+              </Link>
+            </p>
+          </div>
+        </form>
       </div>
     </div>
   );
