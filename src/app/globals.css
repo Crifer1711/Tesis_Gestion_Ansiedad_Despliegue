@@ -83,24 +83,62 @@ body {
 }
 
 /* 3. TEMAS DE COLOR */
+/* =========================================
+   SISTEMA DE ACCESIBILIDAD DEFINITIVO
+========================================= */
+
 /* --- MODO OSCURO --- */
-.theme-dark body {
-  background-color: #0f172a !important; 
-  color: #f8fafc !important; 
+
+/* 1. Forzar TODOS los fondos de Tailwind a oscuros */
+.theme-dark body,
+.theme-dark main,
+.theme-dark section,
+.theme-dark [class*="bg-"] {
+  background-color: #0f172a !important;
+  border-color: #cccccc !important;
 }
 
-.theme-dark .bg-white, 
-.theme-dark .bg-gray-50,
-.theme-dark .bg-\[\#EEF2FF\] {
-  background-color: #1e293b !important; 
-  color: #f1f5f9 !important;
-  border-color: #334155 !important;
+/* Opcional: Dejar las tarjetas (blancas o muy claritas) en un tono azul-gris para que destaquen del fondo */
+.theme-dark .bg-white,
+.theme-dark [class*="bg-gray-50"],
+.theme-dark [class*="bg-slate-50"] {
+  background-color: #1e293b !important;
 }
 
-.theme-dark .text-gray-800, 
-.theme-dark .text-slate-800,
-.theme-dark .text-\[\#1E4D8C\] {
-  color: #60a5fa !important; /* Textos azules y oscuros a azul claro */
+/* 2. Forzar TODAS las etiquetas de texto a ser claras (Gris muy claro) */
+.theme-dark h1, .theme-dark h2, .theme-dark h3, 
+.theme-dark h4, .theme-dark h5, .theme-dark h6, 
+.theme-dark p, .theme-dark span, .theme-dark li, 
+.theme-dark label, .theme-dark a, .theme-dark strong,
+.theme-dark [class*="text-"] {
+  color: #0080ff !important;
+}
+
+/* 3. Excepción: Mantener los azules principales legibles pero vibrantes */
+.theme-dark .text-\[\#1E4D8C\],
+.theme-dark [class*="text-blue-"] {
+  color: #60a5fa !important;
+}
+
+
+/* --- ALTO CONTRASTE --- */
+
+/* 1. Forzar TODO el fondo a negro puro */
+.theme-high-contrast body,
+.theme-high-contrast main,
+.theme-high-contrast section,
+.theme-high-contrast [class*="bg-"] {
+  background-color: #000000 !important;
+  border-color: #facc15 !important;
+}
+
+/* 2. Forzar TODAS las etiquetas de texto a amarillo puro */
+.theme-high-contrast h1, .theme-high-contrast h2, .theme-high-contrast h3, 
+.theme-high-contrast h4, .theme-high-contrast h5, .theme-high-contrast h6, 
+.theme-high-contrast p, .theme-high-contrast span, .theme-high-contrast li, 
+.theme-high-contrast label, .theme-high-contrast a, .theme-high-contrast strong,
+.theme-high-contrast [class*="text-"] {
+  color: #facc15 !important;
 }
 
 /* --- ALTO CONTRASTE --- */
@@ -113,6 +151,7 @@ body {
   border-color: #facc15 !important;
 }
 
+/* Forzar todos los fondos de Tailwind a negro */
 .theme-high-contrast .bg-white,
 .theme-high-contrast .bg-blue-600,
 .theme-high-contrast [class*="bg-"] {
@@ -120,20 +159,17 @@ body {
   color: #facc15 !important;
 }
 
-.theme-high-contrast .text-white,
-.theme-high-contrast .text-gray-800,
-.theme-high-contrast .text-blue-600 {
+/* SOLUCIÓN: 
+  En lugar de listar clase por clase (text-white, text-gray-800, etc.), 
+  forzamos a que CUALQUIER elemento que tenga una clase de texto de Tailwind, 
+  así como los elementos de texto estándar, se vuelvan amarillos.
+*/
+.theme-high-contrast [class*="text-"],
+.theme-high-contrast h1,
+.theme-high-contrast h2,
+.theme-high-contrast h3,
+.theme-high-contrast h4,
+.theme-high-contrast p,
+.theme-high-contrast span {
   color: #facc15 !important;
-}
-
-/* Make react-hot-toast text bold globally */
-.react-hot-toast, .react-hot-toast * {
-  font-weight: 700 !important;
-  color: #000000 !important;
-}
-
-/* Improve toast container contrast (white bg, black text) */
-.react-hot-toast > div {
-  background-color: #ffffff !important;
-  color: #000000 !important;
 }
