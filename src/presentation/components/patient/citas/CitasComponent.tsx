@@ -369,145 +369,157 @@ export function CitasComponent() {
 
   return (
     <>
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Encabezado */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-black text-[#1E4D8C] mb-2">Agendar Cita</h1>
-          <p className="text-slate-600 leading-relaxed text-lg">
-            Elige un psicólogo, selecciona fecha y hora disponibles, y envía tu cita.
-          </p>
-        </div>
+    <div className="min-h-screen bg-[radial-gradient(circle_at_15%_20%,#dff1ff_0%,#eef6ff_35%,#f8fbff_70%)] px-4 py-6 md:px-8 md:py-10">
+      <div className="mx-auto max-w-[1450px] space-y-7">
+        <section className="rounded-3xl border border-[#c7ddf8] bg-white/85 p-6 shadow-[0_20px_45px_rgba(29,78,140,0.12)] backdrop-blur md:p-8">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-[#4c82bf]">Agenda Clínica</p>
+              <h1 className="mt-2 text-3xl font-black text-[#1E4D8C] md:text-5xl">Agendamiento de cita</h1>
+              <p className="mt-3 max-w-3xl text-sm text-slate-600 md:text-base">
+                Selecciona el psicólogo, fecha, modalidad y horario para agendar tu cita.
+              </p>
+            </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:items-start">
-          {/* FORMULARIO */}
-          <div className="lg:col-span-1 lg:sticky lg:top-24 self-start">
-            <div className="bg-white rounded-2xl shadow-lg border border-blue-100 p-6 overflow-hidden">
-              <div className="-mx-6 -mt-6 mb-6 bg-gradient-to-r from-[#71A5D9] to-[#9DC3E6] px-6 py-5 text-white">
-                <h2 className="text-xl font-black">Completa tu solicitud</h2>
-                <p className="text-sm text-white/90 mt-1">Selecciona un espacio disponible y describe, si lo deseas, el motivo de la consulta.</p>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+              <div className="rounded-2xl border border-blue-100 bg-[#f4f9ff] px-4 py-3">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Próximas</p>
+                <p className="mt-1 text-2xl font-black text-[#1E4D8C]">{upcomingAppointments.length}</p>
               </div>
-              <form onSubmit={handleSubmit} className="space-y-5">
-                {/* Seleccionar Psicólogo */}
-                <div>
-                  <label className="block text-sm font-bold text-[#1E4D8C] mb-2">
-                    <User size={16} className="inline mr-1" />
-                    Seleccionar Psicólogo *
-                  </label>
-                  <select
-                    value={formData.psicologo}
-                    onChange={(e) => setFormData({ ...formData, psicologo: e.target.value })}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#71A5D9] text-sm text-gray-800 font-medium bg-white"
-                  >
-                    <option value="" className="text-gray-600">
-                      {loading ? 'Cargando psicólogos...' : psicologos.length === 0 ? 'No hay psicólogos disponibles' : 'Selecciona un psicólogo'}
-                    </option>
-                    {psicologos.map((p) => (
-                      <option key={p.id} value={p.id} className="text-gray-800">{p.name}</option>
-                    ))}
-                  </select>
-                </div>
+              <div className="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Aceptadas</p>
+                <p className="mt-1 text-2xl font-black text-emerald-700">{citasAgendadas.filter((c) => c.estado === 'Aceptada').length}</p>
+              </div>
+              <div className="rounded-2xl border border-amber-100 bg-amber-50 px-4 py-3">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Pendientes</p>
+                <p className="mt-1 text-2xl font-black text-amber-700">{citasAgendadas.filter((c) => c.estado === 'Pendiente').length}</p>
+              </div>
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Historial</p>
+                <p className="mt-1 text-2xl font-black text-slate-700">{historyAppointments.length}</p>
+              </div>
+            </div>
+          </div>
+        </section>
 
-                {/* Fecha */}
-                <div>
-                  <label className="block text-sm font-bold text-[#1E4D8C] mb-2">
-                    <Calendar size={16} className="inline mr-1" />
-                    Fecha *
-                  </label>
-                  <input
-                    type="date"
-                    value={formData.fecha}
-                    onChange={(e) => setFormData({ ...formData, fecha: e.target.value })}
-                    min={today}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#71A5D9] text-sm text-gray-800 font-medium bg-white"
-                  />
-                </div>
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start">
+          <section className="xl:col-span-7">
+            <div className="overflow-hidden rounded-3xl border border-[#c7ddf8] bg-white shadow-[0_18px_35px_rgba(21,74,130,0.12)]">
+              <div className="bg-gradient-to-r from-[#2f6ca9] via-[#4e8ecf] to-[#79b0e3] px-6 py-5 text-white md:px-8">
+                <h2 className="text-2xl font-black">Solicitar nueva cita</h2>
+                <p className="mt-1 text-sm text-white/90">Completa el formulario y confirma una hora disponible.</p>
+              </div>
 
-                {/* Hora */}
-                <div>
-                  <label className="block text-sm font-bold text-[#1E4D8C] mb-2">
-                    <Clock size={16} className="inline mr-1" />
-                    Hora *
-                  </label>
-                  <div className="space-y-2">
-                    <div className="grid grid-cols-3 gap-2">
-                      {HORAS.map((h) => {
-                        const estaOcupada = horasOcupadas.includes(h);
-                        const estaPasada = isHoraPasada(formData.fecha, h);
-                        const estaInhabilitada = estaOcupada || estaPasada;
-                        return (
-                          <button
-                            key={h}
-                            type="button"
-                            onClick={() => !estaInhabilitada && setFormData({ ...formData, hora: h })}
-                            disabled={estaInhabilitada}
-                            className={`py-2 px-2 rounded-lg font-semibold text-sm transition-all border-2 ${
-                              estaPasada
-                                ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
-                                : estaOcupada
-                                ? 'bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed line-through'
-                                : formData.hora === h
-                                ? 'bg-[#71A5D9] text-white border-[#1E4D8C]'
-                                : 'bg-white text-[#1E4D8C] border-[#71A5D9] hover:bg-blue-50'
-                            }`}
-                          >
-                            {estaPasada ? <Clock size={14} className="inline mr-1" /> : estaOcupada ? <Lock size={14} className="inline mr-1" /> : null}
-                            {h}
-                          </button>
-                        );
-                      })}
+              <form onSubmit={handleSubmit} className="space-y-6 p-6 md:p-8">
+                <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                  <div className="md:col-span-2">
+                    <label className="mb-2 block text-sm font-bold text-[#1E4D8C]">
+                      <User size={16} className="mr-1 inline" />
+                      Psicólogo
+                    </label>
+                    <select
+                      value={formData.psicologo}
+                      onChange={(e) => setFormData({ ...formData, psicologo: e.target.value })}
+                      className="w-full rounded-xl border border-blue-100 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 outline-none transition focus:border-[#71A5D9] focus:bg-white"
+                    >
+                      <option value="">{loading ? 'Cargando psicólogos...' : psicologos.length === 0 ? 'No hay psicólogos disponibles' : 'Selecciona un psicólogo'}</option>
+                      {psicologos.map((p) => (
+                        <option key={p.id} value={p.id}>{p.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-sm font-bold text-[#1E4D8C]">
+                      <Calendar size={16} className="mr-1 inline" />
+                      Fecha
+                    </label>
+                    <input
+                      type="date"
+                      value={formData.fecha}
+                      onChange={(e) => setFormData({ ...formData, fecha: e.target.value })}
+                      min={today}
+                      className="w-full rounded-xl border border-blue-100 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 outline-none transition focus:border-[#71A5D9] focus:bg-white"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-sm font-bold text-[#1E4D8C]">Modalidad</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <label className={`flex cursor-pointer items-center justify-center rounded-xl border-2 p-3 text-sm font-semibold transition ${
+                        formData.modalidad === 'Presencial' ? 'text-[#0f3f74]' : 'text-slate-700'
+                      }`}
+                        style={{ borderColor: formData.modalidad === 'Presencial' ? '#71A5D9' : '#d8e8f9', background: formData.modalidad === 'Presencial' ? '#ebf4ff' : '#f8fbff' }}>
+                        <input
+                          type="radio"
+                          value="Presencial"
+                          checked={formData.modalidad === 'Presencial'}
+                          onChange={(e) => setFormData({ ...formData, modalidad: e.target.value })}
+                          className="mr-2 h-4 w-4 accent-[#1E4D8C]"
+                        />
+                        Presencial
+                      </label>
+                      <label className={`flex cursor-pointer items-center justify-center rounded-xl border-2 p-3 text-sm font-semibold transition ${
+                        formData.modalidad === 'Virtual' ? 'text-[#0f3f74]' : 'text-slate-700'
+                      }`}
+                        style={{ borderColor: formData.modalidad === 'Virtual' ? '#71A5D9' : '#d8e8f9', background: formData.modalidad === 'Virtual' ? '#ebf4ff' : '#f8fbff' }}>
+                        <input
+                          type="radio"
+                          value="Virtual"
+                          checked={formData.modalidad === 'Virtual'}
+                          onChange={(e) => setFormData({ ...formData, modalidad: e.target.value })}
+                          className="mr-2 h-4 w-4 accent-[#1E4D8C]"
+                        />
+                        Virtual
+                      </label>
                     </div>
-                    <div className="flex flex-col gap-1 mt-2 text-xs text-gray-500">
-                      <p className="flex items-center gap-1">
-                        <Lock size={12} />
-                        Tachadas — Espacios reservados (no disponibles)
-                      </p>
-                      <p className="flex items-center gap-1">
-                        <Clock size={12} />
-                        En gris — Horas vencidas (no disponibles)
-                      </p>
-                    </div>
+                    <p className="mt-2 text-xs font-medium text-slate-600">
+                      Presencial: atencion en consultorio. Virtual: sesion por Google Meet.
+                    </p>
                   </div>
                 </div>
 
-                {/* Modalidad */}
-                <div>
-                  <label className="block text-sm font-bold text-[#1E4D8C] mb-3">Modalidad</label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <label className="flex items-center cursor-pointer bg-gray-50 p-3 rounded-lg border-2 border-gray-200 hover:border-[#71A5D9] transition"
-                      style={{ borderColor: formData.modalidad === 'Presencial' ? '#71A5D9' : '#E5E7EB' }}>
-                      <input
-                        type="radio"
-                        value="Presencial"
-                        checked={formData.modalidad === 'Presencial'}
-                        onChange={(e) => setFormData({ ...formData, modalidad: e.target.value })}
-                        className="mr-2 w-4 h-4 cursor-pointer"
-                      />
-                      <span className="text-sm font-medium text-gray-800">Presencial</span>
-                    </label>
-                    <label className="flex items-center cursor-pointer bg-gray-50 p-3 rounded-lg border-2 border-gray-200 hover:border-[#71A5D9] transition"
-                      style={{ borderColor: formData.modalidad === 'Virtual' ? '#71A5D9' : '#E5E7EB' }}>
-                      <input
-                        type="radio"
-                        value="Virtual"
-                        checked={formData.modalidad === 'Virtual'}
-                        onChange={(e) => setFormData({ ...formData, modalidad: e.target.value })}
-                        className="mr-2 w-4 h-4 cursor-pointer"
-                      />
-                      <span className="text-sm font-medium text-gray-800">Virtual</span>
-                    </label>
+                <div className="rounded-2xl border border-blue-100 bg-[#f7fbff] p-4 md:p-5">
+                  <label className="mb-3 block text-sm font-bold text-[#1E4D8C]">
+                    <Clock size={16} className="mr-1 inline" />
+                    Selecciona una hora
+                  </label>
+                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
+                    {HORAS.map((h) => {
+                      const estaOcupada = horasOcupadas.includes(h);
+                      const estaPasada = isHoraPasada(formData.fecha, h);
+                      const estaInhabilitada = estaOcupada || estaPasada;
+                      return (
+                        <button
+                          key={h}
+                          type="button"
+                          onClick={() => !estaInhabilitada && setFormData({ ...formData, hora: h })}
+                          disabled={estaInhabilitada}
+                          className={`rounded-lg border-2 px-2 py-2 text-sm font-bold transition ${
+                            estaPasada
+                              ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400'
+                              : estaOcupada
+                              ? 'cursor-not-allowed border-slate-300 bg-gray-200 text-gray-400 line-through'
+                              : formData.hora === h
+                              ? 'border-[#1E4D8C] bg-[#71A5D9] text-white'
+                              : 'border-[#89b7e8] bg-white text-[#1E4D8C] hover:bg-blue-50'
+                          }`}
+                        >
+                          {estaPasada ? <Clock size={13} className="mr-1 inline" /> : estaOcupada ? <Lock size={13} className="mr-1 inline" /> : null}
+                          {h}
+                        </button>
+                      );
+                    })}
                   </div>
-                  {formData.modalidad === 'Virtual' && (
-                    <div className="mt-3 text-sm text-gray-600">
-                      <p className="mb-2">Al seleccionar "Virtual", el psicólogo recibirá una notificación y compartirá directamente el enlace de la sesión. El enlace estará disponible en tus notificaciones y en la sección de citas cuando el psicólogo lo haya publicado.</p>
-                    </div>
-                  )}
+                  <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-slate-500">
+                    <p className="flex items-center gap-1"><Lock size={12} /> Tachadas: espacio reservado</p>
+                    <p className="flex items-center gap-1"><Clock size={12} /> En gris: hora vencida</p>
+                  </div>
                 </div>
 
-                {/* Motivo */}
                 <div>
-                  <label className="block text-sm font-bold text-[#1E4D8C] mb-2">
-                    Motivo de la Consulta (Opcional, máximo {MAX_MOTIVO_WORDS} palabras)
+                  <label className="mb-2 block text-sm font-bold text-[#1E4D8C]">
+                    Motivo de la consulta (opcional, máximo {MAX_MOTIVO_WORDS} palabras)
                   </label>
                   <textarea
                     value={formData.motivo}
@@ -517,38 +529,30 @@ export function CitasComponent() {
                         setFormData({ ...formData, motivo: nextValue });
                       }
                     }}
-                    placeholder="Cuéntale al psicólogo por qué deseas esta cita..."
-                    rows={3}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#71A5D9] text-sm text-gray-800 font-medium resize-none placeholder-gray-500 bg-white"
+                    placeholder="Describe brevemente lo que deseas tratar en la sesión..."
+                    rows={4}
+                    className="w-full resize-none rounded-xl border border-blue-100 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 outline-none transition focus:border-[#71A5D9] focus:bg-white"
                   />
                   <div className="mt-2 flex items-center justify-between text-xs">
-                    <span className="text-gray-500">Opcional — escribe un breve motivo si lo deseas.</span>
-                    <span className={`${motivoWords > MAX_MOTIVO_WORDS ? 'text-red-600 font-semibold' : 'text-gray-500'}`}>
-                      {motivoWords}/{MAX_MOTIVO_WORDS}
-                    </span>
+                    <span className="text-slate-500">Opcional, pero útil para orientar la sesión.</span>
+                    <span className={`${motivoWords > MAX_MOTIVO_WORDS ? 'font-semibold text-red-600' : 'text-slate-500'}`}>{motivoWords}/{MAX_MOTIVO_WORDS}</span>
                   </div>
                 </div>
 
-                {/* Botón Enviar */}
                 <button
                   type="submit"
                   disabled={enviando || !formData.psicologo || !formData.fecha || !formData.hora || horaSeleccionadaInvalida || motivoWords > MAX_MOTIVO_WORDS}
-                  className="w-full bg-gradient-to-r from-[#71A5D9] to-[#1E4D8C] hover:from-[#1E4D8C] hover:to-[#0F2840] text-white font-bold py-3 px-4 rounded-lg transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#2f6ca9] to-[#1E4D8C] px-6 py-3.5 text-sm font-black text-white shadow-lg transition hover:from-[#25588a] hover:to-[#163b68] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <Send size={18} />
-                  {enviando ? 'Agendando...' : 'Agendar Cita'}
+                  {enviando ? 'Agendando...' : 'Confirmar solicitud de cita'}
                 </button>
-
-                <p className="text-xs text-gray-600 text-center mt-3">
-                  * Campos requeridos
-                </p>
               </form>
             </div>
-          </div>
+          </section>
 
-          {/* CITAS AGENDADAS */}
-          <div className="lg:col-span-2 lg:sticky lg:top-24 self-start">
-            <div className="space-y-5 rounded-2xl bg-transparent lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto lg:pr-1">
+          <section className="xl:col-span-5">
+            <div className="space-y-5 rounded-3xl border border-blue-100 bg-white p-5 shadow-[0_12px_30px_rgba(15,70,128,0.10)] md:p-6 xl:sticky xl:top-24 xl:max-h-[calc(100vh-7rem)] xl:overflow-y-auto">
             <div className="flex items-end justify-between gap-4 flex-wrap">
               <h2 className="text-2xl font-black text-[#1E4D8C]">Mis Citas</h2>
               <div className="inline-flex rounded-xl border border-blue-100 bg-white p-1 shadow-sm">
@@ -672,7 +676,7 @@ export function CitasComponent() {
               )
             ) : (
               <div className="space-y-4">
-                <div className="sticky top-0 z-10 flex items-center justify-between gap-3 flex-wrap bg-[#f5f9ff] pb-3 pt-1">
+                <div className="flex items-center justify-between gap-3 flex-wrap rounded-2xl border border-blue-100 bg-[#f5f9ff] px-4 py-3">
                   <p className="text-sm text-slate-600">Aquí verás tus citas aceptadas y canceladas.</p>
                   <select
                     value={historyFilter}
@@ -745,7 +749,7 @@ export function CitasComponent() {
               </div>
             )}
             </div>
-          </div>
+          </section>
         </div>
       </div>
     </div>

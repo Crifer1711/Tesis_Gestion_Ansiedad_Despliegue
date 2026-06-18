@@ -118,10 +118,10 @@ export function NotificationBell({ compact = false }: Props) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-12 z-50 w-[340px] overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-xl">
+        <div className="absolute right-0 top-12 z-50 w-[360px] overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-xl">
           <div className="border-b border-blue-100 bg-[#EAF2FF] px-4 py-3">
             <p className="text-sm font-black text-[#1E4D8C]">Notificaciones</p>
-            <p className="text-[11px] text-slate-600">Tareas, citas aceptadas, rechazadas y enlaces</p>
+            <p className="text-[11px] text-slate-600">Tareas y citas recientes</p>
           </div>
           <div className="max-h-96 overflow-y-auto p-2">
             {items.length === 0 ? (
@@ -132,19 +132,24 @@ export function NotificationBell({ compact = false }: Props) {
                   key={item.id}
                   type="button"
                   onClick={() => markItemAsSeen(item.id)}
-                  className={`mb-2 w-full rounded-xl border px-3 py-3 text-left last:mb-0 transition ${seenIds.has(item.id)
-                    ? 'border-slate-200 bg-slate-50/70 opacity-55 hover:bg-slate-50/80'
-                    : 'border-[#71A5D9] bg-gradient-to-r from-blue-50 to-cyan-50 shadow-sm hover:border-[#1E4D8C] hover:shadow-md'
+                  className={`mb-2 w-full rounded-2xl border px-3 py-3 text-left last:mb-0 transition ${seenIds.has(item.id)
+                    ? 'border-slate-200 bg-slate-50/70 opacity-65 hover:bg-slate-50/80'
+                    : 'border-[#71A5D9] bg-gradient-to-br from-blue-50 via-white to-cyan-50 shadow-sm hover:border-[#1E4D8C] hover:shadow-md'
                     }`}
                 >
-                  <div className="flex items-start gap-2">
+                  <div className="flex items-start gap-3">
                     {!seenIds.has(item.id) && (
                       <span className={`mt-0.5 inline-flex h-2.5 w-2.5 rounded-full ${item.type === 'appointment' ? 'bg-blue-600' : 'bg-amber-600'}`} />
                     )}
                     <div className="min-w-0 flex-1">
-                      <p className={`text-sm font-bold ${seenIds.has(item.id) ? 'text-slate-500' : 'text-[#103A73]'}`}>{item.title}</p>
-                      <p className={`text-xs leading-relaxed ${seenIds.has(item.id) ? 'text-slate-500' : 'text-slate-800'}`}>{item.message}</p>
-                      <p className={`mt-1 text-[10px] font-semibold uppercase tracking-wide ${seenIds.has(item.id) ? 'text-slate-400' : 'text-[#1E4D8C]'}`}>
+                      <div className="mb-1 flex flex-wrap items-center gap-2">
+                        <p className={`text-sm font-black ${seenIds.has(item.id) ? 'text-slate-500' : 'text-[#103A73]'}`}>{item.title}</p>
+                        <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wide ${item.type === 'appointment' ? 'bg-sky-100 text-sky-700' : 'bg-amber-100 text-amber-700'}`}>
+                          {item.type === 'appointment' ? 'Cita' : 'Tarea'}
+                        </span>
+                      </div>
+                      <p className={`text-xs leading-relaxed ${seenIds.has(item.id) ? 'text-slate-500' : 'text-slate-700'}`}>{item.message}</p>
+                      <p className={`mt-2 text-[10px] font-semibold uppercase tracking-wide ${seenIds.has(item.id) ? 'text-slate-400' : 'text-[#1E4D8C]'}`}>
                         {seenIds.has(item.id) ? 'Visto' : 'Nuevo'}
                       </p>
                     </div>
@@ -154,9 +159,12 @@ export function NotificationBell({ compact = false }: Props) {
             )}
           </div>
           {session?.user?.role === 'PACIENTE' && (
-            <div className="border-t border-blue-100 bg-white px-4 py-3 text-right">
-              <Link href="/paciente/tareas" className="text-xs font-bold text-[#1E4D8C] hover:underline">
-                Ir a mis tareas
+            <div className="grid grid-cols-2 gap-2 border-t border-blue-100 bg-white px-4 py-3">
+              <Link href="/paciente/tareas" className="inline-flex items-center justify-center rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-black text-amber-800 hover:bg-amber-100">
+                Mis tareas
+              </Link>
+              <Link href="/paciente/citas" className="inline-flex items-center justify-center rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-black text-[#1E4D8C] hover:bg-blue-100">
+                Mis citas
               </Link>
             </div>
           )}
