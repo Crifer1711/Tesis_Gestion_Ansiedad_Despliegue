@@ -226,7 +226,7 @@ export function PatientManager({ patients }: Props) {
                 {/* Navegación de Pestañas */}
                 <div className="mt-8">
                   <div className="flex border border-gray-300 rounded-xl overflow-hidden bg-gray-50 shadow-inner">
-                    {['Citas', 'Ficha Psicológica', 'Resultados Test'].map((tab) => (
+                    {['Citas', 'Ficha Médica', 'Resultados Test'].map((tab) => (
                       <button 
                         key={tab} 
                         onClick={() => setActiveTab(tab)}
@@ -264,7 +264,7 @@ export function PatientManager({ patients }: Props) {
                         ))}
 
                         {/* PESTAÑA: FICHA MÉDICA */}
-                        {activeTab === 'Ficha Psicológica' && (
+                        {activeTab === 'Ficha Médica' && (
         <MedicalRecordTab 
      patientId={selectedPatient.id} 
      patientName={selectedPatient.nombre} 
