@@ -42,7 +42,6 @@ const getAppointmentColumnFlags = async () => {
     hasRequestLink: columns.has('request_link'),
     hasMeetingLink: columns.has('meeting_link'),
     hasCancelReason: columns.has('cancel_reason'),
-    hasUpdatedByRole: columns.has('status_updated_by_role'),
   };
 };
 
@@ -61,7 +60,7 @@ export async function GET(request: Request) {
     const psychologistId = searchParams.get('psychologistId');
     const patientId = searchParams.get('patientId');
     const fecha = searchParams.get('fecha');
-    const { hasRequestLink, hasMeetingLink, hasCancelReason, hasUpdatedByRole } = await getAppointmentColumnFlags();
+    const { hasRequestLink, hasMeetingLink, hasCancelReason } = await getAppointmentColumnFlags();
 
     const requestLinkSelect = hasRequestLink
       ? 'a.request_link as "requestLink"'
@@ -72,9 +71,6 @@ export async function GET(request: Request) {
     const cancelReasonSelect = hasCancelReason
       ? 'a.cancel_reason as "cancelReason"'
       : 'NULL::text as "cancelReason"';
-    const updatedByRoleSelect = hasUpdatedByRole
-      ? 'a.status_updated_by_role as "updatedByRole"'
-      : 'NULL::text as "updatedByRole"';
 
     // Si se pasa psychologistId, obtener citas del psicólogo
     if (psychologistId) {
@@ -91,7 +87,6 @@ export async function GET(request: Request) {
           ${requestLinkSelect},
           ${meetingLinkSelect},
           ${cancelReasonSelect},
-          ${updatedByRoleSelect},
           a.status,
           u.name as "patientName",
           u.email as "patientEmail"
@@ -129,7 +124,6 @@ export async function GET(request: Request) {
             requestLink: apt.requestLink,
             meetingLink: apt.meetingLink,
             cancelReason: apt.cancelReason,
-            updatedByRole: apt.updatedByRole,
             status: apt.status,
             patientName: apt.patientName,
             patientEmail: apt.patientEmail
@@ -152,7 +146,6 @@ export async function GET(request: Request) {
           ${requestLinkSelect},
           ${meetingLinkSelect},
           ${cancelReasonSelect},
-          ${updatedByRoleSelect},
           a.status,
           p.name as "psychologistName",
           p.email as "psychologistEmail"
@@ -190,7 +183,6 @@ export async function GET(request: Request) {
             requestLink: apt.requestLink,
             meetingLink: apt.meetingLink,
             cancelReason: apt.cancelReason,
-            updatedByRole: apt.updatedByRole,
             status: apt.status,
             psychologistName: apt.psychologistName,
             psychologistEmail: apt.psychologistEmail

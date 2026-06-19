@@ -11,20 +11,6 @@ type NotificationItem = {
   created_at: string;
 };
 
-const getAppointmentColumnFlags = async () => {
-  const result = await pool.query(
-    `SELECT column_name
-     FROM information_schema.columns
-     WHERE table_schema = 'public'
-       AND table_name = 'appointments'`
-  );
-
-  const columns = new Set(result.rows.map((row: any) => row.column_name));
-  return {
-    hasUpdatedByRole: columns.has('status_updated_by_role'),
-  };
-};
-
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
@@ -33,16 +19,8 @@ export async function GET() {
     const role = session.user.role;
     const userId = String(session.user.id || '');
     const items: NotificationItem[] = [];
-    const { hasUpdatedByRole } = await getAppointmentColumnFlags();
 
     if (role === 'PACIENTE') {
-      const statusUpdatedByRoleSelect = hasUpdatedByRole
-        ? 'ap.status_updated_by_role'
-        : 'NULL::text';
-      const cancelMessagePrefix = hasUpdatedByRole
-        ? "COALESCE(ap.status_updated_by_role, '')"
-        : "''";
-
       const tasksRes = await pool.query(
         `SELECT ba.id::text AS id, a.titulo AS title, ba.created_at,
                 'Te asignaron una nueva tarea: ' || COALESCE(a.titulo, 'Actividad') AS message
@@ -55,29 +33,29 @@ export async function GET() {
       );
 
       const appointmentsRes = await pool.query(
-        `SELECT ap.id::text AS id, ap.status,
-          COALESCE(p.name, 'Psicólogo') AS title,
+        `SELECT ap.id::text AS id, COALESCE(p.name, 'Psicólogo') AS title,
                 ap.updated_at AS created_at,
-                ${statusUpdatedByRoleSelect} AS status_updated_by_role,
-                ap.cancel_reason,
-                ap.meeting_link,
                 CASE
-                  WHEN ap.status = 'Cancelada' AND ${cancelMessagePrefix} = 'PSICOLOGO' THEN
-                    'La psicóloga canceló tu cita del ' || TO_CHAR(ap.appointment_date, 'DD/MM/YYYY') || ' a las ' || ap.appointment_time || '. Motivo: ' || COALESCE(ap.cancel_reason, 'Sin motivo especificado')
-                  WHEN ap.status = 'Cancelada' AND ${cancelMessagePrefix} = 'ADMINISTRADOR' THEN
-                    'La administración canceló tu cita del ' || TO_CHAR(ap.appointment_date, 'DD/MM/YYYY') || ' a las ' || ap.appointment_time || '. Motivo: ' || COALESCE(ap.cancel_reason, 'Sin motivo especificado')
-                  WHEN ap.status = 'Aceptada' AND ap.meeting_link IS NOT NULL THEN 'Tu cita con ' || COALESCE(p.name, 'tu psicólogo') || ' fue aceptada para ' || TO_CHAR(ap.appointment_date, 'DD/MM/YYYY') || ' a las ' || ap.appointment_time || ' y ya tienes disponible el enlace de la sesión'
                   WHEN ap.status = 'Aceptada' THEN 'Tu cita con ' || COALESCE(p.name, 'tu psicólogo') || ' fue aceptada para ' || TO_CHAR(ap.appointment_date, 'DD/MM/YYYY') || ' a las ' || ap.appointment_time
                   WHEN ap.status = 'Rechazada' THEN 'La psicóloga rechazó tu cita del ' || TO_CHAR(ap.appointment_date, 'DD/MM/YYYY') || ' a las ' || ap.appointment_time
+                  WHEN ap.status = 'Cancelada' THEN 'Tu cita del ' || TO_CHAR(ap.appointment_date, 'DD/MM/YYYY') || ' a las ' || ap.appointment_time || ' fue cancelada'
                   ELSE 'Actualización en tu cita con ' || COALESCE(p.name, 'tu psicólogo')
                 END AS message
          FROM appointments ap
          LEFT JOIN users p ON p.id = ap.psychologist_id
-         WHERE ap.patient_id = $1
-           AND (
-             ap.status IN ('Aceptada', 'Rechazada')
-             ${hasUpdatedByRole ? "OR (ap.status = 'Cancelada' AND COALESCE(ap.status_updated_by_role, '') IN ('PSICOLOGO', 'ADMINISTRADOR'))" : ''}
-           )
+         WHERE ap.patient_id = $1 AND ap.status IN ('Aceptada', 'Rechazada', 'Cancelada')
+         ORDER BY ap.updated_at DESC
+         LIMIT 5`,
+        [userId]
+      );
+
+      const meetingLinkRes = await pool.query(
+        `SELECT ap.id::text AS id, COALESCE(p.name, 'Psicólogo') AS title,
+                ap.updated_at AS created_at,
+                'El psicólogo ha compartido el enlace de la sesión: ' || COALESCE(ap.meeting_link, '') AS message
+         FROM appointments ap
+         LEFT JOIN users p ON p.id = ap.psychologist_id
+         WHERE ap.patient_id = $1 AND ap.meeting_link IS NOT NULL
          ORDER BY ap.updated_at DESC
          LIMIT 5`,
         [userId]
@@ -92,9 +70,16 @@ export async function GET() {
           created_at: row.created_at,
         })),
         ...appointmentsRes.rows.map((row) => ({
-          id: `apt-${row.id}-${row.status}-${new Date(String(row.created_at)).getTime()}`,
+          id: `apt-${row.id}`,
           type: 'appointment' as const,
           title: row.title || 'Cita actualizada',
+          message: row.message,
+          created_at: row.created_at,
+        })),
+        ...meetingLinkRes.rows.map((row) => ({
+          id: `link-${row.id}`,
+          type: 'appointment' as const,
+          title: row.title || 'Enlace compartido',
           message: row.message,
           created_at: row.created_at,
         }))

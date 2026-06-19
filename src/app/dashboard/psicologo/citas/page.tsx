@@ -19,7 +19,6 @@ interface Appointment {
   requestLink?: boolean;
   meetingLink?: string | null;
   cancelReason?: string | null;
-  updatedByRole?: string | null;
   status: 'Pendiente' | 'Aceptada' | 'Rechazada' | 'Cancelada';
 }
 
@@ -60,8 +59,6 @@ export default function PsychologistCitasPage() {
   const [calendarMonth, setCalendarMonth] = useState<Date>(new Date()); // Para navegar entre meses
   const [meetingLinkDrafts, setMeetingLinkDrafts] = useState<Record<string, string>>({});
   const [savingLinkIds, setSavingLinkIds] = useState<Set<string>>(new Set());
-  const [cancelingAppointmentId, setCancelingAppointmentId] = useState<string | null>(null);
-  const [cancelReasonDraft, setCancelReasonDraft] = useState('');
 
   useEffect(() => {
     setLoading(true);
@@ -121,63 +118,13 @@ export default function PsychologistCitasPage() {
       setAppointments(prev =>
         prev.map(apt => apt.id === appointmentId ? { ...apt, status: newStatus } : apt)
       );
-
-      if (newStatus === 'Rechazada') {
-        setSelectedAppointmentId((current) => (current === appointmentId ? null : current));
-      }
+      
+      setSelectedAppointmentId((current) => (current === appointmentId ? null : current));
 
       console.log(`Cita ${appointmentId} actualizada a ${newStatus}`);
     } catch (err) {
       console.error('Error:', err);
       toast.error('Error al actualizar cita');
-    }
-  };
-
-  const openCancelForm = (appointment: Appointment) => {
-    setSelectedAppointmentId(appointment.id);
-    setCancelingAppointmentId(appointment.id);
-    setCancelReasonDraft(appointment.cancelReason || '');
-  };
-
-  const closeCancelForm = () => {
-    setCancelingAppointmentId(null);
-    setCancelReasonDraft('');
-  };
-
-  const confirmCancelAppointment = async (appointmentId: string) => {
-    const normalizedReason = cancelReasonDraft.trim();
-
-    if (!normalizedReason) {
-      toast.error('Escribe el motivo de la cancelación');
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/appointments/${appointmentId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'Cancelada', cancelReason: normalizedReason }),
-      });
-
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || 'Error al cancelar cita');
-      }
-
-      setAppointments((prev) =>
-        prev.map((apt) =>
-          apt.id === appointmentId
-            ? { ...apt, status: 'Cancelada', cancelReason: normalizedReason, updatedByRole: data.updatedByRole || 'PSICOLOGO' }
-            : apt
-        )
-      );
-
-      setSelectedAppointmentId((current) => (current === appointmentId ? null : current));
-      closeCancelForm();
-      toast.success('Cita cancelada');
-    } catch (err) {
-      console.error('Error:', err);
-      toast.error(err instanceof Error ? err.message : 'Error al cancelar cita');
     }
   };
 
@@ -314,22 +261,6 @@ export default function PsychologistCitasPage() {
     () => filteredAppointments.find((apt) => apt.id === selectedAppointmentId) ?? null,
     [filteredAppointments, selectedAppointmentId]
   );
-
-  const getCancelLabel = (appointment: Appointment) => {
-    if (appointment.updatedByRole === 'PSICOLOGO') {
-      return 'Cancelada por la psicóloga';
-    }
-
-    if (appointment.updatedByRole === 'ADMINISTRADOR') {
-      return 'Cancelada por administración';
-    }
-
-    if (appointment.updatedByRole === 'PACIENTE') {
-      return 'Cancelada por el estudiante';
-    }
-
-    return 'Cancelada';
-  };
 
   useEffect(() => {
     if (selectedAppointmentId && !filteredAppointments.some((apt) => apt.id === selectedAppointmentId)) {
@@ -532,7 +463,7 @@ export default function PsychologistCitasPage() {
                   placeholder="Buscar por paciente o email..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full rounded-lg border-2 border-gray-200 bg-white pl-10 pr-4 py-2 text-sm text-slate-900 caret-[#1E4D8C] placeholder:text-slate-400 focus:outline-none focus:border-[#71A5D9]"
+                  className="w-full pl-10 pr-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#71A5D9] text-sm"
                 />
               </div>
 
@@ -603,32 +534,30 @@ export default function PsychologistCitasPage() {
                           </div>
 
                           {/* Chevron y Status */}
-                          <div className="flex items-start gap-2 ml-3">
-                            <div className="flex flex-col items-end gap-2">
-                              {apt.status === 'Pendiente' && (
-                                <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-full">
-                                  Pendiente
-                                </span>
-                              )}
-                              {apt.status === 'Aceptada' && (
-                                <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">
-                                  Aceptada
-                                </span>
-                              )}
-                              {apt.status === 'Rechazada' && (
+                          <div className="flex items-center gap-2 ml-3">
+                            {apt.status === 'Pendiente' && (
+                              <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-full">
+                                Pendiente
+                              </span>
+                            )}
+                            {apt.status === 'Aceptada' && (
+                              <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">
+                                Aceptada
+                              </span>
+                            )}
+                            {apt.status === 'Rechazada' && (
+                              <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full">
+                                Rechazada
+                              </span>
+                            )}
+                            {apt.status === 'Cancelada' && (
                                 <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full">
-                                  Rechazada
-                                </span>
-                              )}
-                              {apt.status === 'Cancelada' && (
-                                <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full text-right">
-                                  {getCancelLabel(apt)}
-                                </span>
-                              )}
-                            </div>
+                                  Cancelada por el estudiante
+                              </span>
+                            )}
                             <ChevronDown 
                               size={20} 
-                              className={`mt-1 text-gray-600 transition transform ${isSelected ? 'rotate-180' : ''}`}
+                              className={`text-gray-600 transition transform ${isSelected ? 'rotate-180' : ''}`}
                             />
                           </div>
                         </div>
@@ -648,7 +577,6 @@ export default function PsychologistCitasPage() {
                             <p className="text-[#1E4D8C] font-bold">{apt.fecha}</p>
                           </div>
                         </div>
-
                       </div>
 
                     </div>
@@ -701,7 +629,7 @@ export default function PsychologistCitasPage() {
 
               {selectedAppointment.status === 'Cancelada' && selectedAppointment.cancelReason && (
                 <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4">
-                  <p className="text-xs font-black uppercase text-red-700 mb-1">{getCancelLabel(selectedAppointment)}</p>
+                  <p className="text-xs font-black uppercase text-red-700 mb-1">Cancelada por el estudiante</p>
                   <p className="text-sm text-red-800">{selectedAppointment.cancelReason}</p>
                 </div>
               )}
@@ -745,39 +673,6 @@ export default function PsychologistCitasPage() {
                 </div>
               )}
 
-              {cancelingAppointmentId === selectedAppointment.id && selectedAppointment.status === 'Aceptada' && (
-                <div className="mt-4 rounded-2xl border border-rose-200 bg-rose-50 p-4">
-                  <p className="text-xs font-black uppercase text-rose-700 mb-2">Cancelar cita</p>
-                  <p className="text-sm text-rose-800 mb-3">
-                    Escribe el motivo para que el paciente lo vea en su notificación.
-                  </p>
-                  <textarea
-                    value={cancelReasonDraft}
-                    onChange={(e) => setCancelReasonDraft(e.target.value)}
-                    rows={4}
-                    placeholder="Ejemplo: La cita fue reprogramada por un imprevisto clínico."
-                    className="w-full rounded-xl border border-rose-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-200"
-                  />
-                  <div className="mt-3 flex flex-wrap justify-end gap-2">
-                    <button
-                      type="button"
-                      onClick={closeCancelForm}
-                      className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-                    >
-                      Volver
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => confirmCancelAppointment(selectedAppointment.id)}
-                      className="inline-flex items-center gap-2 rounded-xl bg-rose-600 px-4 py-2 text-sm font-bold text-white hover:bg-rose-700"
-                    >
-                      <XCircle size={16} />
-                      Confirmar cancelación
-                    </button>
-                  </div>
-                </div>
-              )}
-
               {selectedAppointment.motivo && (
                 <div className="mt-4 rounded-2xl bg-white p-4 border-l-4 border-[#71A5D9] border border-slate-100">
                   <p className="text-xs font-black text-gray-600 uppercase mb-2">Motivo de la consulta</p>
@@ -803,16 +698,6 @@ export default function PsychologistCitasPage() {
                       Rechazar cita
                     </button>
                   </>
-                )}
-                {selectedAppointment.status === 'Aceptada' && (
-                  <button
-                    type="button"
-                    onClick={() => openCancelForm(selectedAppointment)}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-rose-600 text-white font-bold rounded-xl hover:bg-rose-700 transition"
-                  >
-                    <XCircle size={16} />
-                    Cancelar cita
-                  </button>
                 )}
                 {selectedAppointment.status !== 'Pendiente' && selectedAppointment.modalidad === 'Virtual' && (
                   <p className="text-xs text-slate-500 self-center">
