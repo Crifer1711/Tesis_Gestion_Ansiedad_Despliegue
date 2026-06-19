@@ -38,25 +38,33 @@ export function MedicalRecordTab({ patientId, patientName, patientPhone }: Props
     const res = await saveMedicalRecordAction(formData);
     if (res.success) {
       setIsEditing(false);
+      toast.success("¡Ficha clínica guardada con éxito!");
     } else {
       toast.error("Error al guardar los datos.");
     }
     setSaving(false);
   };
 
-  if (loading) return <div className="p-6 text-center text-gray-500">Cargando ficha médica...</div>;
+  if (loading) return <div className="p-6 text-center text-slate-600 font-bold">Cargando ficha médica...</div>;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm relative">
+    <div className="bg-white rounded-xl border border-slate-300 p-6 shadow-sm relative">
       {/* HEADER Y BOTÓN DE EDICIÓN */}
-      <div className="flex justify-between items-center mb-6 border-b pb-4">
-        <h3 className="text-lg font-black text-[#1E4D8C]">Ficha Clínica Estructurada</h3>
+      <div className="flex justify-between items-center mb-6 border-b border-slate-200 pb-4">
+        <h3 className="text-xl font-black text-[#1E4D8C]">Ficha Clínica Estructurada</h3>
         {!isEditing ? (
-          <button onClick={() => setIsEditing(true)} className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-bold transition">
+          <button 
+            onClick={() => setIsEditing(true)} 
+            className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-900 border border-slate-300 rounded-lg text-sm font-bold transition shadow-sm"
+          >
             <Edit3 size={16} /> Editar Ficha
           </button>
         ) : (
-          <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-bold transition">
+          <button 
+            onClick={handleSave} 
+            disabled={saving} 
+            className="flex items-center gap-2 px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-lg text-sm font-bold transition shadow-sm disabled:opacity-50"
+          >
             {saving ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />} Guardar Cambios
           </button>
         )}
@@ -65,7 +73,9 @@ export function MedicalRecordTab({ patientId, patientName, patientPhone }: Props
       <div className="space-y-8">
         {/* I. IDENTIFICACIÓN */}
         <section>
-          <h4 className="font-bold text-slate-800 mb-4 bg-slate-50 p-2 rounded">I. IDENTIFICACIÓN</h4>
+          <h4 className="font-black text-slate-900 mb-4 bg-slate-100 p-2 rounded border border-slate-200 text-sm tracking-wide">
+            I. IDENTIFICACIÓN
+          </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <InputRow label="Nombre" value={patientName} readOnly />
             <InputRow label="Teléfono / Contacto" value={patientPhone} readOnly />
@@ -75,15 +85,19 @@ export function MedicalRecordTab({ patientId, patientName, patientPhone }: Props
             <InputRow label="Estab. Educacional" name="estabEducacional" value={formData.estabEducacional} isEditing={isEditing} onChange={handleChange} />
             <InputRow label="Con quién vive" name="conQuienVive" value={formData.conQuienVive} isEditing={isEditing} onChange={handleChange} />
             <InputRow label="Domicilio" name="domicilio" value={formData.domicilio} isEditing={isEditing} onChange={handleChange} />
-            <InputRow label="Quién consulta" name="quienConsulta" value={formData.quienConsulta} isEditing={isEditing} onChange={handleChange} />
-            <InputRow label="Interconsulta" name="interconsulta" value={formData.interconsulta} isEditing={isEditing} onChange={handleChange} />
+            <InputRow label="Departamento" name="departamento" value={formData.departamento} isEditing={isEditing} onChange={handleChange} />
+            <InputRow label="Carrera" name="carrera" value={formData.carrera} isEditing={isEditing} onChange={handleChange} />
+            <InputRow label="Género" name="genero" value={formData.genero} isEditing={isEditing} onChange={handleChange} />
+            <InputRow label="Nivel" name="nivel" value={formData.nivel} isEditing={isEditing} onChange={handleChange} />
             <InputRow label="Derivado por" name="derivadoPor" value={formData.derivadoPor} isEditing={isEditing} onChange={handleChange} />
           </div>
         </section>
 
         {/* II. MOTIVO DE CONSULTA */}
         <section>
-          <h4 className="font-bold text-slate-800 mb-4 bg-slate-50 p-2 rounded">II. MOTIVO DE CONSULTA</h4>
+          <h4 className="font-black text-slate-900 mb-4 bg-slate-100 p-2 rounded border border-slate-200 text-sm tracking-wide">
+            II. MOTIVO DE CONSULTA
+          </h4>
           <div className="space-y-4">
             <TextAreaRow label="Motivo de consulta de padres o tutores" name="motivoPadres" value={formData.motivoPadres} isEditing={isEditing} onChange={handleChange} />
             <TextAreaRow label="Motivo de consulta del niño/joven" name="motivoNino" value={formData.motivoNino} isEditing={isEditing} onChange={handleChange} />
@@ -98,15 +112,23 @@ export function MedicalRecordTab({ patientId, patientName, patientPhone }: Props
   );
 }
 
-// Sub-componentes auxiliares para mantener el código limpio
+// Sub-componentes auxiliares con alto contraste mejorado
 const InputRow = ({ label, name, value, type = "text", isEditing, readOnly, onChange }: any) => (
   <div className="flex flex-col">
-    <label className="text-xs font-semibold text-slate-500 uppercase mb-1">{label}</label>
+    {/* Subimos a text-slate-700 y font-bold para legibilidad estricta */}
+    <label className="text-xs font-bold text-slate-700 uppercase mb-1 tracking-wider">{label}</label>
     {isEditing && !readOnly ? (
-      <input type={type} name={name} value={value || ''} onChange={onChange} className="p-2 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-400 outline-none text-sm" />
+      <input 
+        type={type} 
+        name={name} 
+        value={value || ''} 
+        onChange={onChange} 
+        className="p-2 border border-slate-400 bg-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-600 outline-none text-sm text-slate-950 font-medium transition" 
+      />
     ) : (
-      <div className="p-2 bg-slate-50 rounded-md text-sm text-slate-800 border border-transparent min-h-[38px]">
-        {value || <span className="text-slate-400 italic">No registrado</span>}
+      /* Cambiado text-slate-800 por text-slate-950 y agregado un borde sutil para enmarcar el dato */
+      <div className="p-2 bg-slate-50 rounded-md text-sm text-slate-950 font-semibold border border-slate-200 min-h-[38px] flex items-center">
+        {value || <span className="text-slate-500 italic font-normal">No registrado</span>}
       </div>
     )}
   </div>
@@ -114,12 +136,20 @@ const InputRow = ({ label, name, value, type = "text", isEditing, readOnly, onCh
 
 const TextAreaRow = ({ label, name, value, isEditing, onChange }: any) => (
   <div className="flex flex-col">
-    <label className="text-xs font-semibold text-slate-500 uppercase mb-1">{label}</label>
+    {/* Subimos a text-slate-700 y font-bold */}
+    <label className="text-xs font-bold text-slate-700 uppercase mb-1 tracking-wider">{label}</label>
     {isEditing ? (
-      <textarea name={name} value={value || ''} onChange={onChange} rows={3} className="p-3 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-400 outline-none text-sm resize-none" />
+      <textarea 
+        name={name} 
+        value={value || ''} 
+        onChange={onChange} 
+        rows={3} 
+        className="p-3 border border-slate-400 bg-white rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-600 outline-none text-sm text-slate-950 font-medium transition resize-none" 
+      />
     ) : (
-      <div className="p-3 bg-slate-50 rounded-md text-sm text-slate-800 border border-transparent min-h-[80px] whitespace-pre-wrap">
-        {value || <span className="text-slate-400 italic">No registrado</span>}
+      /* Alto contraste asegurado para bloques largos de texto */
+      <div className="p-3 bg-slate-50 rounded-md text-sm text-slate-950 font-medium border border-slate-200 min-h-[80px] whitespace-pre-wrap leading-relaxed">
+        {value || <span className="text-slate-500 italic font-normal">No registrado</span>}
       </div>
     )}
   </div>
