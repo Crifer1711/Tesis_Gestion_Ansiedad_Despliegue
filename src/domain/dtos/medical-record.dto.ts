@@ -7,12 +7,9 @@ export interface MedicalRecordDTO {
   estabEducacional?: string;
   conQuienVive?: string;
   domicilio?: string;
+  quienConsulta?: string;
+  interconsulta?: string;
   derivadoPor?: string;
-  //
-  departamento?: string;
-  carrera?: string;
-  genero?: string;
-  nivel?: string;
   // II. Motivo de Consulta
   motivoPadres?: string;
   motivoNino?: string;
@@ -20,7 +17,6 @@ export interface MedicalRecordDTO {
   intentosSolucion?: string;
   sintomatologiaConductual?: string;
   sintomatologiaEmocional?: string;
-  
 }
 
 export interface IMedicalRecordRepository {

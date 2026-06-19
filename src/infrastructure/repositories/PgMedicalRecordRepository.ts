@@ -17,11 +17,11 @@ export class PgMedicalRecordRepository implements IMedicalRecordRepository {
     const query = `
       INSERT INTO medical_records (
         patient_id, edad, fecha_nacimiento, escolaridad, estab_educacional, 
-        con_quien_vive, domicilio, derivado_por, departamento, carrera, genero, nivel,
+        con_quien_vive, domicilio, quien_consulta, interconsulta, derivado_por,
         motivo_padres, motivo_nino, motivo_latente, intentos_solucion, 
         sintomatologia_conductual, sintomatologia_emocional, updated_at
       ) VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, NOW()
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, NOW()
       )
       ON CONFLICT (patient_id) DO UPDATE SET
         edad = EXCLUDED.edad,
@@ -30,10 +30,8 @@ export class PgMedicalRecordRepository implements IMedicalRecordRepository {
         estab_educacional = EXCLUDED.estab_educacional,
         con_quien_vive = EXCLUDED.con_quien_vive,
         domicilio = EXCLUDED.domicilio,
-        departamento = EXCLUDED.departamento,
-        carrera = EXCLUDED.carrera,
-        genero = EXCLUDED.genero,
-        nivel = EXCLUDED.nivel,
+        quien_consulta = EXCLUDED.quien_consulta,
+        interconsulta = EXCLUDED.interconsulta,
         derivado_por = EXCLUDED.derivado_por,
         motivo_padres = EXCLUDED.motivo_padres,
         motivo_nino = EXCLUDED.motivo_nino,
@@ -48,7 +46,7 @@ export class PgMedicalRecordRepository implements IMedicalRecordRepository {
     const values = [
       data.patientId, data.edad, data.fechaNacimiento ? new Date(data.fechaNacimiento) : null,
       data.escolaridad, data.estabEducacional, data.conQuienVive, data.domicilio,
-      data.derivadoPor, data.departamento, data.carrera, data.genero, data.nivel,
+      data.quienConsulta, data.interconsulta, data.derivadoPor,
       data.motivoPadres, data.motivoNino, data.motivoLatente, data.intentosSolucion,
       data.sintomatologiaConductual, data.sintomatologiaEmocional
     ];
@@ -57,7 +55,7 @@ export class PgMedicalRecordRepository implements IMedicalRecordRepository {
     return this.mapToDTO(res.rows[0]);
   }
 
-  // Mapeador auxiliar corregido para retornar todos los datos al Frontend
+  // Mapeador auxiliar para limpiar el código
   private mapToDTO(row: any): MedicalRecordDTO {
     return {
       patientId: row.patient_id.toString(),
@@ -67,14 +65,9 @@ export class PgMedicalRecordRepository implements IMedicalRecordRepository {
       estabEducacional: row.estab_educacional,
       conQuienVive: row.con_quien_vive,
       domicilio: row.domicilio,
+      quienConsulta: row.quien_consulta,
+      interconsulta: row.interconsulta,
       derivadoPor: row.derivado_por,
-      
-      // 👇 Campos nuevos integrados al mapeador
-      departamento: row.departamento,
-      carrera: row.carrera,
-      genero: row.genero,
-      nivel: row.nivel,
-
       motivoPadres: row.motivo_padres,
       motivoNino: row.motivo_nino,
       motivoLatente: row.motivo_latente,
