@@ -24,7 +24,6 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export const LoginForm = () => {
   const [serverError, setServerError] = useState("");
-  const [approvalWarning, setApprovalWarning] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
@@ -37,7 +36,6 @@ export const LoginForm = () => {
   const onSubmit = async (data: LoginFormData) => {
     setLoading(true);
     setServerError("");
-    setApprovalWarning("");
 
     try {
       const result = await signIn("credentials", {
@@ -71,7 +69,6 @@ export const LoginForm = () => {
 
   const clearErrorsOnType = () => {
     if (serverError) setServerError("");
-    if (approvalWarning) setApprovalWarning("");
   };
 
   return (
@@ -81,18 +78,6 @@ export const LoginForm = () => {
     >
       {/* Capa de superposición para contraste */}
       <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm z-0"></div>
-
-      {/* Alerta de aprobación flotante estilo Toast */}
-      {approvalWarning && (
-        <div className="fixed top-6 right-6 z-50 w-80 rounded-xl border border-amber-200 bg-amber-50 p-4 shadow-lg shadow-amber-900/10 animate-fade-in">
-          <div className="flex items-start">
-            <div className="ml-3 w-0 flex-1 pt-0.5">
-              <p className="text-sm font-bold text-amber-800">{approvalWarning}</p>
-              <p className="mt-1 text-xs text-amber-700">Tu cuenta aún no ha sido aprobada o está desactivada.</p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Tarjeta Principal */}
       <div className="z-10 flex w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100 flex-col md:flex-row">

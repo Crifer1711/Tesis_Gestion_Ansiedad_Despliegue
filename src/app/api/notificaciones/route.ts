@@ -11,6 +11,20 @@ type NotificationItem = {
   created_at: string;
 };
 
+const getAppointmentColumnFlags = async () => {
+  const result = await pool.query(
+    `SELECT column_name
+     FROM information_schema.columns
+     WHERE table_schema = 'public'
+       AND table_name = 'appointments'`
+  );
+
+  const columns = new Set(result.rows.map((row: any) => row.column_name));
+  return {
+    hasUpdatedByRole: columns.has('status_updated_by_role'),
+  };
+};
+
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
@@ -19,6 +33,7 @@ export async function GET() {
     const role = session.user.role;
     const userId = String(session.user.id || '');
     const items: NotificationItem[] = [];
+    const { hasUpdatedByRole } = await getAppointmentColumnFlags();
 
     if (role === 'PACIENTE') {
       const tasksRes = await pool.query(
@@ -35,15 +50,24 @@ export async function GET() {
       const appointmentsRes = await pool.query(
         `SELECT ap.id::text AS id, COALESCE(p.name, 'Psicólogo') AS title,
                 ap.updated_at AS created_at,
+                ${hasUpdatedByRole ? 'ap.status_updated_by_role' : 'NULL::text'} AS status_updated_by_role,
+                ap.cancel_reason,
                 CASE
                   WHEN ap.status = 'Aceptada' THEN 'Tu cita con ' || COALESCE(p.name, 'tu psicólogo') || ' fue aceptada para ' || TO_CHAR(ap.appointment_date, 'DD/MM/YYYY') || ' a las ' || ap.appointment_time
                   WHEN ap.status = 'Rechazada' THEN 'La psicóloga rechazó tu cita del ' || TO_CHAR(ap.appointment_date, 'DD/MM/YYYY') || ' a las ' || ap.appointment_time
-                  WHEN ap.status = 'Cancelada' THEN 'Tu cita del ' || TO_CHAR(ap.appointment_date, 'DD/MM/YYYY') || ' a las ' || ap.appointment_time || ' fue cancelada'
+                  WHEN ap.status = 'Cancelada' AND ${hasUpdatedByRole ? "COALESCE(ap.status_updated_by_role, '') = 'PSICOLOGO'" : "FALSE"}
+                    THEN 'La psicóloga canceló tu cita del ' || TO_CHAR(ap.appointment_date, 'DD/MM/YYYY') || ' a las ' || ap.appointment_time || '. Motivo: ' || COALESCE(ap.cancel_reason, 'Sin motivo especificado')
+                  WHEN ap.status = 'Cancelada' AND ${hasUpdatedByRole ? "COALESCE(ap.status_updated_by_role, '') = 'ADMINISTRADOR'" : "FALSE"}
+                    THEN 'Administración canceló tu cita del ' || TO_CHAR(ap.appointment_date, 'DD/MM/YYYY') || ' a las ' || ap.appointment_time || '. Motivo: ' || COALESCE(ap.cancel_reason, 'Sin motivo especificado')
                   ELSE 'Actualización en tu cita con ' || COALESCE(p.name, 'tu psicólogo')
                 END AS message
          FROM appointments ap
          LEFT JOIN users p ON p.id = ap.psychologist_id
-         WHERE ap.patient_id = $1 AND ap.status IN ('Aceptada', 'Rechazada', 'Cancelada')
+         WHERE ap.patient_id = $1
+           AND (
+             ap.status IN ('Aceptada', 'Rechazada')
+             ${hasUpdatedByRole ? "OR (ap.status = 'Cancelada' AND COALESCE(ap.status_updated_by_role, '') IN ('PSICOLOGO', 'ADMINISTRADOR'))" : ''}
+           )
          ORDER BY ap.updated_at DESC
          LIMIT 5`,
         [userId]

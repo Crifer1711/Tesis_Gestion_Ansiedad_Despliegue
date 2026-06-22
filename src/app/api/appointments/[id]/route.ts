@@ -17,6 +17,7 @@ const getAppointmentColumnFlags = async () => {
     hasRequestLink: columns.has('request_link'),
     hasMeetingLink: columns.has('meeting_link'),
     hasCancelReason: columns.has('cancel_reason'),
+    hasUpdatedByRole: columns.has('status_updated_by_role'),
   };
 };
 
@@ -26,6 +27,10 @@ const ensureMeetingLinkColumn = async () => {
 
 const ensureCancelReasonColumn = async () => {
   await db.query('ALTER TABLE appointments ADD COLUMN IF NOT EXISTS cancel_reason TEXT');
+};
+
+const ensureUpdatedByRoleColumn = async () => {
+  await db.query('ALTER TABLE appointments ADD COLUMN IF NOT EXISTS status_updated_by_role VARCHAR(50)');
 };
 
 export async function PATCH(
@@ -44,7 +49,7 @@ export async function PATCH(
     }
 
     const { status, meetingLink, cancelReason } = await request.json();
-    let { hasMeetingLink, hasCancelReason } = await getAppointmentColumnFlags();
+    let { hasMeetingLink, hasCancelReason, hasUpdatedByRole } = await getAppointmentColumnFlags();
 
     if (typeof meetingLink !== 'undefined' && !hasMeetingLink) {
       await ensureMeetingLinkColumn();
@@ -54,6 +59,11 @@ export async function PATCH(
     if (typeof cancelReason !== 'undefined' && !hasCancelReason) {
       await ensureCancelReasonColumn();
       ({ hasCancelReason } = await getAppointmentColumnFlags());
+    }
+
+    if (!hasUpdatedByRole) {
+      await ensureUpdatedByRoleColumn();
+      ({ hasUpdatedByRole } = await getAppointmentColumnFlags());
     }
 
     // Verificar que el psicólogo es el dueño de la cita
@@ -81,7 +91,7 @@ export async function PATCH(
     const isAdmin = session.user.role === 'ADMINISTRADOR';
 
     if (status === 'Cancelada') {
-      if (!isOwnerPatient && !isAdmin) {
+      if (!isOwnerPatient && !isOwnerPsychologist && !isAdmin) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
 
@@ -90,13 +100,11 @@ export async function PATCH(
         return NextResponse.json({ error: 'Debes indicar el motivo de la cancelación' }, { status: 400 });
       }
 
-      const cancelParams = hasCancelReason ? [status, cancelReasonValue, id] : [status, id];
-
       const result = await db.query(
         hasCancelReason
-          ? 'UPDATE appointments SET status = $1, cancel_reason = $2, updated_at = NOW() WHERE id = $3 RETURNING *'
-          : 'UPDATE appointments SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *',
-        cancelParams
+          ? 'UPDATE appointments SET status = $1, cancel_reason = $2, status_updated_by_role = $3, updated_at = NOW() WHERE id = $4 RETURNING *'
+          : 'UPDATE appointments SET status = $1, status_updated_by_role = $2, updated_at = NOW() WHERE id = $3 RETURNING *',
+        hasCancelReason ? [status, cancelReasonValue, session.user.role, id] : [status, session.user.role, id]
       );
 
       const updated = result.rows[0];
@@ -141,6 +149,11 @@ export async function PATCH(
       setClauses.push(`cancel_reason = $${updateValues.length}`);
     }
 
+    if (hasUpdatedByRole) {
+      updateValues.push(session.user.role);
+      setClauses.push(`status_updated_by_role = $${updateValues.length}`);
+    }
+
     if (setClauses.length === 0) {
       return NextResponse.json({ error: 'No hay campos para actualizar' }, { status: 400 });
     }
@@ -161,6 +174,7 @@ export async function PATCH(
       status: updated.status,
       cancelReason: hasCancelReason ? updated.cancel_reason : null,
       meetingLink: hasMeetingLink ? updated.meeting_link : null,
+      updatedByRole: hasUpdatedByRole ? updated.status_updated_by_role : null,
       message: 'Cita actualizada'
     });
   } catch (error) {

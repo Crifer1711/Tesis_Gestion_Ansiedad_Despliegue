@@ -103,7 +103,13 @@ const InputRow = ({ label, name, value, type = "text", isEditing, readOnly, onCh
   <div className="flex flex-col">
     <label className="text-xs font-semibold text-slate-500 uppercase mb-1">{label}</label>
     {isEditing && !readOnly ? (
-      <input type={type} name={name} value={value || ''} onChange={onChange} className="p-2 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-400 outline-none text-sm" />
+      <input
+        type={type}
+        name={name}
+        value={value || ''}
+        onChange={onChange}
+        className="p-2 border border-blue-200 rounded-md bg-white text-slate-900 caret-[#1E4D8C] placeholder:text-slate-400 focus:ring-2 focus:ring-blue-400 outline-none text-sm"
+      />
     ) : (
       <div className="p-2 bg-slate-50 rounded-md text-sm text-slate-800 border border-transparent min-h-[38px]">
         {value || <span className="text-slate-400 italic">No registrado</span>}
@@ -116,7 +122,13 @@ const TextAreaRow = ({ label, name, value, isEditing, onChange }: any) => (
   <div className="flex flex-col">
     <label className="text-xs font-semibold text-slate-500 uppercase mb-1">{label}</label>
     {isEditing ? (
-      <textarea name={name} value={value || ''} onChange={onChange} rows={3} className="p-3 border border-blue-200 rounded-md focus:ring-2 focus:ring-blue-400 outline-none text-sm resize-none" />
+      <textarea
+        name={name}
+        value={value || ''}
+        onChange={onChange}
+        rows={3}
+        className="p-3 border border-blue-200 rounded-md bg-white text-slate-900 caret-[#1E4D8C] placeholder:text-slate-400 focus:ring-2 focus:ring-blue-400 outline-none text-sm resize-none"
+      />
     ) : (
       <div className="p-3 bg-slate-50 rounded-md text-sm text-slate-800 border border-transparent min-h-[80px] whitespace-pre-wrap">
         {value || <span className="text-slate-400 italic">No registrado</span>}

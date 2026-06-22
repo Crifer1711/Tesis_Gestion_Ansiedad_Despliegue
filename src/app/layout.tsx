@@ -30,7 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ConfirmProvider>
             <AuthProvider>
               {children}
-              <Toaster position="top-right" />
+              <Toaster position="top-right" containerStyle={{ top: 84, right: 16 }} />
             </AuthProvider>
           </ConfirmProvider>
         </AccessibilityProvider>
