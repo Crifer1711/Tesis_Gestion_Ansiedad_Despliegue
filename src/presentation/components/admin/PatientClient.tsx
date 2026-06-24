@@ -28,6 +28,7 @@ export function PatientClient({ initialData }: Props) {
   // Lógica de filtrado coincidiendo con tu diseño
   const filteredData = patients.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) || 
+                          (p.lastname || '').toLowerCase().includes(search.toLowerCase()) ||
                           p.email.toLowerCase().includes(search.toLowerCase());
     const matchesFilter = filter === "Todos" || p.estado === filter;
     return matchesSearch && matchesFilter;
@@ -136,6 +137,7 @@ export function PatientClient({ initialData }: Props) {
       <thead className="bg-[#BDBDBD] border-b-2 border-gray-800 font-black text-gray-900">
         <tr>
           <th className="px-4 py-4 border-r-2 border-gray-800 text-center uppercase">Nombre</th>
+          <th className="px-4 py-4 border-r-2 border-gray-800 text-center uppercase">Apellidos</th>
           <th className="px-4 py-4 border-r-2 border-gray-800 text-center uppercase">Email</th>
           <th className="px-4 py-4 border-r-2 border-gray-800 text-center uppercase">Teléfono</th>
           <th className="px-4 py-4 border-r-2 border-gray-800 text-center uppercase">Fecha de Registro</th>
@@ -147,6 +149,7 @@ export function PatientClient({ initialData }: Props) {
         {filteredData.map((p) => (
           <tr key={p.id} className="hover:bg-gray-100 transition-colors">
             <td className="px-4 py-4 border-r-2 border-gray-200 text-gray-900 font-medium">{p.name}</td>
+            <td className="px-4 py-4 border-r-2 border-gray-200 text-gray-900">{p.lastname || '-'}</td>
             <td className="px-4 py-4 border-r-2 border-gray-200 text-gray-900">{p.email}</td>
             <td className="px-4 py-4 border-r-2 border-gray-200 text-gray-900">{p.contacto}</td>
             <td className="px-4 py-4 border-r-2 border-gray-200 text-gray-900">{p.fecha_registro}</td>

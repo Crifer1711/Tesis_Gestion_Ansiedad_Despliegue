@@ -12,7 +12,7 @@ import { Psychologist } from "@/domain/dtos/psychologist.dto";
 // 1. Definimos el esquema de validación con Zod
 const psychologistSchema = z.object({
   name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
-  email: z.string().email("Correo inválido"), // Quité la validación estricta de @espe.edu.ec, pero puedes agregarla con .endsWith() si es necesario
+  email: z.string().email("Correo inválido").endsWith("@espe.edu.ec", "Debe ser un correo institucional @espe.edu.ec"),
   especialidad: z.string().min(3, "La especialidad es requerida"),
   contacto: z.string().min(7, "Número de contacto inválido"),
   password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
@@ -35,6 +35,7 @@ export function CreatePsychologistModal({ isOpen, onClose, onCreated }: Props) {
   const { 
     register, 
     handleSubmit, 
+    setValue,
     formState: { errors },
     reset 
   } = useForm<PsychologistFormData>({
@@ -47,18 +48,26 @@ export function CreatePsychologistModal({ isOpen, onClose, onCreated }: Props) {
   const onSubmit = async (data: PsychologistFormData) => {
     setLoading(true);
     setServerError("");
+
+    const payload: PsychologistFormData = {
+      ...data,
+      name: data.name.trim().toUpperCase(),
+      email: data.email.trim().toLowerCase(),
+      especialidad: data.especialidad.trim().toUpperCase(),
+      contacto: data.contacto.trim(),
+    };
     
     try {
-      const result = await createPsychologistAction(data);
+      const result = await createPsychologistAction(payload);
       
       if (result.success) {
         toast.success("Psicólogo creado con éxito");
         onCreated?.({
           id: String(result.id || Date.now()),
-          name: data.name,
-          email: data.email,
-          contacto: data.contacto,
-          especialidad: data.especialidad,
+          name: payload.name,
+          email: payload.email,
+          contacto: payload.contacto,
+          especialidad: payload.especialidad,
           pacientes: 0,
           estado: 'Activo',
         });
@@ -93,7 +102,9 @@ export function CreatePsychologistModal({ isOpen, onClose, onCreated }: Props) {
           <div>
             <label className="block text-xs font-black uppercase mb-1 text-gray-700">Nombre Completo</label>
             <input 
-              {...register("name")}
+              {...register("name", {
+                onChange: (e) => setValue("name", e.target.value.toUpperCase(), { shouldValidate: true })
+              })}
               className={`w-full p-3 bg-[#EAF2FB] border-2 rounded-xl focus:bg-white outline-none text-gray-900 placeholder-gray-500 ${errors.name ? 'border-red-500 focus:border-red-500' : 'border-gray-700'}`} 
               placeholder="Ej. Dr. Juan Pérez" 
             />
@@ -104,10 +115,12 @@ export function CreatePsychologistModal({ isOpen, onClose, onCreated }: Props) {
           <div>
             <label className="block text-xs font-black uppercase mb-1 text-gray-700">Correo Electrónico</label>
             <input 
-              {...register("email")}
+              {...register("email", {
+                onChange: (e) => setValue("email", e.target.value.toLowerCase(), { shouldValidate: true })
+              })}
               type="email" 
               className={`w-full p-3 bg-[#EAF2FB] border-2 rounded-xl focus:bg-white outline-none text-gray-900 placeholder-gray-500 ${errors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-700'}`} 
-              placeholder="correo@ejemplo.com" 
+              placeholder="usuario@espe.edu.ec" 
             />
             {errors.email && <p className="text-[10px] text-red-500 mt-1 ml-1 font-bold uppercase italic">{errors.email.message}</p>}
           </div>
@@ -117,7 +130,9 @@ export function CreatePsychologistModal({ isOpen, onClose, onCreated }: Props) {
             <div>
               <label className="block text-xs font-black uppercase mb-1 text-gray-700">Especialidad</label>
               <input 
-                {...register("especialidad")}
+                {...register("especialidad", {
+                  onChange: (e) => setValue("especialidad", e.target.value.toUpperCase(), { shouldValidate: true })
+                })}
                 className={`w-full p-3 bg-[#EAF2FB] border-2 rounded-xl focus:bg-white outline-none text-gray-900 placeholder-gray-500 ${errors.especialidad ? 'border-red-500 focus:border-red-500' : 'border-gray-700'}`} 
                 placeholder="Clínica" 
               />

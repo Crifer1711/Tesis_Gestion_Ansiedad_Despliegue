@@ -12,7 +12,12 @@ export async function POST(request: Request) {
     const useCase = new RegisterUserUseCase(repository);
 
     const result = await useCase.execute(body);
-    await sendVerificationEmail(result.email, result.verificationToken);
+
+    try {
+      await sendVerificationEmail(result.email, result.verificationToken);
+    } catch (emailError) {
+      console.error('[Register] Verification email could not be sent:', emailError);
+    }
 
     return NextResponse.json(
       { message: result.message },

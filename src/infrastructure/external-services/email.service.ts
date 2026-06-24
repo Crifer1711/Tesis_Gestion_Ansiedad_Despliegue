@@ -1,5 +1,7 @@
 import nodemailer from 'nodemailer';
 
+const EMAIL_SEND_TIMEOUT_MS = 6000;
+
 const getBaseUrl = () => {
   return process.env.NEXTAUTH_URL || process.env.APP_BASE_URL || 'http://localhost:3000';
 };
@@ -24,9 +26,12 @@ export const sendVerificationEmail = async (email: string, token: string) => {
     port,
     secure: port === 465,
     auth: { user, pass },
+    connectionTimeout: EMAIL_SEND_TIMEOUT_MS,
+    greetingTimeout: EMAIL_SEND_TIMEOUT_MS,
+    socketTimeout: EMAIL_SEND_TIMEOUT_MS,
   });
 
-  await transporter.sendMail({
+  const sendMailPromise = transporter.sendMail({
     from,
     to: email,
     subject: 'Verifica tu cuenta de MindPeace',
@@ -45,4 +50,11 @@ export const sendVerificationEmail = async (email: string, token: string) => {
     `,
     text: `Activa tu cuenta de MindPeace con este enlace: ${verifyUrl}`,
   });
+
+  await Promise.race([
+    sendMailPromise,
+    new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('SMTP timeout while sending verification email')), EMAIL_SEND_TIMEOUT_MS);
+    }),
+  ]);
 };

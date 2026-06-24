@@ -18,6 +18,7 @@ export class PatientRepository {
         SELECT 
           id, 
           name, 
+          lastname,
           email,
           contacto, 
           status,
@@ -31,6 +32,7 @@ export class PatientRepository {
       return res.rows.map(row => ({
         id: row.id,
         name: row.name,
+        lastname: row.lastname || '',
         email: row.email,
         contacto: row.contacto || "N/A", // Dato ejemplo hasta que agregues la columna
         fecha_registro: row.fecha_registro,

@@ -35,10 +35,18 @@ export async function deletePsychologistAction(id: string) {
 
 // --- CREAR ---
 export async function createPsychologistAction(formData: CreatePsychologistData) {
-  const { name, email, password, especialidad, contacto } = formData;
+  const normalizedName = (formData.name || '').trim().toUpperCase();
+  const normalizedEmail = (formData.email || '').trim().toLowerCase();
+  const normalizedEspecialidad = (formData.especialidad || '').trim().toUpperCase();
+  const normalizedContacto = (formData.contacto || '').trim();
+  const { password } = formData;
   const client = await pool.connect();
 
   try {
+    if (!normalizedEmail.endsWith('@espe.edu.ec')) {
+      return { success: false, error: 'El correo del psicólogo debe ser @espe.edu.ec' };
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Creado por el administrador: marcamos la cuenta como aprobada en la BD
@@ -46,7 +54,7 @@ export async function createPsychologistAction(formData: CreatePsychologistData)
       `INSERT INTO users (name, email, password, role, status, especialidad, contacto) 
        VALUES ($1, $2, $3, 'PSICOLOGO', 'Activo', $4, $5)
        RETURNING id`,
-      [name, email, hashedPassword, especialidad, contacto]
+      [normalizedName, normalizedEmail, hashedPassword, normalizedEspecialidad, normalizedContacto]
     );
 
     revalidatePath('/dashboard/admin/psicologos');
