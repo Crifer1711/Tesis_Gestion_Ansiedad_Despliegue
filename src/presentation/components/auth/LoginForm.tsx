@@ -101,9 +101,9 @@ export const LoginForm = () => {
           
           {/* Logo y Encabezado */}
           <div className="flex flex-col items-center mb-8">
-            <div className="relative w-14 h-14 rounded-xl overflow-hidden shadow-sm border border-gray-100 mb-4 bg-white p-1">
-              <Image
-                src="/images/Logo.png"
+<div className="relative w-14 h-14 rounded-xl overflow-hidden shadow-sm border border-gray-100 mb-4 bg-white p-1">
+            <Image
+                src="/images/Logo-.png"
                 alt="Logo"
                 fill
                 priority

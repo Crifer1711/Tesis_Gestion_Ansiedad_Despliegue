@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { User, Mail, Lock, Loader2, Phone, Eye, EyeOff } from "lucide-react";
+import { toast } from 'react-hot-toast';
 import Image from 'next/image';
 
 const registerSchema = z.object({
@@ -87,6 +88,7 @@ export const RegisterForm = () => {
       });
 
       if (res.ok) {
+        toast.success("Usuario registrado exitosamente", { id: 'register-success' });
         router.push("/login");
       } else {
         const result = await res.json();
@@ -111,8 +113,9 @@ export const RegisterForm = () => {
         
         {/* LOGO & ENCABEZADO */}
         <div className="flex flex-col items-center mb-6">
-          <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-sm border border-gray-100 mb-3 bg-white p-1">
-            <Image src="/images/Logo.png" alt="Logo" fill className="object-contain" sizes="48px" priority />
+<div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-sm border border-gray-100 mb-3 bg-white p-1">
+            <Image src="/images/Logo-.png" alt="Logo" fill className="object-contain" sizes="48px" priority />
+            
           </div>
           <h1 className="text-xl font-bold text-slate-800 tracking-tight">Crear una cuenta</h1>
           <p className="text-xs text-gray-500 mt-1">Ingresa tus datos institucionales para registrarte</p>
