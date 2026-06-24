@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from "react";
-import { X, Loader2 } from "lucide-react";
+import { X, Loader2, Eye, EyeOff } from "lucide-react";
 import { toast } from 'react-hot-toast';
 import { createPsychologistAction } from "@/infrastructure/actions/psychologist.actions";
 import { useForm } from "react-hook-form";
@@ -30,6 +30,7 @@ interface Props {
 export function CreatePsychologistModal({ isOpen, onClose, onCreated }: Props) {
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   // 2. Configuramos react-hook-form
   const { 
@@ -154,11 +155,21 @@ export function CreatePsychologistModal({ isOpen, onClose, onCreated }: Props) {
           {/* Contraseña */}
           <div>
             <label className="block text-xs font-black uppercase mb-1 text-gray-700">Contraseña Temporal</label>
-            <input 
-              {...register("password")}
-              type="password" 
-              className={`w-full p-3 bg-[#EAF2FB] border-2 rounded-xl focus:bg-white outline-none text-gray-900 placeholder-gray-500 ${errors.password ? 'border-red-500 focus:border-red-500' : 'border-gray-700'}`} 
-            />
+            <div className="relative">
+              <input 
+                {...register("password")}
+                type={showPassword ? "text" : "password"}
+                className={`w-full p-3 pr-10 bg-[#EAF2FB] border-2 rounded-xl focus:bg-white outline-none text-gray-900 placeholder-gray-500 ${errors.password ? 'border-red-500 focus:border-red-500' : 'border-gray-700'}`} 
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((value) => !value)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-800 transition-colors"
+                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
             {errors.password && <p className="text-[10px] text-red-500 mt-1 ml-1 font-bold uppercase italic">{errors.password.message}</p>}
           </div>
 

@@ -23,10 +23,30 @@ export interface UpdatePatientData {
 export async function deletePatientAction(id: string) {
   const client = await pool.connect();
   try {
-    await client.query('DELETE FROM users WHERE id = $1', [id]);
+    await client.query('BEGIN');
+
+    // Algunas tablas usan RESTRICT sobre estudiante_id, por eso limpiamos primero.
+    await client.query('DELETE FROM bienestar_asignaciones WHERE estudiante_id = $1', [id]);
+
+    const deletedUser = await client.query(
+      'DELETE FROM users WHERE id = $1 AND role = $2 RETURNING id',
+      [id, 'PACIENTE']
+    );
+
+    if (deletedUser.rowCount === 0) {
+      await client.query('ROLLBACK');
+      return { success: false, error: 'Paciente no encontrado o no se pudo eliminar' };
+    }
+
+    await client.query('COMMIT');
     revalidatePath('/dashboard/admin/pacientes');
     return { success: true };
   } catch (error: unknown) {
+    try {
+      await client.query('ROLLBACK');
+    } catch {
+      // No-op: rollback best effort
+    }
     const errorMessage = error instanceof Error ? error.message : "Error al eliminar";
     return { success: false, error: errorMessage };
   } finally {

@@ -38,7 +38,13 @@ export function PatientClient({ initialData }: Props) {
     const ok = await confirm({ title: 'Eliminar paciente', description: '¿Estás seguro de eliminar este paciente? Esta acción es irreversible.', confirmText: 'Eliminar', cancelText: 'Cancelar' });
     if (!ok) return;
     try {
-      await deletePatientAction(id);
+      const result = await deletePatientAction(id);
+
+      if (!result.success) {
+        toast.error(result.error || 'No se pudo eliminar el paciente');
+        return;
+      }
+
       setPatients(prev => prev.filter(p => p.id !== id));
       toast.success('Paciente eliminado');
     } catch (err) {
