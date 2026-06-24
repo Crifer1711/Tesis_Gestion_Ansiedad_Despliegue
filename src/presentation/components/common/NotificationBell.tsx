@@ -1,7 +1,8 @@
+// src/presentation/components/common/NotificationBell.tsx
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Bell } from 'lucide-react';
+import { Bell, Calendar, CheckSquare, Home, X } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 
@@ -27,7 +28,6 @@ export function NotificationBell({ compact = false }: Props) {
     if (!session?.user?.id || !session?.user?.role) {
       return null;
     }
-
     return `notification-seen:${session.user.role}:${session.user.id}`;
   }, [session?.user?.id, session?.user?.role]);
 
@@ -35,7 +35,6 @@ export function NotificationBell({ compact = false }: Props) {
     if (!storageKey || typeof window === 'undefined') {
       return;
     }
-
     try {
       const raw = window.localStorage.getItem(storageKey);
       const parsed = raw ? (JSON.parse(raw) as string[]) : [];
@@ -102,6 +101,26 @@ export function NotificationBell({ compact = false }: Props) {
     persistSeenIds(next);
   };
 
+  const getNotificationLink = (item: NotificationItem) => {
+    if (item.type === 'appointment') {
+      return '/paciente/citas';
+    }
+    if (item.type === 'task') {
+      return '/paciente/tareas';
+    }
+    return '/paciente/citas';
+  };
+
+  const getNotificationBadge = (item: NotificationItem) => {
+    if (item.type === 'appointment') {
+      return { text: '📅 Cita', color: 'text-blue-600 bg-blue-50' };
+    }
+    if (item.type === 'task') {
+      return { text: '📋 Tarea', color: 'text-purple-600 bg-purple-50' };
+    }
+    return { text: '📌 General', color: 'text-gray-600 bg-gray-50' };
+  };
+
   return (
     <div className="relative">
       <button
@@ -112,54 +131,116 @@ export function NotificationBell({ compact = false }: Props) {
         <Bell size={compact ? 18 : 20} />
         {unreadCount > 0 && (
           <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-black text-white">
-            {unreadCount}
+            {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="absolute right-0 top-12 z-50 w-[340px] overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-xl">
+        <div className="absolute right-0 top-12 z-50 w-[360px] overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-xl">
+          {/* HEADER */}
           <div className="border-b border-blue-100 bg-[#EAF2FF] px-4 py-3">
-            <p className="text-sm font-black text-[#1E4D8C]">Notificaciones</p>
-            <p className="text-[11px] text-slate-600">Tareas, citas aceptadas, rechazadas y enlaces</p>
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-sm font-black text-[#1E4D8C]">Notificaciones</p>
+                <p className="text-[11px] text-slate-600">Tareas, citas aceptadas, rechazadas y enlaces</p>
+              </div>
+              <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-600">
+                <X size={18} />
+              </button>
+            </div>
           </div>
-          <div className="max-h-96 overflow-y-auto p-2">
+
+          {/* ACCESOS RÁPIDOS */}
+          <div className="border-b border-gray-200 bg-gradient-to-r from-blue-50/80 to-purple-50/80 px-4 py-3">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1">
+              <span className="inline-block w-1 h-1 rounded-full bg-blue-400"></span>
+              Accesos rápidos
+            </p>
+            <div className="flex gap-2">
+              <Link
+                href="/paciente/citas"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg border border-blue-200 hover:bg-blue-50 hover:border-blue-300 transition text-xs font-bold text-blue-700 shadow-sm flex-1 justify-center"
+              >
+                <Calendar size={14} />
+                Citas
+              </Link>
+              <Link
+                href="/paciente/tareas"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg border border-purple-200 hover:bg-purple-50 hover:border-purple-300 transition text-xs font-bold text-purple-700 shadow-sm flex-1 justify-center"
+              >
+                <CheckSquare size={14} />
+                Tareas
+              </Link>
+              <Link
+                href="/dashboard/paciente"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition text-xs font-bold text-slate-600 shadow-sm flex-1 justify-center"
+              >
+                <Home size={14} />
+                Inicio
+              </Link>
+            </div>
+          </div>
+
+          {/* LISTA DE NOTIFICACIONES */}
+          <div className="max-h-64 overflow-y-auto p-2">
             {items.length === 0 ? (
               <div className="p-4 text-center text-sm text-slate-500">Sin notificaciones nuevas</div>
             ) : (
-              items.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => markItemAsSeen(item.id)}
-                  className={`mb-2 w-full rounded-xl border px-3 py-3 text-left last:mb-0 transition ${seenIds.has(item.id)
-                    ? 'border-slate-200 bg-slate-50/70 opacity-55 hover:bg-slate-50/80'
-                    : 'border-[#71A5D9] bg-gradient-to-r from-blue-50 to-cyan-50 shadow-sm hover:border-[#1E4D8C] hover:shadow-md'
+              items.map((item) => {
+                const link = getNotificationLink(item);
+                const badge = getNotificationBadge(item);
+                const isSeen = seenIds.has(item.id);
+                return (
+                  <Link
+                    key={item.id}
+                    href={link}
+                    onClick={() => {
+                      markItemAsSeen(item.id);
+                      setOpen(false);
+                    }}
+                    className={`mb-2 block w-full rounded-xl border px-3 py-3 text-left last:mb-0 transition ${
+                      isSeen
+                        ? 'border-slate-200 bg-slate-50/70 opacity-55 hover:bg-slate-50/80'
+                        : 'border-[#71A5D9] bg-gradient-to-r from-blue-50 to-cyan-50 shadow-sm hover:border-[#1E4D8C] hover:shadow-md'
                     }`}
-                >
-                  <div className="flex items-start gap-2">
-                    {!seenIds.has(item.id) && (
-                      <span className={`mt-0.5 inline-flex h-2.5 w-2.5 rounded-full ${item.type === 'appointment' ? 'bg-blue-600' : 'bg-amber-600'}`} />
-                    )}
-                    <div className="min-w-0 flex-1">
-                      <p className={`text-sm font-bold ${seenIds.has(item.id) ? 'text-slate-500' : 'text-[#103A73]'}`}>{item.title}</p>
-                      <p className={`text-xs leading-relaxed ${seenIds.has(item.id) ? 'text-slate-500' : 'text-slate-800'}`}>{item.message}</p>
-                      <p className={`mt-1 text-[10px] font-semibold uppercase tracking-wide ${seenIds.has(item.id) ? 'text-slate-400' : 'text-[#1E4D8C]'}`}>
-                        {seenIds.has(item.id) ? 'Visto' : 'Nuevo'}
-                      </p>
+                  >
+                    <div className="flex items-start gap-2">
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-sm font-bold ${isSeen ? 'text-slate-500' : 'text-[#103A73]'}`}>
+                          {item.title}
+                        </p>
+                        <p className={`text-xs leading-relaxed ${isSeen ? 'text-slate-500' : 'text-slate-800'}`}>
+                          {item.message}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${badge.color}`}>
+                            {badge.text}
+                          </span>
+                          <span className="text-[10px] text-gray-400">
+                            {new Date(item.created_at).toLocaleDateString('es-ES', {
+                              day: '2-digit',
+                              month: '2-digit',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </span>
+                          <span className={`text-[10px] font-semibold uppercase tracking-wide ${isSeen ? 'text-slate-400' : 'text-[#1E4D8C]'}`}>
+                            {isSeen ? 'Visto' : 'Nuevo'}
+                          </span>
+                        </div>
+                      </div>
+                      <span className="text-gray-300 group-hover:text-blue-500 transition text-xs">→</span>
                     </div>
-                  </div>
-                </button>
-              ))
+                  </Link>
+                );
+              })
             )}
           </div>
-          {session?.user?.role === 'PACIENTE' && (
-            <div className="border-t border-blue-100 bg-white px-4 py-3 text-right">
-              <Link href="/paciente/tareas" className="text-xs font-bold text-[#1E4D8C] hover:underline">
-                Ir a mis tareas
-              </Link>
-            </div>
-          )}
         </div>
       )}
     </div>
