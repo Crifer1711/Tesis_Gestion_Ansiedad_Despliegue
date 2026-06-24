@@ -1,8 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Zap, PlayCircle, Filter, X, ArrowLeft } from 'lucide-react';
+import { Zap, PlayCircle, Filter, X } from 'lucide-react';
 import { Activity } from '@/domain/dtos/activity.dto';
 
 type Props = {
@@ -34,7 +33,6 @@ const categoryLabels: Record<string, string> = {
 };
 
 export function TechnicasRapidasGallery({ activities }: Props) {
-  const router = useRouter();
   const [category, setCategory] = useState<'Todos' | Activity['categoria']>('Todos');
   const [selected, setSelected] = useState<Activity | null>(null);
 
@@ -42,26 +40,9 @@ export function TechnicasRapidasGallery({ activities }: Props) {
     return activities.filter((activity) => category === 'Todos' ? true : activity.categoria === category);
   }, [activities, category]);
 
-  const handleVolverInicio = () => {
-    const referrer = typeof document !== 'undefined' ? document.referrer : '';
-    const target = referrer.includes('/dashboard/paciente') ? '/dashboard/paciente#recursos' : '/#recursos';
-    router.push(target);
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#eef6ff] via-white to-[#dfeeff]">
       <div className="mx-auto max-w-7xl px-6 py-8 md:py-10">
-        <div className="mb-6">
-          <button
-            type="button"
-            onClick={handleVolverInicio}
-            className="inline-flex items-center gap-2 rounded-full border border-[#71A5D9] bg-white px-4 py-2 text-sm font-black text-[#1E4D8C] shadow-sm transition hover:bg-blue-50 hover:shadow-md"
-          >
-            <ArrowLeft size={16} />
-            Volver al inicio
-          </button>
-        </div>
-
         <div className="mb-8 rounded-[28px] border border-blue-200 bg-white/80 p-6 shadow-[0_10px_40px_rgba(30,77,140,0.10)] backdrop-blur">
           <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
             <div className="max-w-3xl">

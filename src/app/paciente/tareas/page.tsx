@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useCallback } from 'react';
 import { PatientHeader } from '@/presentation/components/patient/PatientHeader';
-import { ArrowLeft, CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
+import { CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
 import { scrollToTop } from '@/presentation/utils/scrollWithOffset';
 import { EmotionWheelModal, type Emocion } from '@/presentation/components/patient/EmotionWheelModal';
 
@@ -136,11 +136,6 @@ export default function TareasPage() {
     return null;
   }
 
-  const handleVolver = () => {
-    router.push('/dashboard/paciente');
-    setTimeout(() => scrollToTop(), 150);
-  };
-
   const handleOpenAsignacion = (asignacion: any) => {
     // Generate a unique Attempt ID for this session
     const newIntentoId = typeof crypto.randomUUID === 'function' 
@@ -227,16 +222,8 @@ export default function TareasPage() {
         userName={session?.user?.name || 'Paciente'}
         userRole={session?.user?.role || 'ESTUDIANTE'}
       />
-      <div className="py-16">
+      <div className="pt-28 pb-16">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="mb-6">
-            <button
-              onClick={handleVolver}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white text-[#1E4D8C] font-semibold rounded-lg shadow-sm border border-[#71A5D9] hover:bg-[#71A5D9] hover:text-white transition"
-            >
-              <ArrowLeft size={18} /> Volver a Inicio
-            </button>
-          </div>
           <h1 className="text-4xl font-black text-[#1E4D8C] mb-4">Mis Tareas</h1>
           <p className="text-slate-700 leading-relaxed mb-6">
             Aquí se muestran las actividades, ejercicios o tareas que tu psicólogo te haya asignado para acompañar tu proceso. Podrás abrir cada actividad, revisar sus instrucciones, ver su estado y la fecha límite, y completar el contenido desde esta misma pantalla. Si tu psicólogo aún no te ha asignado tareas, verás el aviso de que no tienes asignaciones disponibles.
