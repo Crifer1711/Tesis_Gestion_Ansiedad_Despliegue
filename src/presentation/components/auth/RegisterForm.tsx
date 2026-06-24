@@ -119,7 +119,6 @@ export const RegisterForm = () => {
         <div className="flex flex-col items-center mb-6">
           <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-sm border border-gray-100 mb-3 bg-white p-1">
             <Image src="/images/Logo-.png" alt="Logo" fill className="object-contain" sizes="48px" priority />
-            
           </div>
           <h1 className="text-xl font-bold text-slate-800 tracking-tight">Crear una cuenta</h1>
           <p className="text-xs text-gray-500 mt-1">Ingresa tus datos institucionales para registrarte</p>
@@ -228,26 +227,25 @@ export const RegisterForm = () => {
                 <Lock size={18} />
               </div>
               <input
-                {...register("password", {
-                  onChange: (e) => {
-                    setValue("password", e.target.value, { shouldValidate: true });
-                  }
-                })}
+                {...register("password")}
                 type={showPassword ? "text" : "password"}
-                placeholder="Mínimo 8 caracteres con letras, números y símbolos"
+                placeholder="Ingresa tu contraseña"
                 maxLength={30}
-                className={`w-full pl-10 pr-10 py-2.5 text-sm rounded-xl border bg-gray-50/50 transition-all outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 text-gray-800 placeholder-gray-400 font-medium ${errors.password ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'}`}
+                className={`w-full pl-10 pr-16 py-2.5 text-sm rounded-xl border bg-gray-50/50 transition-all outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 text-gray-800 placeholder-gray-400 font-medium ${errors.password ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'}`}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-slate-600 transition-colors"
-                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
               >
                 <span className="text-xs font-semibold">{showPassword ? "Ocultar" : "Mostrar"}</span>
               </button>
             </div>
-            {errors.password && <p className="text-red-500 text-xs mt-1 font-medium pl-1">{errors.password.message}</p>}
+            {/* ✅ TEXTO DE AYUDA CON REQUISITOS - MÁS GRANDE */}
+            <p className="text-xs text-gray-500 mt-1.5 pl-1">
+              <span className="font-semibold text-gray-600">Requisitos:</span> Mínimo 8 caracteres, una mayúscula, una minúscula y un número
+            </p>
+            {errors.password && <p className="text-red-500 text-xs mt-0.5 font-medium pl-1">{errors.password.message}</p>}
           </div>
 
           {/* CAMPO: CONFIRMAR CONTRASEÑA */}
@@ -262,25 +260,18 @@ export const RegisterForm = () => {
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="Repite tu contraseña"
                 maxLength={30}
-                className={`w-full pl-10 pr-10 py-2.5 text-sm rounded-xl border bg-gray-50/50 transition-all outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 text-gray-800 placeholder-gray-400 font-medium ${errors.confirmPassword ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'}`}
+                className={`w-full pl-10 pr-16 py-2.5 text-sm rounded-xl border bg-gray-50/50 transition-all outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/20 text-gray-800 placeholder-gray-400 font-medium ${errors.confirmPassword ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'}`}
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-slate-600 transition-colors"
-                aria-label={showConfirmPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
               >
                 <span className="text-xs font-semibold">{showConfirmPassword ? "Ocultar" : "Mostrar"}</span>
               </button>
             </div>
             {errors.confirmPassword && <p className="text-red-500 text-xs mt-1 font-medium pl-1">{errors.confirmPassword.message}</p>}
           </div>
-
-          {serverError && (
-            <p className="text-red-600 text-center font-semibold text-xs bg-red-50 p-2.5 rounded-xl border border-red-200 shadow-sm animate-fade-in">
-              {serverError}
-            </p>
-          )}
 
           {/* BOTÓN DE ENVÍO */}
           <button
