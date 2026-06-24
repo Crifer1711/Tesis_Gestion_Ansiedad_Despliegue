@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
-const EMAIL_SEND_TIMEOUT_MS = 6000;
+const EMAIL_SEND_TIMEOUT_MS = 2500;
 
 const getBaseUrl = () => {
   return process.env.NEXTAUTH_URL || process.env.APP_BASE_URL || 'http://localhost:3000';
@@ -19,6 +19,16 @@ export const sendVerificationEmail = async (email: string, token: string) => {
   if (!host || !user || !pass) {
     console.info('[Verification Email] SMTP not configured. Share this URL manually:', verifyUrl);
     return;
+  }
+
+  if (!user.includes('@')) {
+    console.error('[Verification Email] Invalid SMTP_USER format. Expected an email address.');
+    throw new Error('Invalid SMTP_USER format');
+  }
+
+  if (!from.includes('@')) {
+    console.error('[Verification Email] Invalid SMTP_FROM format. Expected an email address.');
+    throw new Error('Invalid SMTP_FROM format');
   }
 
   const transporter = nodemailer.createTransport({

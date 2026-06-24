@@ -173,3 +173,14 @@ body {
 .theme-high-contrast span {
   color: #facc15 !important;
 }
+
+/* Evita doble icono de ver contraseña (icono nativo + icono custom). */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-textfield-decoration-container {
+  display: none !important;
+}
