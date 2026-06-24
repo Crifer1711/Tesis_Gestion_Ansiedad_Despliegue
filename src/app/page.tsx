@@ -43,6 +43,28 @@ export default function HomePage() {
             <div className="text-3xl font-semibold tracking-tight text-white [font-family:Georgia,serif]">
               MindPeace
             </div>
+
+            <div className="text-3xl font-semibold tracking-tight text-white [font-family:Georgia,serif]">
+              MindPeace
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 md:gap-4">
+            <Link
+              href="/login"
+              className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors hover:bg-white/10 md:px-6"
+            >
+              <LogIn className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden sm:inline">Iniciar Sesión</span>
+            </Link>
+
+            <Link
+              href="/register"
+              className="flex items-center gap-2 rounded-xl bg-sky-600 px-3 py-2.5 text-sm font-medium transition-colors hover:bg-sky-500 md:px-6"
+            >
+              <UserPlus className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden sm:inline">Crear Cuenta</span>
+            </Link>
           </div>
 
           <div className="flex items-center gap-2 md:gap-4">
