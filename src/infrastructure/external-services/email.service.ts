@@ -1,16 +1,21 @@
-// Usa Resend HTTP API (sin SMTP, sin timeouts de red)
+// emailservice.ts - VERSIÓN CORREGIDA CON SENDGRID
+import sgMail from '@sendgrid/mail';
+
 const getBaseUrl = () =>
   process.env.NEXTAUTH_URL || process.env.APP_BASE_URL || 'http://localhost:3000';
 
 export const sendVerificationEmail = async (email: string, token: string) => {
   const verifyUrl = `${getBaseUrl()}/api/auth/verify-email?token=${encodeURIComponent(token)}`;
 
-  const apiKey = (process.env.RESEND_API_KEY || '').trim();
+  const apiKey = process.env.SENDGRID_API_KEY;
+  const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'cfloachamin@espe.edu.ec';
 
   if (!apiKey) {
-    console.info('[Verification Email] RESEND_API_KEY not set. Verification URL:', verifyUrl);
+    console.info('[Verification Email] SENDGRID_API_KEY not set. Verification URL:', verifyUrl);
     return;
   }
+
+  sgMail.setApiKey(apiKey);
 
   const html = `
     <div style="font-family: Arial, sans-serif; color: #0f172a; line-height: 1.5; max-width: 560px; margin: 0 auto;">
@@ -26,27 +31,24 @@ export const sendVerificationEmail = async (email: string, token: string) => {
     </div>
   `;
 
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: 'MindPeace <onboarding@resend.dev>',
-      to: [email],
+  try {
+    const response = await sgMail.send({
+      to: email,
+      from: fromEmail,
       subject: 'Verifica tu cuenta de MindPeace',
-      html,
+      html: html,
       text: `Activa tu cuenta de MindPeace: ${verifyUrl}`,
-    }),
-  });
+    });
 
-  if (!res.ok) {
-    const body = await res.text();
-    console.error('[Verification Email] Resend API error:', res.status, body);
-    throw new Error(`Resend error ${res.status}: ${body}`);
+    console.info('[Verification Email] Sent via SendGrid, response:', response);
+    return response;
+  } catch (error: any) {
+    console.error('[Verification Email] SendGrid error:', error);
+    
+    if (error.response) {
+      console.error('[Verification Email] SendGrid response error:', error.response.body);
+    }
+    
+    throw new Error(`SendGrid error: ${error.message || 'Unknown error'}`);
   }
-
-  const data = await res.json();
-  console.info('[Verification Email] Sent via Resend, id:', data.id);
 };
