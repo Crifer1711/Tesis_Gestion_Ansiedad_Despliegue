@@ -1,5 +1,5 @@
-// src/presentation/components/psychologist/PsychologistNavbar.tsx
 'use client';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -9,6 +9,23 @@ import { useSession, signOut } from 'next-auth/react';
 export function PsychologistNavbar() {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const [isVisible, setIsVisible] = useState(true);
+  const lastScrollYRef = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollYRef.current && currentScrollY > 20) {
+        setIsVisible(false);
+      } else {
+        setIsVisible(true);
+      }
+      lastScrollYRef.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const navLinks = [
     { id: 'inicio', label: 'Inicio', href: '/dashboard/psicologo' },
@@ -18,24 +35,26 @@ export function PsychologistNavbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur shadow-md border-b-2 border-[#71A5D9]">
-      <div className="flex items-center justify-between px-8 py-4">
-        {/* Logo */}
+    <header className={`fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/50 backdrop-blur-xl transition-transform duration-300 ${
+      isVisible ? 'translate-y-0' : '-translate-y-full'
+    }`}>
+      <div className="flex items-center justify-between px-5 py-4 md:px-8 md:py-5">
         <Link href="/dashboard/psicologo" className="flex items-center gap-3 hover:opacity-80 transition">
-          <div className="relative h-12 w-12">
-            <Image 
-              src="/images/Logo.png" 
-              alt="MindPeace" 
-              fill 
+          <div className="relative h-10 w-10 overflow-hidden rounded-2xl bg-white/90 p-1 shadow-inner">
+            <Image
+              src="/images/Logo.png"
+              alt="MindPeace"
+              fill
               className="object-contain"
-              sizes="48px"
+              sizes="40px"
               priority
             />
           </div>
-          <span className="font-black text-xl text-[#1E4D8C]">MindPeace</span>
+          <span className="text-3xl font-semibold tracking-tight text-white [font-family:Georgia,serif]">
+            MindPeace
+          </span>
         </Link>
 
-        {/* Navigation */}
         <div className="flex items-center gap-2">
           <nav className="hidden md:flex items-center gap-2">
             {navLinks.map(item => (
@@ -44,8 +63,8 @@ export function PsychologistNavbar() {
                 href={item.href}
                 className={`font-semibold text-sm px-4 py-2 rounded-full transition ${
                   pathname === item.href
-                    ? 'bg-[#71A5D9] text-white'
-                    : 'text-[#1E4D8C] hover:bg-blue-100'
+                    ? 'bg-white/25 text-white'
+                    : 'text-white/70 hover:bg-white/15 hover:text-white'
                 }`}
               >
                 {item.label}
@@ -53,19 +72,16 @@ export function PsychologistNavbar() {
             ))}
           </nav>
 
-          <div className="w-px h-6 bg-[#d0e4fc] mx-1"></div>
-
-          {/* User Info and Logout */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 ml-4">
             <div className="text-right">
-              <p className="text-sm font-semibold text-[#1E4D8C]">{session?.user?.name || 'Psicólogo'}</p>
-              <p className="text-xs text-slate-500 font-bold">PSICÓLOGO</p>
+              <p className="font-bold text-white text-sm">{session?.user?.name || 'Psicólogo'}</p>
+              <p className="text-xs text-white/60 uppercase font-semibold tracking-wide">PSICÓLOGO</p>
             </div>
             <button
               onClick={() => signOut({ redirect: true, callbackUrl: '/' })}
-              className="flex items-center gap-2 text-sm font-bold text-white bg-[#71A5D9] px-4 py-2 rounded-lg hover:bg-[#1E4D8C] shadow-lg transition"
+              className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition font-semibold"
             >
-              <LogOut size={16} />
+              <LogOut size={18} />
               Salir
             </button>
           </div>

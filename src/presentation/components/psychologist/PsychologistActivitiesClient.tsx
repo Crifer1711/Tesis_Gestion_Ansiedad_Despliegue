@@ -39,7 +39,7 @@ export default function PsychologistActivitiesClient({ activities, patients }: {
             </div>
             <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold text-slate-600">
               <span className="rounded-full bg-slate-50 px-3 py-1 border border-slate-100">Duración: {act.duracion || '—'}s</span>
-              <span className="rounded-full bg-slate-50 px-3 py-1 border border-slate-100">Usos: {act.usos ?? 0}</span>
+              <span className="rounded-full bg-slate-50 px-3 py-1 border border-slate-100">{act.usos === 'tecnicas' ? 'Técnicas rápidas' : 'Asignable'}</span>
             </div>
             <div className="mt-5 flex gap-3">
               <a href={act.embed_url || '#'} target="_blank" rel="noreferrer" className="inline-flex flex-1 items-center justify-center rounded-2xl border border-blue-200 bg-white px-4 py-3 text-sm font-black text-[#1E4D8C] transition hover:bg-blue-50">Abrir</a>

@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { PatientHeader } from '@/presentation/components/patient/PatientHeader';
 import { ArrowLeft, CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
 import { scrollToTop } from '@/presentation/utils/scrollWithOffset';
+import { EmotionWheelModal, type Emocion } from '@/presentation/components/patient/EmotionWheelModal';
 
 export default function TareasPage() {
   const [activeSection, setActiveSection] = useState('tareas');
@@ -17,6 +18,11 @@ export default function TareasPage() {
   const [selectedAsignacion, setSelectedAsignacion] = useState<any | null>(null);
   const [currentIntentoId, setCurrentIntentoId] = useState<string | null>(null);
   const [showCompleted, setShowCompleted] = useState(false);
+
+  // Estado para la rueda de emociones post-actividad
+  const [showEmotionWheel, setShowEmotionWheel] = useState(false);
+  const [completedIntentoId, setCompletedIntentoId] = useState<string | null>(null);
+  const [completedActividadNombre, setCompletedActividadNombre] = useState<string>('');
 
   // Load asignaciones from the database
   const loadAsign = useCallback(async () => {
@@ -104,8 +110,12 @@ export default function TareasPage() {
             if (type === 'BIENESTAR_ACTIVIDAD_COMPLETADA') {
               // Reload task list to show updated state
               loadAsign();
-              // Close the modal automatically as requested
+              // Close the activity modal
               handleCloseAsignacion();
+              // Show the emotion wheel so the patient can rate how they felt
+              setCompletedIntentoId(normalizedData.intento_id ?? null);
+              setCompletedActividadNombre(selectedAsignacion?.titulo || 'la actividad');
+              setShowEmotionWheel(true);
             }
           } else {
             console.error('Error al guardar el evento en el backend:', result.error);
@@ -143,6 +153,37 @@ export default function TareasPage() {
   const handleCloseAsignacion = () => {
     setSelectedAsignacion(null);
     setCurrentIntentoId(null);
+  };
+
+  const handleEmotionConfirm = async (emocion: Emocion) => {
+    setShowEmotionWheel(false);
+    if (!completedIntentoId) return;
+    try {
+      const res = await fetch('/api/actividades/events/resumen', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          intento_id: completedIntentoId,
+          emocion: emocion.nombre,
+          categoria: emocion.categoria,
+        }),
+      });
+      const result = await res.json();
+      if (res.ok && result.success) {
+        console.log('Emoción guardada en resumen:', emocion);
+      } else {
+        console.error('Error al guardar emoción:', result.error);
+      }
+    } catch (err) {
+      console.error('Error de red al guardar emoción:', err);
+    } finally {
+      setCompletedIntentoId(null);
+    }
+  };
+
+  const handleEmotionSkip = () => {
+    setShowEmotionWheel(false);
+    setCompletedIntentoId(null);
   };
 
   const getIframeUrl = () => {
@@ -317,6 +358,15 @@ export default function TareasPage() {
           )}
         </div>
       </div>
+
+      {/* Rueda de emociones post-actividad */}
+      {showEmotionWheel && (
+        <EmotionWheelModal
+          actividadNombre={completedActividadNombre}
+          onConfirm={handleEmotionConfirm}
+          onSkip={handleEmotionSkip}
+        />
+      )}
     </div>
   );
 }
