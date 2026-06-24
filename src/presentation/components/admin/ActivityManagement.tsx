@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Activity } from "@/domain/dtos/activity.dto";
@@ -8,6 +8,7 @@ import { Search, Edit2, Eye, Trash2, Upload } from "lucide-react";
 import { useConfirm } from '@/presentation/components/common/ConfirmProvider';
 
 export function ActivityManagement({ initialActivities = [] }: { initialActivities: Activity[] }) {
+  const [activities, setActivities] = useState<Activity[]>(initialActivities);
   const [filter, setFilter] = useState('Todos');
   const [searchTerm, setSearchTerm] = useState('');
   const [showImportModal, setShowImportModal] = useState(false);
@@ -29,11 +30,34 @@ export function ActivityManagement({ initialActivities = [] }: { initialActiviti
 
   const categories = ['Todos', 'Respiración', 'Visualizacion', 'Sonidos', 'Interaccion', 'Otros'];
 
-  const filteredActivities = initialActivities.filter(a => {
+  useEffect(() => {
+    setActivities(initialActivities);
+  }, [initialActivities]);
+
+  const normalizeEstado = (estado: string) => {
+    const value = (estado || '').toString().trim().toLowerCase();
+    if (value === 'aprobada' || value === 'activo') return 'Aprobada';
+    if (value === 'rechazada' || value === 'inactivo') return 'Rechazada';
+    return 'Pendiente';
+  };
+
+  const isApproved = (estado: string) => normalizeEstado(estado) === 'Aprobada';
+
+  const updateActivity = (id: string | number, patch: Partial<Activity>) => {
+    setActivities(prev => prev.map(activity => (
+      activity.id === id ? { ...activity, ...patch } : activity
+    )));
+  };
+
+  const removeActivity = (id: string | number) => {
+    setActivities(prev => prev.filter(activity => activity.id !== id));
+  };
+
+  const filteredActivities = useMemo(() => activities.filter(a => {
     const matchesFilter = filter === 'Todos' ? true : (a.categoria === filter);
     const matchesSearch = a.nombre.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesFilter && matchesSearch;
-  });
+  }), [activities, filter, searchTerm]);
 
   return (
     <div className="p-6 bg-[#E3F2FD] min-h-screen space-y-6 font-sans">
@@ -82,76 +106,157 @@ export function ActivityManagement({ initialActivities = [] }: { initialActiviti
         </div>
 
         {/* Tabla de Actividades */}
-        <div className="overflow-hidden rounded-xl border-2 border-gray-800 bg-white">
-          <table className="w-full border-collapse">
+        <div className="overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-lg shadow-blue-100/30">
+          <table className="w-full">
             <thead>
-              <tr className="bg-[#BDBDBD] border-b-2 border-gray-800 text-xs font-bold text-gray-900">
-                <th className="p-3 border-r-2 border-gray-800">Nombre</th>
-                <th className="p-3 border-r-2 border-gray-800">Categoría</th>
-                <th className="p-3 border-r-2 border-gray-800">Duración</th>
-                <th className="p-3 border-r-2 border-gray-800">Usos</th>
-                <th className="p-3 border-r-2 border-gray-800">Estado</th>
-                <th className="p-3">Acciones</th>
+              <tr className="bg-gradient-to-r from-[#1E4D8C] to-[#2A6AB5] text-xs font-bold text-white">
+                <th className="p-4 text-left">Nombre</th>
+                <th className="p-4 text-left">Categoría</th>
+                <th className="p-4 text-center">Duración</th>
+                <th className="p-4 text-center">Usos</th>
+                <th className="p-4 text-center">Estado</th>
+                <th className="p-4 text-center">Acciones</th>
               </tr>
             </thead>
 
-            <tbody className="text-xs text-gray-900">
+            <tbody className="text-sm">
               {filteredActivities.length > 0 ? (
-                filteredActivities.map((act) => (
-                  <tr key={act.id} className="border-b border-gray-300 text-center hover:bg-gray-100 transition-colors">
-                    <td className="p-3 border-r-2 border-gray-200">{act.nombre}</td>
-                    <td className="p-3 border-r-2 border-gray-200">{act.categoria}</td>
-                    <td className="p-3 border-r-2 border-gray-200">{act.duracion}</td>
-                    <td className="p-3 border-r-2 border-gray-200">{act.usos}</td>
-                    <td className="p-3 border-r-2 border-gray-200">
+                filteredActivities.map((act, i) => (
+                  <tr key={act.id} className={`border-b border-blue-100 transition-all hover:bg-blue-50/60 ${i % 2 === 0 ? 'bg-white' : 'bg-blue-50/30'}`}>
+                    <td className="p-4 font-semibold text-gray-800">{act.nombre}</td>
+                    <td className="p-4">
+                      <span className={`inline-block rounded-full px-3 py-1 text-xs font-bold ${
+                        act.categoria === 'Respiración' ? 'bg-cyan-100 text-cyan-800' :
+                        act.categoria === 'Visualizacion' ? 'bg-violet-100 text-violet-800' :
+                        act.categoria === 'Sonidos' ? 'bg-amber-100 text-amber-800' :
+                        act.categoria === 'Interaccion' ? 'bg-rose-100 text-rose-800' :
+                        'bg-slate-100 text-slate-700'
+                      }`}>
+                        {act.categoria}
+                      </span>
+                    </td>
+                    <td className="p-4 text-center font-mono text-xs text-gray-600">{act.duracion || '—'}s</td>
+                    <td className="p-4 text-center">
                       {session?.user?.role === 'ADMINISTRADOR' ? (
-                        <select value={act.estado} onChange={async (e) => {
-                          const newVal = e.target.value;
-                          // map display to db value
-                          const mapToDb = (v:string) => v.toLowerCase() === 'aprobada' ? 'aprobada' : v.toLowerCase() === 'rechazada' ? 'rechazada' : 'pendiente';
-                          try {
-                            const res = await fetch(`/api/actividades/${act.id}/status`, { method: 'PATCH', body: JSON.stringify({ estado: mapToDb(newVal) }), headers: { 'Content-Type': 'application/json' } });
-                            const data = await res.json();
-                            if (!res.ok) { setMessage(data.error || 'Error actualizando estado'); }
-                            else { setMessage(null); router.refresh(); }
-                          } catch (err) { console.error(err); setMessage('Error en la solicitud'); }
-                        }} className="p-1 rounded text-xs border">
-                          <option>Pendiente</option>
-                          <option>Aprobada</option>
-                          <option>Rechazada</option>
+                        <select
+                          value={act.usos}
+                          onChange={async (e) => {
+                            const newVal = e.target.value;
+                            try {
+                              const res = await fetch(`/api/actividades/${act.id}`, {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ usos: newVal }),
+                              });
+                              if (!res.ok) { setMessage('Error actualizando usos'); }
+                              else {
+                                setMessage(null);
+                                updateActivity(act.id, { usos: newVal as 'asignar' | 'tecnicas' });
+                                router.refresh();
+                              }
+                            } catch (err) { console.error(err); setMessage('Error en la solicitud'); }
+                          }}
+                          className={`rounded-lg px-3 py-1.5 text-xs font-bold border-0 cursor-pointer outline-none ring-2 transition ${
+                            act.usos === 'tecnicas'
+                              ? 'ring-purple-300 bg-purple-50 text-purple-800'
+                              : 'ring-blue-300 bg-blue-50 text-blue-800'
+                          }`}
+                        >
+                          <option value="asignar" className="bg-white text-blue-800">Asignar</option>
+                          <option value="tecnicas" className="bg-white text-purple-800">Técnicas</option>
                         </select>
                       ) : (
-                        <span className={`px-2 py-1 rounded-full font-bold text-[10px] uppercase ${act.estado==='Aprobada' ? 'bg-green-100 text-green-700' : act.estado==='Rechazada' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-800'}`}>
+                        <span className={`inline-block rounded-full px-3 py-1 text-xs font-bold ${
+                          act.usos === 'tecnicas' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+                        }`}>
+                          {act.usos === 'tecnicas' ? 'Técnicas' : 'Asignar'}
+                        </span>
+                      )}
+                    </td>
+                    <td className="p-4 text-center">
+                      {session?.user?.role === 'ADMINISTRADOR' ? (
+                        <select
+                          value={normalizeEstado(act.estado)}
+                          onChange={async (e) => {
+                            const newVal = e.target.value;
+                            const mapToDb = (v: string) => v.toLowerCase() === 'aprobada' ? 'aprobada' : v.toLowerCase() === 'rechazada' ? 'rechazada' : 'pendiente';
+                            try {
+                              const res = await fetch(`/api/actividades/${act.id}/status`, { method: 'PATCH', body: JSON.stringify({ estado: mapToDb(newVal) }), headers: { 'Content-Type': 'application/json' } });
+                              const data = await res.json();
+                              if (!res.ok) { setMessage(data.error || 'Error actualizando estado'); }
+                              else {
+                                setMessage(null);
+                                updateActivity(act.id, { estado: normalizeEstado(data.estado || newVal) as Activity['estado'] });
+                                router.refresh();
+                              }
+                            } catch (err) { console.error(err); setMessage('Error en la solicitud'); }
+                          }}
+                          className={`rounded-lg px-3 py-1.5 text-xs font-bold border-0 cursor-pointer outline-none ring-2 transition ${
+                            normalizeEstado(act.estado) === 'Aprobada'
+                              ? 'ring-green-300 bg-green-50 text-green-800'
+                              : normalizeEstado(act.estado) === 'Rechazada'
+                                ? 'ring-red-300 bg-red-50 text-red-800'
+                                : 'ring-amber-300 bg-amber-50 text-amber-800'
+                          }`}
+                        >
+                          <option className="bg-white text-amber-800">Pendiente</option>
+                          <option className="bg-white text-green-800">Aprobada</option>
+                          <option className="bg-white text-red-800">Rechazada</option>
+                        </select>
+                      ) : (
+                        <span className={`inline-block rounded-full px-3 py-1 text-xs font-bold ${
+                          act.estado === 'Aprobada' ? 'bg-green-100 text-green-800 ring-1 ring-green-200' :
+                          act.estado === 'Rechazada' ? 'bg-red-100 text-red-800 ring-1 ring-red-200' :
+                          'bg-amber-100 text-amber-800 ring-1 ring-amber-200'
+                        }`}>
                           {act.estado}
                         </span>
                       )}
                     </td>
-                    <td className="p-3 flex justify-center gap-4">
-                      <Edit2 onClick={() => { setEditingActivity(act); setMessage(null); }} className="h-4 w-4 cursor-pointer text-gray-700 hover:text-blue-600" />
-                      <Eye onClick={() => {
-                        if (act.estado.toLowerCase() === 'aprobada') {
-                          setViewingActivity(act);
-                        } else {
-                          setMessage('Solo actividades aprobadas se pueden ejecutar');
-                        }
-                      }} className="h-4 w-4 cursor-pointer text-gray-700 hover:text-green-600" />
-                      <Trash2 onClick={async () => {
-                        const ok = await confirm({ title: 'Eliminar actividad', description: '¿Eliminar actividad? Esta acción es irreversible.', confirmText: 'Eliminar', cancelText: 'Cancelar' });
-                        if (!ok) return;
-                        try {
-                          const res = await fetch(`/api/actividades/${act.id}`, { method: 'DELETE' });
-                          const data = await res.json();
-                          if (!res.ok) setMessage(data.error || 'Error eliminando');
-                          else { router.refresh(); }
-                        } catch (err) { console.error(err); setMessage('Error en la solicitud'); }
-                      }} className="h-4 w-4 cursor-pointer text-gray-700 hover:text-red-600" />
+                    <td className="p-4">
+                      <div className="flex items-center justify-center gap-2">
+                        <button onClick={() => { setEditingActivity(act); setMessage(null); }} className="rounded-lg bg-blue-50 p-2 text-blue-700 transition hover:bg-blue-100 hover:text-blue-900" title="Editar">
+                          <Edit2 className="h-4 w-4" />
+                        </button>
+                        <button onClick={() => {
+                          if (isApproved(act.estado)) {
+                            setViewingActivity(act);
+                          } else {
+                            setMessage('Solo actividades aprobadas se pueden ejecutar');
+                          }
+                        }} className="rounded-lg bg-emerald-50 p-2 text-emerald-700 transition hover:bg-emerald-100 hover:text-emerald-900" title="Ver">
+                          <Eye className="h-4 w-4" />
+                        </button>
+                        <button onClick={async () => {
+                          const ok = await confirm({ title: 'Eliminar actividad', description: '¿Eliminar actividad? Esta acción es irreversible.', confirmText: 'Eliminar', cancelText: 'Cancelar' });
+                          if (!ok) return;
+                          try {
+                            const res = await fetch(`/api/actividades/${act.id}`, { method: 'DELETE' });
+                            const data = await res.json();
+                            if (!res.ok) setMessage(data.error || 'Error eliminando');
+                            else {
+                              removeActivity(act.id);
+                              setMessage(null);
+                              router.refresh();
+                            }
+                          } catch (err) { console.error(err); setMessage('Error en la solicitud'); }
+                        }} className="rounded-lg bg-red-50 p-2 text-red-700 transition hover:bg-red-100 hover:text-red-900" title="Eliminar">
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="p-6 text-center text-gray-500 font-bold">
-                    No hay actividades registradas
+                  <td colSpan={6} className="p-10 text-center">
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="rounded-full bg-blue-50 p-3">
+                        <Search className="h-6 w-6 text-blue-400" />
+                      </div>
+                      <p className="font-bold text-gray-500">No hay actividades registradas</p>
+                      <p className="text-xs text-gray-400">Importa actividades usando los botones de abajo</p>
+                    </div>
                   </td>
                 </tr>
               )}
@@ -256,10 +361,10 @@ export function ActivityManagement({ initialActivities = [] }: { initialActiviti
               <button onClick={() => setShowViewModal(false)} className="text-black font-bold">Cerrar ✕</button>
             </div>
             <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {initialActivities.filter(a => a.estado === 'Aprobada').length === 0 && (
+              {activities.filter(a => isApproved(a.estado)).length === 0 && (
                 <div className="p-6 text-center text-gray-500 col-span-full">No hay actividades aprobadas</div>
               )}
-              {initialActivities.filter(a => a.estado === 'Aprobada').map(act => (
+              {activities.filter(a => isApproved(a.estado)).map(act => (
                 <div key={act.id} className="border rounded-lg p-4 flex flex-col bg-gradient-to-br from-white via-slate-50 to-slate-100 shadow-sm hover:shadow-md transition-shadow">
                   <div className="flex items-start gap-3">
                     <div className="w-14 h-14 bg-blue-50 rounded-md flex items-center justify-center text-2xl text-blue-700 font-bold">{act.nombre?.charAt(0) || 'A'}</div>
@@ -269,7 +374,7 @@ export function ActivityManagement({ initialActivities = [] }: { initialActiviti
                       <div className="mt-2 flex items-center gap-3 text-xs text-gray-700">
                         <span className="px-2 py-1 bg-blue-50 rounded-full">{act.categoria}</span>
                         <span className="px-2 py-1 bg-green-50 rounded-full">Dur: {act.duracion || '—'}s</span>
-                        <span className="px-2 py-1 bg-gray-50 rounded-full">Usos: {act.usos ?? 0}</span>
+                        <span className="px-2 py-1 bg-gray-50 rounded-full">Usos: {act.usos === 'tecnicas' ? 'Técnicas' : 'Asignar'}</span>
                       </div>
                     </div>
                   </div>
@@ -347,7 +452,10 @@ export function ActivityManagement({ initialActivities = [] }: { initialActiviti
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-black font-bold">Usos</label>
-                  <input id="edit-usos" type="number" defaultValue={editingActivity.usos || 0} className="w-full p-2 border rounded text-black font-bold" />
+                  <select id="edit-usos" defaultValue={editingActivity.usos || 'asignar'} className="w-full p-2 border rounded text-black font-bold">
+                    <option value="asignar">Asignar</option>
+                    <option value="tecnicas">Técnicas</option>
+                  </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-black font-bold">Estado</label>
@@ -370,7 +478,7 @@ export function ActivityManagement({ initialActivities = [] }: { initialActiviti
                   const titulo = (document.getElementById('edit-titulo') as HTMLInputElement).value;
                   const categoria = (document.getElementById('edit-categoria') as HTMLSelectElement).value;
                   const duracion = (document.getElementById('edit-duracion') as HTMLInputElement).value;
-                  const usos = Number((document.getElementById('edit-usos') as HTMLInputElement).value || 0);
+                  const usos = (document.getElementById('edit-usos') as HTMLSelectElement).value;
                   const estado = (document.getElementById('edit-estado') as HTMLSelectElement).value;
                   const embed = (document.getElementById('edit-embed') as HTMLInputElement).value;
                   try {
@@ -378,7 +486,19 @@ export function ActivityManagement({ initialActivities = [] }: { initialActiviti
                     const res = await fetch(`/api/actividades/${editingActivity.id}`, { method: 'PATCH', headers: { 'Content-Type':'application/json' }, body: JSON.stringify(body) });
                     const data = await res.json();
                     if (!res.ok) { setMessage(data.error || 'Error actualizando'); }
-                    else { setEditingActivity(null); router.refresh(); }
+                    else {
+                      setEditingActivity(null);
+                      updateActivity(editingActivity.id, {
+                        nombre: titulo,
+                        categoria: categoria as Activity['categoria'],
+                        duracion,
+                        usos: usos as 'asignar' | 'tecnicas',
+                        estado: normalizeEstado(estado) as Activity['estado'],
+                        embed_url: embed,
+                      });
+                      setMessage(null);
+                      router.refresh();
+                    }
                   } catch (err) { console.error(err); setMessage('Error en la solicitud'); }
                 }} className="px-4 py-2 bg-blue-600 text-white rounded">Guardar</button>
               </div>

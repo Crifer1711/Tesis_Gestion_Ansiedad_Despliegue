@@ -1,6 +1,13 @@
 import pool from "@/infrastructure/database/db";
 import { Psychologist } from "@/domain/dtos/psychologist.dto";
 
+const toUiStatus = (status: string | null | undefined) => {
+  const normalized = (status || '').toString().trim().toLowerCase();
+  if (normalized === 'activo' || normalized === 'aprobado') return 'Activo';
+  if (normalized === 'inactivo' || normalized === 'desactivado' || normalized === 'rechazado') return 'Inactivo';
+  return 'Pendiente';
+};
+
 export class PsychologistRepository {
   async getAll(): Promise<Psychologist[]> {
     const client = await pool.connect();
@@ -26,8 +33,8 @@ export class PsychologistRepository {
         contacto: row.contacto || "N/A", // Dato ejemplo hasta que agregues la columna
         especialidad: "N/A", // Dato ejemplo hasta que agregues la columna
         pacientes: 0,
-        // Mapear valores de BD ('aprobado'/'pendiente') a etiquetas UI ('Activo'/'Pendiente')
-        estado: (row.status === 'aprobado') ? 'Activo' : (row.status === 'pendiente' ? 'Pendiente' : row.status)
+        // Mapear valores de BD a etiquetas UI
+        estado: toUiStatus(row.status)
       }));
     } finally {
       client.release();

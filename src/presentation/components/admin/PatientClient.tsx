@@ -68,6 +68,9 @@ export function PatientClient({ initialData }: Props) {
   <CreatePatientModal 
     isOpen={isModalOpen} 
     onClose={() => setIsModalOpen(false)} 
+    onCreated={(patient) => {
+      setPatients(prev => [patient, ...prev]);
+    }}
   />
   
   <EditPatientModal 
@@ -77,6 +80,9 @@ export function PatientClient({ initialData }: Props) {
       setSelectedPatient(null);
     }} 
     patient={selectedPatient}
+    onUpdated={(updatedPatient) => {
+      setPatients(prev => prev.map(p => p.id === updatedPatient.id ? updatedPatient : p));
+    }}
   />
 
   {/* Encabezado */}

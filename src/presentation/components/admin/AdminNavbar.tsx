@@ -1,82 +1,93 @@
-"use client";
+'use client';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from "next/navigation";
-import { LogOut } from "lucide-react";
-// 1. Importamos los hooks de NextAuth
-import { useSession, signOut } from "next-auth/react";
+import { usePathname } from 'next/navigation';
+import { LogOut } from 'lucide-react';
+import { useSession, signOut } from 'next-auth/react';
 
 export function AdminNavbar() {
   const pathname = usePathname();
-  // 2. Obtenemos los datos de la sesión (nombre de la DB)
   const { data: session } = useSession();
+  const [isVisible, setIsVisible] = useState(true);
+  const lastScrollYRef = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollYRef.current && currentScrollY > 20) {
+        setIsVisible(false);
+      } else {
+        setIsVisible(true);
+      }
+      lastScrollYRef.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const navLinks = [
-    { name: "Inicio", href: "/dashboard/admin" },
-    { name: "Psicólogos", href: "/dashboard/admin/psicologos" },
-    { name: "Pacientes", href: "/dashboard/admin/pacientes" },
-    { name: "Actividades", href: "/dashboard/admin/actividades" },
-    { name: "Reportes", href: "/dashboard/admin/reportes" },
+    { name: 'Inicio', href: '/dashboard/admin' },
+    { name: 'Psicólogos', href: '/dashboard/admin/psicologos' },
+    { name: 'Pacientes', href: '/dashboard/admin/pacientes' },
+    { name: 'Actividades', href: '/dashboard/admin/actividades' },
+    { name: 'Reportes', href: '/dashboard/admin/reportes' },
   ];
 
-  // 3. Función para cerrar sesión
-  const handleLogout = async () => {
-    await signOut({ 
-      callbackUrl: "/", // Redirige al Home principal
-      redirect: true 
-    });
-  };
-
   return (
-    <>
-      <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-blue-100 px-8 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-10">
-          <div className="flex flex-col items-center">
-            <Image src="/images/logo-.png" alt="Mindpeace Logo" width={50} height={50} className="rounded-full" />
-            <span className="text-[10px] font-bold text-blue-800 uppercase tracking-tighter">Mindpeace</span>
+    <header className={`fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/50 backdrop-blur-xl transition-transform duration-300 ${
+      isVisible ? 'translate-y-0' : '-translate-y-full'
+    }`}>
+      <div className="flex items-center justify-between px-5 py-4 md:px-8 md:py-5">
+        <Link href="/dashboard/admin" className="flex items-center gap-3 hover:opacity-80 transition">
+          <div className="relative h-10 w-10 overflow-hidden rounded-2xl bg-white/90 p-1 shadow-inner">
+            <Image
+              src="/images/Logo.png"
+              alt="MindPeace"
+              fill
+              className="object-contain"
+              sizes="40px"
+              priority
+            />
           </div>
-
-          <nav className="flex items-center bg-blue-50 rounded-lg p-1 border border-blue-100">
-            {navLinks.map((link, index) => {
-              const isActive = pathname === link.href;
-              return (
-                <div key={link.name} className="flex items-center">
-                  <Link
-                    href={link.href}
-                    className={`px-4 py-1.5 rounded-md text-sm transition-all ${
-                      isActive
-                        ? "bg-blue-200 text-blue-900 font-bold"
-                        : "text-gray-600 hover:text-blue-800"
-                    }`}
-                  >
-                    {link.name}
-                  </Link>
-                  {index < navLinks.length - 1 && (
-                    <div className="w-[1px] h-4 bg-gray-300 mx-2" />
-                  )}
-                </div>
-              );
-            })}
-          </nav>
-        </div>
-
-        {/* Perfil y Salir */}
-        <div className="flex items-center gap-6">
-          {/* 4. Mostramos el nombre dinámico o un fallback si está cargando */}
-          <span className="font-bold text-gray-700">
-            {session?.user?.name || "Cargando..."}
+          <span className="text-3xl font-semibold tracking-tight text-white [font-family:Georgia,serif]">
+            MindPeace
           </span>
-          
-          {/* 5. Agregamos el onClick para salir */}
-          <button 
-            onClick={handleLogout}
-            className="flex flex-col items-center text-gray-600 hover:text-red-600 transition-colors"
-          >
-            <LogOut size={20} />
-            <span className="text-[10px] font-bold">Salir</span>
-          </button>
+        </Link>
+
+        <div className="flex items-center gap-2">
+          <nav className="hidden md:flex items-center gap-2">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                className={`font-semibold text-sm px-4 py-2 rounded-full transition ${
+                  pathname === link.href
+                    ? 'bg-white/25 text-white'
+                    : 'text-white/70 hover:bg-white/15 hover:text-white'
+                }`}
+              >
+                {link.name}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-4 ml-4">
+            <div className="text-right">
+              <p className="font-bold text-white text-sm">{session?.user?.name || 'Admin'}</p>
+              <p className="text-xs text-white/60 uppercase font-semibold tracking-wide">ADMINISTRADOR</p>
+            </div>
+            <button
+              onClick={() => signOut({ callbackUrl: '/', redirect: true })}
+              className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition font-semibold"
+            >
+              <LogOut size={18} />
+              Salir
+            </button>
+          </div>
         </div>
-      </header>
-    </>
+      </div>
+    </header>
   );
 }

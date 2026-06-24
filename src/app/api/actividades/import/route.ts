@@ -84,7 +84,7 @@ export async function POST(request: Request) {
         const text = await resp.text();
         const titleMatch = text.match(/<title>(.*?)<\/title>/i);
         const pageTitle = titleMatch ? titleMatch[1].trim() : sourceUrl;
-        const makeSlug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+        const makeSlug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
         const generatedSlug = makeSlug(pageTitle || sourceUrl) || String(Date.now());
 
         // set manifest directly
@@ -177,17 +177,10 @@ export async function POST(request: Request) {
       console.log('[import] actividad insertada id=', newId);
       return NextResponse.json({ success: true, id: newId });
     } catch (err) {
-  console.error('[import] error insertando en DB:', err);
-
-  const msg = err instanceof Error
-    ? err.message
-    : String(err);
-
-  return NextResponse.json(
-    { error: 'Error interno al insertar actividad: ' + msg },
-    { status: 500 }
-  );
-}
+      console.error('[import] error insertando en DB:', err);
+      const message = err instanceof Error ? err.message : String(err);
+      return NextResponse.json({ error: 'Error interno al insertar actividad: ' + message }, { status: 500 });
+    }
   } catch (error) {
     console.error('Error importing actividad:', error);
     const msg = error instanceof Error ? error.message : String(error);

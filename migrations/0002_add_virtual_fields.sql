@@ -1,0 +1,3 @@
+ALTER TABLE public.appointments
+  ADD COLUMN IF NOT EXISTS request_link BOOLEAN NOT NULL DEFAULT FALSE,
+  ADD COLUMN IF NOT EXISTS meeting_link TEXT;

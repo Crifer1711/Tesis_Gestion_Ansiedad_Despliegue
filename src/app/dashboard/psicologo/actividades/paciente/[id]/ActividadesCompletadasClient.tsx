@@ -12,6 +12,43 @@ function parseEntrada(raw: string | null | undefined): Record<string, string> {
   }
 }
 
+function parseSatisfaccion(resumen: any): { emocion: string; categoria: string } | null {
+  if (!resumen) return null;
+  try {
+    const obj = typeof resumen === 'string' ? JSON.parse(resumen) : resumen;
+    if (obj?.satisfaccion_paciente?.emocion) {
+      return {
+        emocion: obj.satisfaccion_paciente.emocion,
+        categoria: obj.satisfaccion_paciente.categoria || '',
+      };
+    }
+  } catch {
+    // ignore parse errors
+  }
+  return null;
+}
+
+const CATEGORIA_COLORS: Record<string, string> = {
+  Ira: '#e91e8c',
+  Disgusto: '#f44336',
+  Tristeza: '#4caf50',
+  Miedo: '#9c27b0',
+  Felicidad: '#ffeb3b',
+  Sorpresa: '#2196f3',
+  Humillado: '#ff9800',
+};
+
+const CATEGORIA_EMOJIS: Record<string, string> = {
+  Ira: '😠',
+  Disgusto: '🤢',
+  Tristeza: '😢',
+  Miedo: '😨',
+  Felicidad: '😊',
+  Sorpresa: '😲',
+  Humillado: '😔',
+};
+
+
 function renderRespuesta(ia: any): React.ReactNode {
   if (!ia) return "—";
   if (typeof ia === "string") {
@@ -100,12 +137,35 @@ export function ActividadesCompletadasClient({ actividades }: Props) {
                     <td className="px-4 py-3 text-sm text-gray-700">
                       {act.duracion_segundos ? `${act.duracion_segundos}s` : "—"}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-700 max-w-xs truncate">
-                      {act.resumen
-                        ? typeof act.resumen === "string"
-                          ? act.resumen
-                          : JSON.stringify(act.resumen)
-                        : "—"}
+                    <td className="px-4 py-3 text-sm text-gray-700 max-w-xs">
+                      {(() => {
+                        const sat = parseSatisfaccion(act.resumen);
+                        if (sat) {
+                          const color = CATEGORIA_COLORS[sat.categoria] || '#6b7280';
+                          const emoji = CATEGORIA_EMOJIS[sat.categoria] || '😐';
+                          return (
+                            <span
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold"
+                              style={{
+                                background: `${color}22`,
+                                border: `1.5px solid ${color}66`,
+                                color: color === '#ffeb3b' ? '#92400e' : color,
+                              }}
+                            >
+                              <span>{emoji}</span>
+                              <span>{sat.emocion}</span>
+                            </span>
+                          );
+                        }
+                        if (act.resumen) {
+                          return (
+                            <span className="text-gray-400 text-xs truncate block max-w-[120px]">
+                              {typeof act.resumen === 'string' ? act.resumen : JSON.stringify(act.resumen)}
+                            </span>
+                          );
+                        }
+                        return <span className="text-gray-300">—</span>;
+                      })()}
                     </td>
                   </tr>
                 ))
@@ -157,12 +217,37 @@ export function ActividadesCompletadasClient({ actividades }: Props) {
 
               {selected.resumen && (
                 <div>
-                  <h4 className="font-bold text-gray-700 mb-1">Resumen</h4>
-                  <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded">
-                    {typeof selected.resumen === "string"
-                      ? selected.resumen
-                      : JSON.stringify(selected.resumen, null, 2)}
-                  </p>
+                  <h4 className="font-bold text-gray-700 mb-2">Satisfacción del Paciente</h4>
+                  {(() => {
+                    const sat = parseSatisfaccion(selected.resumen);
+                    if (sat) {
+                      const color = CATEGORIA_COLORS[sat.categoria] || '#6b7280';
+                      const emoji = CATEGORIA_EMOJIS[sat.categoria] || '😐';
+                      return (
+                        <div
+                          className="flex items-center gap-3 p-4 rounded-xl"
+                          style={{ background: `${color}15`, border: `2px solid ${color}44` }}
+                        >
+                          <span className="text-3xl">{emoji}</span>
+                          <div>
+                            <p className="font-black text-gray-800 text-lg">{sat.emocion}</p>
+                            {sat.emocion !== sat.categoria && (
+                              <p className="text-xs font-semibold mt-0.5" style={{ color }}>
+                                Categoría: {sat.categoria}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    }
+                    return (
+                      <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded">
+                        {typeof selected.resumen === 'string'
+                          ? selected.resumen
+                          : JSON.stringify(selected.resumen, null, 2)}
+                      </p>
+                    );
+                  })()}
                 </div>
               )}
 

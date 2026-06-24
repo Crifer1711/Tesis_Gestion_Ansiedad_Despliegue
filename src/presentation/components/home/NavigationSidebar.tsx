@@ -30,7 +30,7 @@ export function NavigationSidebar({ isPatient = false, lastVisited }: Navigation
     recursos: [
       { id: 'biblioteca', label: 'Guías de Autoayuda', path: isPacient ? '/paciente/biblioteca' : '/biblioteca' },
       { id: 'videos', label: 'Videos Educativos', path: isPacient ? '/paciente/videos' : '/videos' },
-      { id: 'tecnicas', label: 'Técnicas Rápidas', path: isPacient ? '/paciente/salud-mental#tecnicas' : '/salud-mental#tecnicas' },
+      { id: 'tecnicas', label: 'Técnicas Rápidas', path: '/tecnicas-rapidas' },
     ],
   };
 

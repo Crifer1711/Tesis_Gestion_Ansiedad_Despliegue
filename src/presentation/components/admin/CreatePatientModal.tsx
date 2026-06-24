@@ -7,6 +7,7 @@ import { createPatientAction, CreatePatientData } from "@/infrastructure/actions
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { Patient } from "@/domain/dtos/patient.dto";
 
 // 1. Definimos el esquema de validación con Zod
 const patientSchema = z.object({
@@ -19,9 +20,10 @@ const patientSchema = z.object({
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  onCreated?: (patient: Patient) => void;
 }
 
-export function CreatePatientModal({ isOpen, onClose }: Props) {
+export function CreatePatientModal({ isOpen, onClose, onCreated }: Props) {
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState("");
 
@@ -47,6 +49,14 @@ export function CreatePatientModal({ isOpen, onClose }: Props) {
       
       if (result.success) {
         toast.success("Paciente creado con éxito");
+        onCreated?.({
+          id: String(result.id || Date.now()),
+          name: data.name,
+          email: data.email,
+          contacto: data.contacto,
+          fecha_registro: result.fecha_registro || new Date().toLocaleDateString('es-ES'),
+          estado: 'Activo',
+        });
         reset(); // Limpiamos el form
         onClose();
       } else {

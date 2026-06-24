@@ -42,14 +42,15 @@ export async function createPsychologistAction(formData: CreatePsychologistData)
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Creado por el administrador: marcamos la cuenta como aprobada en la BD
-    await client.query(
+    const result = await client.query(
       `INSERT INTO users (name, email, password, role, status, especialidad, contacto) 
-       VALUES ($1, $2, $3, 'PSICOLOGO', 'aprobado', $4, $5)`,
+       VALUES ($1, $2, $3, 'PSICOLOGO', 'Activo', $4, $5)
+       RETURNING id`,
       [name, email, hashedPassword, especialidad, contacto]
     );
 
     revalidatePath('/dashboard/admin/psicologos');
-    return { success: true };
+    return { success: true, id: result.rows[0]?.id };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : "Error desconocido";
     console.error("Error al crear psicólogo:", errorMessage);
@@ -86,18 +87,16 @@ export async function updatePsychologistAction(id: string, formData: UpdatePsych
 export async function togglePsychologistStatusAction(id: string, currentStatus: string) {
   const client = await pool.connect();
   try {
-    // Alternamos entre 'aprobado' y 'pendiente' para cumplir la constraint
+    // Alternamos entre activo e inactivo para reflejar el acceso real
     const lowered = (currentStatus || '').toString().toLowerCase();
-    const newStatus = (lowered === 'aprobado' || lowered === 'activo') ? 'pendiente' : 'aprobado';
+    const newStatus = (lowered === 'activo' || lowered === 'aprobado') ? 'Inactivo' : 'Activo';
 
     await client.query(
       'UPDATE users SET status = $1 WHERE id = $2 AND role = $3',
       [newStatus, id, 'PSICOLOGO']
     );
 
-    // Retornamos estado para UI
-    const uiStatus = newStatus === 'aprobado' ? 'Activo' : 'Pendiente';
-    return { success: true, newStatus: uiStatus };
+    return { success: true, newStatus };
   } catch (error: unknown) {
     console.error("Error al cambiar estado del psicólogo:", error);
     return { success: false, error: "No se pudo actualizar el estado" };
@@ -117,7 +116,7 @@ export async function getDashboardAction(psychologistId: string) {
     console.error("Error en getDashboardAction:", error);
     // Devolvemos datos vacíos para que la UI no rompa si falla la DB
     return {
-      stats: { totalPatients: 0, pendingAppointments: 0, acceptedAppointments: 0 },
+      stats: { totalPatients: 0, pendingAppointments: 0, acceptedAppointments: 0, todayAppointments: 0 },
       nextAppointments: [],
       recentActivities: []
     };

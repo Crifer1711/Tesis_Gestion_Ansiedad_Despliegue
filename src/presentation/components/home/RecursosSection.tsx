@@ -5,6 +5,12 @@ import { BookOpen, Play, Zap } from 'lucide-react';
 import { InfoCard } from './InfoCard';
 import { InformateDetailModal } from './InformateDetailModal';
 
+type RecursosSectionProps = {
+  description?: string;
+  transparent?: boolean;
+  onModalChange?: (isOpen: boolean) => void;
+};
+
 const RESOURCE_CARDS = [
   {
     icon: <BookOpen size={56} />,
@@ -25,15 +31,9 @@ const RESOURCE_CARDS = [
     title: 'Técnicas rápidas',
     description: 'Estrategias de estabilización inmediata que puedes aplicar en momentos de ansiedad intensa para recuperar el control.',
     buttonText: 'Ver técnicas',
-    path: '/ansiedad#tecnicas',
+    path: '/tecnicas-rapidas',
   },
 ];
-
-interface RecursosSectionProps {
-  description?: string;
-  transparent?: boolean;
-  onModalChange?: (isOpen: boolean) => void;
-}
 
 export function RecursosSection({ description, transparent = false, onModalChange }: RecursosSectionProps = {}) {
   const [selectedCard, setSelectedCard] = useState<(typeof RESOURCE_CARDS)[number] | null>(null);
@@ -63,9 +63,9 @@ export function RecursosSection({ description, transparent = false, onModalChang
               description={card.description}
               buttonText={card.buttonText}
               onButtonClick={() => {
-              setSelectedCard(card);
-              onModalChange?.(true);
-            }}
+                setSelectedCard(card);
+                onModalChange?.(true);
+              }}
             />
           ))}
         </div>

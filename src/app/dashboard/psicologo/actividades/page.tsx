@@ -11,7 +11,7 @@ export default async function PsychologistActividadesPage() {
   const session = await getServerSession(authOptions);
   const repo = new ActivityRepository();
   const activities = await repo.getAllActivities();
-  const approved = activities.filter(a => a.estado === 'Aprobada');
+  const approved = activities.filter(a => a.estado === 'Aprobada' && a.usos === 'asignar');
   let patients: PatientListItemDTO[] = [];
   try {
     if (session?.user?.id) {
@@ -27,19 +27,19 @@ export default async function PsychologistActividadesPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-black text-[#1E4D8C]">Actividades</h1>
-        <p className="text-slate-600 mt-1">Gestiona actividades para tus pacientes</p>
+    <div className="space-y-6 rounded-[28px] border border-blue-100 bg-gradient-to-b from-[#f5f9ff] to-[#e7f1ff] p-4 md:p-6 shadow-sm">
+      <div className="rounded-[24px] border border-blue-100 bg-white/80 p-5 md:p-6 shadow-[0_10px_30px_rgba(30,77,140,0.08)] backdrop-blur">
+        <h1 className="text-3xl md:text-4xl font-black text-[#1E4D8C]">Actividades</h1>
+        <p className="text-slate-600 mt-2 max-w-3xl leading-relaxed">
+          Gestiona actividades para tus pacientes desde un panel visual más limpio y cómodo.
+        </p>
       </div>
 
       {approved.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-md p-12 text-center border border-blue-100">
-          <div className="mb-4">
-            <div className="text-6xl">🚀</div>
-          </div>
-          <p className="text-slate-600 text-lg">No hay actividades aprobadas aún</p>
-          <p className="text-slate-500 text-sm mt-2">Las actividades aprobadas por el administrador aparecerán aquí.</p>
+        <div className="bg-white rounded-[24px] shadow-md p-12 text-center border border-blue-100">
+          <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 text-4xl">🚀</div>
+          <p className="text-slate-700 text-lg font-semibold">No hay actividades aprobadas aún</p>
+          <p className="text-slate-500 text-sm mt-2 max-w-xl mx-auto">Las actividades aprobadas aparecerán aquí para que puedas asignarlas a tus pacientes.</p>
         </div>
       ) : (
         <PsychologistActivitiesClient activities={approved} patients={patients} />

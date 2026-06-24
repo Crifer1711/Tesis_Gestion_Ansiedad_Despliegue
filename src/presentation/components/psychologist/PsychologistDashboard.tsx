@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import { Users, Calendar, CheckCircle, Clock, AlertCircle, Eye, PlusCircle, LucideIcon } from 'lucide-react';
+import { Users, Calendar, CheckCircle, Clock, Eye, PlusCircle, LucideIcon } from 'lucide-react';
 import { 
   PsychologistDashboardDTO, 
   AppointmentDTO, 
@@ -47,11 +47,12 @@ export function PsychologistDashboard({ initialData }: DashboardProps) {
           textColor="text-green-700"
         />
         <StatCard 
-          title="Notificaciones" 
-          count={recentActivities.length} 
-          icon={AlertCircle}
+          title="Citas de hoy" 
+          count={stats.todayAppointments} 
+          icon={Calendar}
           bgGradient="from-purple-100 to-purple-200"
           textColor="text-purple-700"
+          hideSubtitle
         />
       </div>
 
@@ -166,9 +167,10 @@ interface StatCardProps {
   icon: LucideIcon;
   bgGradient: string;
   textColor: string;
+  hideSubtitle?: boolean;
 }
 
-function StatCard({ title, count, icon: Icon, bgGradient, textColor }: StatCardProps) {
+function StatCard({ title, count, icon: Icon, bgGradient, textColor, hideSubtitle }: StatCardProps) {
   return (
     <div className={`bg-gradient-to-br ${bgGradient} p-6 rounded-lg shadow-md border-2 border-white hover:shadow-lg transition`}>
       <div className="flex items-start justify-between">

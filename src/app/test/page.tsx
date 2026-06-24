@@ -1,11 +1,24 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { GAD7Test } from '@/presentation/components/test';
 import { ArrowLeft } from 'lucide-react';
 import { navigateAndScroll } from '@/presentation/utils/scrollWithOffset';
 
 export default function TestPage() {
+  return (
+    <Suspense fallback={<TestLoading />}>
+      <TestContent />
+    </Suspense>
+  );
+}
+
+function TestLoading() {
+  return <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100" />;
+}
+
+function TestContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isModal = searchParams.get('modal') === '1';

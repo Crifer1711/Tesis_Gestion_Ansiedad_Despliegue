@@ -4,8 +4,9 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useCallback } from 'react';
 import { PatientHeader } from '@/presentation/components/patient/PatientHeader';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
 import { scrollToTop } from '@/presentation/utils/scrollWithOffset';
+import { EmotionWheelModal, type Emocion } from '@/presentation/components/patient/EmotionWheelModal';
 
 export default function TareasPage() {
   const [activeSection, setActiveSection] = useState('tareas');
@@ -16,6 +17,12 @@ export default function TareasPage() {
   const [loadingAsign, setLoadingAsign] = useState(false);
   const [selectedAsignacion, setSelectedAsignacion] = useState<any | null>(null);
   const [currentIntentoId, setCurrentIntentoId] = useState<string | null>(null);
+  const [showCompleted, setShowCompleted] = useState(false);
+
+  // Estado para la rueda de emociones post-actividad
+  const [showEmotionWheel, setShowEmotionWheel] = useState(false);
+  const [completedIntentoId, setCompletedIntentoId] = useState<string | null>(null);
+  const [completedActividadNombre, setCompletedActividadNombre] = useState<string>('');
 
   // Load asignaciones from the database
   const loadAsign = useCallback(async () => {
@@ -103,8 +110,12 @@ export default function TareasPage() {
             if (type === 'BIENESTAR_ACTIVIDAD_COMPLETADA') {
               // Reload task list to show updated state
               loadAsign();
-              // Close the modal automatically as requested
+              // Close the activity modal
               handleCloseAsignacion();
+              // Show the emotion wheel so the patient can rate how they felt
+              setCompletedIntentoId(normalizedData.intento_id ?? null);
+              setCompletedActividadNombre(selectedAsignacion?.titulo || 'la actividad');
+              setShowEmotionWheel(true);
             }
           } else {
             console.error('Error al guardar el evento en el backend:', result.error);
@@ -144,6 +155,37 @@ export default function TareasPage() {
     setCurrentIntentoId(null);
   };
 
+  const handleEmotionConfirm = async (emocion: Emocion) => {
+    setShowEmotionWheel(false);
+    if (!completedIntentoId) return;
+    try {
+      const res = await fetch('/api/actividades/events/resumen', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          intento_id: completedIntentoId,
+          emocion: emocion.nombre,
+          categoria: emocion.categoria,
+        }),
+      });
+      const result = await res.json();
+      if (res.ok && result.success) {
+        console.log('Emoción guardada en resumen:', emocion);
+      } else {
+        console.error('Error al guardar emoción:', result.error);
+      }
+    } catch (err) {
+      console.error('Error de red al guardar emoción:', err);
+    } finally {
+      setCompletedIntentoId(null);
+    }
+  };
+
+  const handleEmotionSkip = () => {
+    setShowEmotionWheel(false);
+    setCompletedIntentoId(null);
+  };
+
   const getIframeUrl = () => {
     if (!selectedAsignacion || !selectedAsignacion.embed_url) return '';
     try {
@@ -174,6 +216,9 @@ export default function TareasPage() {
     }
   };
 
+  const assignedTasks = asignaciones.filter((task) => String(task.estado || '').toLowerCase() !== 'completada');
+  const completedTasks = asignaciones.filter((task) => String(task.estado || '').toLowerCase() === 'completada');
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100">
       <PatientHeader
@@ -192,40 +237,98 @@ export default function TareasPage() {
               <ArrowLeft size={18} /> Volver a Inicio
             </button>
           </div>
-          <h1 className="text-4xl font-black text-[#1E4D8C] mb-8">Mis Tareas</h1>
-          <p className="text-lg text-slate-700">Las tareas asignadas por tu psicólogo aparecerán aquí.</p>
+          <h1 className="text-4xl font-black text-[#1E4D8C] mb-4">Mis Tareas</h1>
+          <p className="text-slate-700 leading-relaxed mb-6">
+            Aquí se muestran las actividades, ejercicios o tareas que tu psicólogo te haya asignado para acompañar tu proceso. Podrás abrir cada actividad, revisar sus instrucciones, ver su estado y la fecha límite, y completar el contenido desde esta misma pantalla. Si tu psicólogo aún no te ha asignado tareas, verás el aviso de que no tienes asignaciones disponibles.
+          </p>
           <div className="mt-6">
             {loadingAsign ? (
               <div className="text-sm text-gray-600">Cargando asignaciones...</div>
             ) : asignaciones.length === 0 ? (
               <div className="text-sm text-gray-600 mt-3">No tienes tareas asignadas.</div>
             ) : (
-              <div className="grid grid-cols-1 gap-4 mt-4">
-                {asignaciones.map(a => (
-                  <div key={a.id} className="bg-white p-4 rounded-lg shadow-sm border">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <div className="font-semibold text-gray-900">{a.titulo || 'Actividad'}</div>
-                        <div className="text-sm text-gray-600">{a.descripcion || ''}</div>
-                        <div className="text-xs text-gray-500 mt-2">Estado: {a.estado}</div>
-                        {a.instrucciones_psicologo && <div className="mt-2 text-sm text-gray-700">Instrucciones: {a.instrucciones_psicologo}</div>}
-                        {a.fecha_limite && <div className="mt-1 text-xs text-red-600">Fecha límite: {new Date(a.fecha_limite).toLocaleString()}</div>}
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        {a.embed_url ? (
-                          <button onClick={() => handleOpenAsignacion(a)} className="px-3 py-2 bg-green-600 text-white rounded">Abrir</button>
-                        ) : null}
-                      </div>
-                    </div>
+              <div className="space-y-6 mt-4">
+                <section className="rounded-2xl border border-[#71A5D9] bg-white/80 p-4 shadow-sm">
+                  <div className="flex items-center justify-between gap-3 mb-4">
+                    <h2 className="text-xl font-black text-[#1E4D8C]">Tareas asignadas</h2>
+                    <span className="text-xs font-bold uppercase text-slate-500">{assignedTasks.length} visibles</span>
                   </div>
-                ))}
+                  {assignedTasks.length === 0 ? (
+                    <div className="rounded-xl border border-dashed border-blue-200 bg-blue-50 p-5 text-sm text-slate-600">
+                      No tienes tareas asignadas pendientes.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 gap-4">
+                      {assignedTasks.map(a => (
+                        <div key={a.id} className="rounded-2xl border border-blue-200 bg-gradient-to-br from-white to-blue-50 p-4 shadow-sm transition hover:shadow-md">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="min-w-0 flex-1">
+                              <div className="font-black text-[#1E4D8C] text-lg">{a.titulo || 'Actividad'}</div>
+                              <div className="text-sm text-slate-600 mt-1">{a.descripcion || ''}</div>
+                              <div className="flex flex-wrap gap-2 mt-3 text-[11px] font-bold uppercase">
+                                <span className="rounded-full bg-yellow-100 px-3 py-1 text-yellow-800">Estado: {a.estado}</span>
+                                {a.fecha_limite && <span className="rounded-full bg-red-50 px-3 py-1 text-red-700">Límite: {new Date(a.fecha_limite).toLocaleString()}</span>}
+                              </div>
+                              {a.instrucciones_psicologo && <div className="mt-3 rounded-xl border border-blue-100 bg-white p-3 text-sm text-slate-700">{a.instrucciones_psicologo}</div>}
+                            </div>
+                            <div className="flex flex-col gap-2 shrink-0">
+                              {a.embed_url ? (
+                                <button onClick={() => handleOpenAsignacion(a)} className="rounded-xl bg-[#1E4D8C] px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-[#173d6f]">
+                                  Abrir
+                                </button>
+                              ) : null}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </section>
+
+                <section className="rounded-2xl border border-slate-300 bg-slate-100/80 p-4 shadow-sm">
+                  <button
+                    type="button"
+                    onClick={() => setShowCompleted((value) => !value)}
+                    className="flex w-full items-center justify-between rounded-xl border border-slate-300 bg-slate-200 px-4 py-3 text-left"
+                  >
+                    <div>
+                      <h2 className="text-lg font-black text-slate-700">Tareas realizadas</h2>
+                    </div>
+                    {showCompleted ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                  </button>
+
+                  {showCompleted && (
+                    <div className="mt-4 grid grid-cols-1 gap-4">
+                      {completedTasks.length === 0 ? (
+                        <div className="rounded-xl border border-dashed border-slate-300 bg-white p-5 text-sm text-slate-500">
+                          Todavía no has completado tareas.
+                        </div>
+                      ) : (
+                        completedTasks.map(a => (
+                          <div key={a.id} className="rounded-2xl border border-slate-400 bg-slate-800/90 p-4 text-slate-100 shadow-sm opacity-90">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-2 text-lg font-black">
+                                  <CheckCircle2 size={18} className="text-emerald-300" />
+                                  {a.titulo || 'Actividad'}
+                                </div>
+                                <div className="text-sm text-slate-300 mt-1">{a.descripcion || ''}</div>
+                                <div className="mt-3 text-[11px] font-bold uppercase text-slate-300">Realizada</div>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </section>
               </div>
             )}
           </div>
           {/* Modal to open assigned activity */}
           {selectedAsignacion && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4">
-              <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl md:max-w-6xl overflow-hidden flex flex-col max-h-[92vh] border border-[#71A5D9]">
+            <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
+              <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl md:max-w-6xl overflow-y-auto flex flex-col max-h-[92vh] border border-[#71A5D9]">
                 <div className="bg-[#D1E7FF] text-gray-800 px-6 py-4 flex items-center justify-between border-b border-[#71A5D9] flex-shrink-0">
                   <h3 className="font-bold text-lg text-[#1E4D8C]">{selectedAsignacion.titulo || 'Actividad'}</h3>
                   <button 
@@ -236,13 +339,13 @@ export default function TareasPage() {
                     ✕
                   </button>
                 </div>
-                <div className="flex-1 p-0 overflow-hidden relative">
+                <div className="flex-1 p-0 relative">
                   {selectedAsignacion.embed_url ? (
-                    <div className="w-full h-[78vh] bg-white overflow-y-auto">
+                    <div className="w-full h-[82vh] bg-white overflow-y-auto">
                       <iframe 
                         src={getIframeUrl()} 
                         title={selectedAsignacion.titulo} 
-                        className="w-full h-full border-0" 
+                        className="w-full h-full min-h-[82vh] border-0" 
                         allow="geolocation; microphone; camera; midi; encrypted-media; xr-spatial-tracking"
                       />
                     </div>
@@ -255,6 +358,15 @@ export default function TareasPage() {
           )}
         </div>
       </div>
+
+      {/* Rueda de emociones post-actividad */}
+      {showEmotionWheel && (
+        <EmotionWheelModal
+          actividadNombre={completedActividadNombre}
+          onConfirm={handleEmotionConfirm}
+          onSkip={handleEmotionSkip}
+        />
+      )}
     </div>
   );
 }

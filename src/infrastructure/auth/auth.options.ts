@@ -35,9 +35,12 @@ export const authOptions: NextAuthOptions = {
             email: credentials.email,
           };
         } catch (error) {
-          // 5. Si las credenciales fallan, retornamos null
+          // 5. Propagamos el mensaje exacto para que la UI pueda distinguir el motivo
           console.error("Auth error:", error);
-          return null;
+          if (error instanceof Error) {
+            throw new Error(error.message);
+          }
+          throw error;
         }
       }
     })

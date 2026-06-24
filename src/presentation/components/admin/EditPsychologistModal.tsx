@@ -24,9 +24,10 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   psychologist: Psychologist | null;
+  onUpdated?: (psychologist: Psychologist) => void;
 }
 
-export function EditPsychologistModal({ isOpen, onClose, psychologist }: Props) {
+export function EditPsychologistModal({ isOpen, onClose, psychologist, onUpdated }: Props) {
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState("");
 
@@ -63,6 +64,13 @@ export function EditPsychologistModal({ isOpen, onClose, psychologist }: Props) 
       
       if (result.success) {
         toast.success("Psicólogo actualizado correctamente");
+        onUpdated?.({
+          ...psychologist,
+          name: data.name,
+          email: data.email,
+          especialidad: data.especialidad,
+          contacto: data.contacto,
+        });
         onClose();
       } else {
         setServerError(result.error || "Error al actualizar el psicólogo");

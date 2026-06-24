@@ -1,11 +1,24 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Biblioteca } from '@/presentation/components/biblioteca/Biblioteca';
 import { ArrowLeft } from 'lucide-react';
 import { navigateAndScroll } from '@/presentation/utils/scrollWithOffset';
 
 export default function BibliotecaPage() {
+  return (
+    <Suspense fallback={<BibliotecaLoading />}>
+      <BibliotecaContent />
+    </Suspense>
+  );
+}
+
+function BibliotecaLoading() {
+  return <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100" />;
+}
+
+function BibliotecaContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isModal = searchParams.get('modal') === '1';

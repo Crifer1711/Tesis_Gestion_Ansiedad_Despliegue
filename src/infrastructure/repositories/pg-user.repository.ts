@@ -6,8 +6,8 @@ export class PgUserRepository implements IAuthRepository {
   async save(user: User): Promise<void> {
     // 1. Actualizamos la consulta para incluir los nuevos campos
     const query = `
-      INSERT INTO users (email, password, name, role, contacto, status, especialidad) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      INSERT INTO users (email, password, name, lastname, role, contacto, status, especialidad) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     `;
 
     // 2. Definimos los valores con las reglas que pediste
@@ -15,6 +15,7 @@ export class PgUserRepository implements IAuthRepository {
       user.email,
       user.password, // Ya cifrado desde el Use Case
       user.name,
+      user.lastname,
       user.role || 'PACIENTE',             // Evita el error NOT NULL si no viene el rol
       user.contacto,                        // Capturado desde el nuevo input del registro
       // La base de datos valida el campo status con CHECK (status IN ('pendiente','aprobado'))
