@@ -31,7 +31,7 @@ const RESOURCE_CARDS = [
     title: 'Técnicas rápidas',
     description: 'Estrategias de estabilización inmediata que puedes aplicar en momentos de ansiedad intensa para recuperar el control.',
     buttonText: 'Ver técnicas',
-    path: '/ansiedad#tecnicas',
+    path: '/tecnicas-rapidas',
   },
 ];
 

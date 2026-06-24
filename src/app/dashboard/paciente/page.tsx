@@ -56,6 +56,8 @@ function DashboardContent() {
   const [isAccessibilityOpen, setIsAccessibilityOpen] = useState(false);
   const [appointments, setAppointments] = useState<AppointmentItem[]>([]);
   const [loadingAppointments, setLoadingAppointments] = useState(true);
+  const [tasks, setTasks] = useState<any[]>([]);
+  const [loadingTasks, setLoadingTasks] = useState(true);
   const router = useRouter();
   const { data: session, status } = useSession();
 
@@ -100,11 +102,28 @@ function DashboardContent() {
     }
   }, [session?.user?.id]);
 
+  const fetchTasks = useCallback(async () => {
+    if (!session?.user?.id) return;
+    setLoadingTasks(true);
+    try {
+      const response = await fetch('/api/paciente/asignaciones', { cache: 'no-store' });
+      if (!response.ok) throw new Error('No se pudieron cargar las tareas');
+      const data = await response.json();
+      setTasks(data.data ?? []);
+    } catch (error) {
+      console.error('Error cargando tareas:', error);
+      setTasks([]);
+    } finally {
+      setLoadingTasks(false);
+    }
+  }, [session?.user?.id]);
+
   useEffect(() => {
     fetchAppointments();
+    fetchTasks();
     const interval = setInterval(fetchAppointments, 5000);
     return () => clearInterval(interval);
-  }, [fetchAppointments]);
+  }, [fetchAppointments, fetchTasks]);
 
   const now = useMemo(() => new Date(), [appointments]);
 
@@ -119,6 +138,11 @@ function DashboardContent() {
   const acceptedCount = appointments.filter((item) => item.status === 'Aceptada').length;
   const canceledCount = appointments.filter((item) => item.status === 'Cancelada').length;
   const totalCount = appointments.length;
+
+  const taskTotal = tasks.length;
+  const taskPending = tasks.filter((t) => t.estado === 'asignada' || t.estado === 'en_progreso').length;
+  const taskCompleted = tasks.filter((t) => t.estado === 'completada').length;
+  const taskProgress = taskTotal > 0 ? Math.round((taskCompleted / taskTotal) * 100) : 0;
 
   const SECTION_HEIGHT = 'min-h-[calc(100dvh-72px)]';
 
@@ -252,7 +276,7 @@ function DashboardContent() {
                     </div>
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Total de tareas</p>
-                      <p className="text-3xl font-black text-[#1E4D8C]">12</p>
+                      <p className="text-3xl font-black text-[#1E4D8C]">{loadingTasks ? '...' : taskTotal}</p>
                     </div>
                   </div>
                   <p className="text-sm text-slate-600">Todas tus tareas asignadas</p>
@@ -265,7 +289,7 @@ function DashboardContent() {
                     </div>
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">Pendientes</p>
-                      <p className="text-3xl font-black text-amber-800">5</p>
+                      <p className="text-3xl font-black text-amber-800">{loadingTasks ? '...' : taskPending}</p>
                     </div>
                   </div>
                   <p className="text-sm text-amber-700">Tareas por realizar</p>
@@ -278,7 +302,7 @@ function DashboardContent() {
                     </div>
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Completadas</p>
-                      <p className="text-3xl font-black text-emerald-800">7</p>
+                      <p className="text-3xl font-black text-emerald-800">{loadingTasks ? '...' : taskCompleted}</p>
                     </div>
                   </div>
                   <p className="text-sm text-emerald-700">Tareas finalizadas con éxito</p>
@@ -286,10 +310,10 @@ function DashboardContent() {
               </div>
               <div className="mt-6 bg-blue-50 rounded-xl border border-[#71A5D9]/40 p-4">
                 <p className="text-sm text-slate-600 text-center">
-                  <strong className="text-[#1E4D8C]">Progreso:</strong> 7 de 12 tareas completadas (58%)
+                  <strong className="text-[#1E4D8C]">Progreso:</strong> {taskCompleted} de {taskTotal} tareas completadas ({taskProgress}%)
                 </p>
                 <div className="mt-2 h-2 w-full rounded-full bg-white overflow-hidden">
-                  <div className="h-full rounded-full bg-emerald-400" style={{ width: '58%' }} />
+                  <div className="h-full rounded-full bg-emerald-400" style={{ width: `${taskProgress}%` }} />
                 </div>
               </div>
               <div className="mt-8 text-center">

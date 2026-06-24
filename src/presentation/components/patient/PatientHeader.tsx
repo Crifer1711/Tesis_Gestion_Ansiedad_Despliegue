@@ -61,7 +61,7 @@ export function PatientHeader({ activeSection, onNavClick, userName = 'Paciente'
             <p className="text-xs text-white/60 uppercase font-semibold tracking-wide">{userRole}</p>
           </div>
           <button
-            onClick={() => signOut({ callbackUrl: '/login' })}
+            onClick={() => signOut({ callbackUrl: '/' })}
             className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition font-semibold"
           >
             <LogOut size={18} />

@@ -11,7 +11,7 @@ export default async function PsychologistActividadesPage() {
   const session = await getServerSession(authOptions);
   const repo = new ActivityRepository();
   const activities = await repo.getAllActivities();
-  const approved = activities.filter(a => a.estado === 'Aprobada');
+  const approved = activities.filter(a => a.estado === 'Aprobada' && a.usos === 'asignar');
   let patients: PatientListItemDTO[] = [];
   try {
     if (session?.user?.id) {

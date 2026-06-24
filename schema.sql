@@ -196,7 +196,7 @@ CREATE TABLE IF NOT EXISTS public.actividades (
     source_filename text,
     created_by integer NULL REFERENCES public.users(id) ON DELETE SET NULL,
     categoria text NOT NULL DEFAULT 'Sin categoria',
-    usos integer NOT NULL DEFAULT 0,
+    usos text NOT NULL DEFAULT 'asignar' CHECK (usos IN ('tecnicas', 'asignar')),
     created_at timestamptz NOT NULL DEFAULT now(),
     updated_at timestamptz NOT NULL DEFAULT now(),
     UNIQUE (slug, embed_url)
