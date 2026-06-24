@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { User, Mail, Lock, Loader2, Phone, Eye, EyeOff } from "lucide-react";
+import { User, Mail, Lock, Loader2, Phone } from "lucide-react";
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
 
@@ -93,9 +93,7 @@ export const RegisterForm = () => {
           result.message || "Registro completado. Revisa tu correo institucional para activar tu cuenta.",
           { id: 'register-success', duration: 6000 }
         );
-        setTimeout(() => {
-          router.push("/login?verify=pending");
-        }, 1800);
+        router.push("/login?verify=pending");
       } else {
         const result = await res.json();
         setServerError(result.error || "Error al registrarse");
@@ -246,7 +244,7 @@ export const RegisterForm = () => {
                 className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-slate-600 transition-colors"
                 aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
               >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                <span className="text-xs font-semibold">{showPassword ? "Ocultar" : "Mostrar"}</span>
               </button>
             </div>
             {errors.password && <p className="text-red-500 text-xs mt-1 font-medium pl-1">{errors.password.message}</p>}
@@ -272,7 +270,7 @@ export const RegisterForm = () => {
                 className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-slate-600 transition-colors"
                 aria-label={showConfirmPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
               >
-                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                <span className="text-xs font-semibold">{showConfirmPassword ? "Ocultar" : "Mostrar"}</span>
               </button>
             </div>
             {errors.confirmPassword && <p className="text-red-500 text-xs mt-1 font-medium pl-1">{errors.confirmPassword.message}</p>}

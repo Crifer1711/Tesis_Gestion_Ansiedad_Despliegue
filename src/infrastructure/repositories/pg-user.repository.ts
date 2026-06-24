@@ -3,15 +3,7 @@ import { IAuthRepository } from "@/domain/repositories/auth.repository";
 import { User } from "@/domain/entities/user";
 
 export class PgUserRepository implements IAuthRepository {
-  private async ensureVerificationColumns() {
-    await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_token TEXT');
-    await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_token_expires_at TIMESTAMP');
-    await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified_at TIMESTAMP');
-  }
-
   async save(user: User): Promise<void> {
-    await this.ensureVerificationColumns();
-
     // 1. Actualizamos la consulta para incluir los nuevos campos
     const query = `
       INSERT INTO users (

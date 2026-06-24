@@ -12,10 +12,6 @@ export async function GET(request: Request) {
       return NextResponse.redirect(`${getBaseUrl()}/login?verify=invalid`);
     }
 
-    await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_token TEXT');
-    await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_token_expires_at TIMESTAMP');
-    await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified_at TIMESTAMP');
-
     const userRes = await pool.query(
       `SELECT id, verification_token_expires_at
        FROM users

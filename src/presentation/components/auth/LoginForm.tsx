@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, Loader2 } from "lucide-react";
 import Image from 'next/image';
 import { signIn } from "next-auth/react";
 
@@ -215,7 +215,7 @@ const LoginFormContent = () => {
                   aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-slate-600 transition-colors"
                 >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  <span className="text-xs font-semibold">{showPassword ? "Ocultar" : "Mostrar"}</span>
                 </button>
               </div>
               {errors.password && (
