@@ -13,12 +13,11 @@ export class ActivityRepository {
           tipo as tipo_raw,
           embed_url,
           COALESCE((finalizacion->>'duracion_minima_segundos'), '') as duracion,
-          0 as usos,
+          usos,
           estado
         FROM actividades
         ORDER BY titulo ASC
       `);
-      // Map DB rows into the expected DTO shape
       return res.rows.map((r: any) => ({
         id: r.id,
         nombre: r.nombre || '',
@@ -30,12 +29,10 @@ export class ActivityRepository {
           if (t.includes('visual')) return 'Visualizacion';
           if (t.includes('sonid')) return 'Sonidos';
           if (t.includes('interaccion') || t.includes('interacción')) return 'Interaccion';
-          // fallback to a friendly label
           return 'Otros';
         })(),
         duracion: String(r.duracion || ''),
-        usos: r.usos || 0,
-        // Map DB estado to UI-friendly labels
+        usos: (r.usos === 'tecnicas' ? 'tecnicas' : 'asignar') as 'asignar' | 'tecnicas',
         estado: (r.estado === 'aprobada') ? 'Aprobada' : (r.estado === 'rechazada') ? 'Rechazada' : 'Pendiente',
         embed_url: r.embed_url || null
       }));

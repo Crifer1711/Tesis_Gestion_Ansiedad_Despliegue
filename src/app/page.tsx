@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Heart, LogIn, UserPlus } from 'lucide-react';
+import { ArrowRight, LogIn, Palette, UserPlus, X } from 'lucide-react';
+import { AccessibilityPanel } from '@/presentation/components/accessibility/AccessibilityPanel';
 
 const slides = [
   '/images/psico1.png',
@@ -13,6 +14,7 @@ const slides = [
 
 export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isAccessibilityOpen, setIsAccessibilityOpen] = useState(false);
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -41,6 +43,28 @@ export default function HomePage() {
             <div className="text-3xl font-semibold tracking-tight text-white [font-family:Georgia,serif]">
               MindPeace
             </div>
+
+            <div className="text-3xl font-semibold tracking-tight text-white [font-family:Georgia,serif]">
+              MindPeace
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 md:gap-4">
+            <Link
+              href="/login"
+              className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors hover:bg-white/10 md:px-6"
+            >
+              <LogIn className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden sm:inline">Iniciar Sesión</span>
+            </Link>
+
+            <Link
+              href="/register"
+              className="flex items-center gap-2 rounded-xl bg-sky-600 px-3 py-2.5 text-sm font-medium transition-colors hover:bg-sky-500 md:px-6"
+            >
+              <UserPlus className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden sm:inline">Crear Cuenta</span>
+            </Link>
           </div>
 
           <div className="flex items-center gap-2 md:gap-4">
@@ -115,10 +139,41 @@ export default function HomePage() {
           ))}
         </div>
 
-        <div className="absolute bottom-10 left-10 z-20 text-slate-400">
-          <Heart className="h-8 w-8 text-sky-300" aria-hidden="true" />
-        </div>
       </section>
+
+      <button
+        type="button"
+        onClick={() => setIsAccessibilityOpen(true)}
+        aria-label="Abrir opciones de accesibilidad"
+        className="fixed left-5 bottom-10 z-40 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-500 text-white shadow-lg transition-colors hover:bg-sky-400"
+      >
+        <Palette className="h-6 w-6" aria-hidden="true" />
+      </button>
+
+      {isAccessibilityOpen && (
+        <div className="fixed inset-0 z-[60]">
+          <button
+            type="button"
+            aria-label="Cerrar opciones de accesibilidad"
+            onClick={() => setIsAccessibilityOpen(false)}
+            className="absolute inset-0 bg-black/55"
+          />
+          <aside className="relative h-full w-full max-w-sm overflow-y-auto border-r border-white/10 bg-slate-950/95 p-5 shadow-2xl backdrop-blur-xl">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-white">Accesibilidad</h2>
+              <button
+                type="button"
+                onClick={() => setIsAccessibilityOpen(false)}
+                aria-label="Cerrar panel"
+                className="flex h-10 w-10 items-center justify-center rounded-xl text-white transition-colors hover:bg-white/10"
+              >
+                <X className="h-5 w-5" aria-hidden="true" />
+              </button>
+            </div>
+            <AccessibilityPanel />
+          </aside>
+        </div>
+      )}
 
       <footer className="bg-[#71A5D9] py-4 text-sm text-center">
         <div className="mx-auto max-w-7xl px-5">

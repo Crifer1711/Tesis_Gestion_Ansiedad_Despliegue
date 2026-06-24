@@ -7,7 +7,7 @@ export const revalidate = 0;
 export default async function TecnicasRapidasPage() {
   const repository = new ActivityRepository();
   const activities = await repository.getAllActivities();
-  const approved = activities.filter((activity) => activity.estado === 'Aprobada');
+  const tecnicas = activities.filter((activity) => activity.estado === 'Aprobada' && activity.usos === 'tecnicas');
 
-  return <TechnicasRapidasGallery activities={approved} />;
+  return <TechnicasRapidasGallery activities={tecnicas} />;
 }
