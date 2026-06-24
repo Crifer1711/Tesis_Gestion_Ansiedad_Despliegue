@@ -13,14 +13,14 @@ export async function POST(request: Request) {
 
     const result = await useCase.execute(body);
 
-    // En serverless, evitar fire-and-forget para no perder la ejecución.
-    // Esperamos un intento corto de envío para mantener la respuesta rápida.
-    try {
-      await sendVerificationEmail(result.email, result.verificationToken);
-      console.info('[Register] Verification email sent for:', result.email);
-    } catch (emailError) {
-      console.error('[Register] Verification email could not be sent:', emailError);
-    }
+    // Respondemos rápido al usuario y dejamos el envío de correo en segundo plano.
+    void sendVerificationEmail(result.email, result.verificationToken)
+      .then(() => {
+        console.info('[Register] Verification email sent for:', result.email);
+      })
+      .catch((emailError) => {
+        console.error('[Register] Verification email could not be sent:', emailError);
+      });
 
     return NextResponse.json(
       { message: result.message },

@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
-const EMAIL_SEND_TIMEOUT_MS = 2500;
+const EMAIL_SEND_TIMEOUT_MS = 8000;
 
 const getBaseUrl = () => {
   return process.env.NEXTAUTH_URL || process.env.APP_BASE_URL || 'http://localhost:3000';
@@ -9,11 +9,11 @@ const getBaseUrl = () => {
 export const sendVerificationEmail = async (email: string, token: string) => {
   const verifyUrl = `${getBaseUrl()}/api/auth/verify-email?token=${encodeURIComponent(token)}`;
 
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT || 587);
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-  const from = process.env.SMTP_FROM || 'MindPeace <no-reply@mindpeace.local>';
+  const host = (process.env.SMTP_HOST || '').trim();
+  const configuredPort = Number((process.env.SMTP_PORT || '587').trim());
+  const user = (process.env.SMTP_USER || '').trim();
+  const pass = (process.env.SMTP_PASS || '').trim();
+  const from = (process.env.SMTP_FROM || 'MindPeace <no-reply@mindpeace.local>').trim();
 
   // Development fallback: if SMTP is not configured, we log the URL and continue.
   if (!host || !user || !pass) {
@@ -31,17 +31,7 @@ export const sendVerificationEmail = async (email: string, token: string) => {
     throw new Error('Invalid SMTP_FROM format');
   }
 
-  const transporter = nodemailer.createTransport({
-    host,
-    port,
-    secure: port === 465,
-    auth: { user, pass },
-    connectionTimeout: EMAIL_SEND_TIMEOUT_MS,
-    greetingTimeout: EMAIL_SEND_TIMEOUT_MS,
-    socketTimeout: EMAIL_SEND_TIMEOUT_MS,
-  });
-
-  const sendMailPromise = transporter.sendMail({
+  const message = {
     from,
     to: email,
     subject: 'Verifica tu cuenta de MindPeace',
@@ -59,12 +49,37 @@ export const sendVerificationEmail = async (email: string, token: string) => {
       </div>
     `,
     text: `Activa tu cuenta de MindPeace con este enlace: ${verifyUrl}`,
-  });
+  };
 
-  await Promise.race([
-    sendMailPromise,
-    new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('SMTP timeout while sending verification email')), EMAIL_SEND_TIMEOUT_MS);
-    }),
-  ]);
+  const sendWithPort = async (port: number, secure: boolean) => {
+    const transporter = nodemailer.createTransport({
+      host,
+      port,
+      secure,
+      auth: { user, pass },
+      connectionTimeout: EMAIL_SEND_TIMEOUT_MS,
+      greetingTimeout: EMAIL_SEND_TIMEOUT_MS,
+      socketTimeout: EMAIL_SEND_TIMEOUT_MS,
+      tls: { servername: host },
+    });
+
+    await transporter.sendMail(message);
+  };
+
+  try {
+    await sendWithPort(configuredPort, configuredPort === 465);
+  } catch (firstError) {
+    const msg = firstError instanceof Error ? firstError.message : String(firstError);
+    const isTimeout = /timeout/i.test(msg);
+
+    if (!isTimeout) {
+      throw firstError;
+    }
+
+    const fallbackPort = configuredPort === 465 ? 587 : 465;
+    const fallbackSecure = fallbackPort === 465;
+
+    console.warn(`[Verification Email] SMTP timeout on port ${configuredPort}. Retrying on ${fallbackPort}...`);
+    await sendWithPort(fallbackPort, fallbackSecure);
+  }
 };
