@@ -23,7 +23,15 @@ export class LoginUserUseCase {
       throw new Error("Contraseña incorrecta");
     }
 
-    // 3. Registro de fecha de último inicio de sesión
+    // 3. Verificación de cuenta activa
+    const normalizedStatus = (user.status || '').toString().trim().toLowerCase();
+    const isAccountEnabled = normalizedStatus === 'activo' || normalizedStatus === 'aprobado';
+
+    if (!isAccountEnabled) {
+      throw new Error('Tu cuenta está pendiente de verificación. Revisa tu correo institucional.');
+    }
+
+    // 4. Registro de fecha de último inicio de sesión
     if (user.role === "PACIENTE") {
       await this.authRepository.updateLastLogin(user.id);
     }

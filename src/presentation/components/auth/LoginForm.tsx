@@ -1,6 +1,7 @@
 "use client";
-import { useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from 'next/link';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,10 +24,20 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export const LoginForm = () => {
+  return (
+    <Suspense fallback={null}>
+      <LoginFormContent />
+    </Suspense>
+  );
+};
+
+const LoginFormContent = () => {
   const [serverError, setServerError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const verifyState = useMemo(() => searchParams.get('verify'), [searchParams]);
 
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -101,19 +112,49 @@ export const LoginForm = () => {
           
           {/* Logo y Encabezado */}
           <div className="flex flex-col items-center mb-8">
-<div className="relative w-14 h-14 rounded-xl overflow-hidden shadow-sm border border-gray-100 mb-4 bg-white p-1">
+            <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-sm border border-gray-100 mb-4 bg-white p-1">
             <Image
                 src="/images/Logo-.png"
                 alt="Logo"
                 fill
                 priority
                 className="object-contain"
-                sizes="56px"
+                sizes="48px"
               />
             </div>
             <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Bienvenido de nuevo</h1>
             <p className="text-sm text-gray-500 mt-1 font-medium">Ingresa a tu cuenta de MINDPEACE</p>
           </div>
+
+          {verifyState === 'pending' && (
+            <div className="mb-4 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-800">
+              Registro completado. Revisa tu correo institucional para verificar tu cuenta y habilitar el acceso.
+            </div>
+          )}
+
+          {verifyState === 'success' && (
+            <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+              Tu correo fue verificado correctamente. Ya puedes iniciar sesión.
+            </div>
+          )}
+
+          {verifyState === 'expired' && (
+            <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              El enlace de verificación expiró. Solicita un nuevo correo de validación.
+            </div>
+          )}
+
+          {verifyState === 'invalid' && (
+            <div className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+              El enlace de verificación no es válido.
+            </div>
+          )}
+
+          {verifyState === 'error' && (
+            <div className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+              Ocurrió un problema al verificar tu cuenta. Intenta nuevamente.
+            </div>
+          )}
           
           <form className="w-full space-y-5" onSubmit={handleSubmit(onSubmit)}>
             

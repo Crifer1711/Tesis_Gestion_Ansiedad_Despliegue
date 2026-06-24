@@ -88,8 +88,14 @@ export const RegisterForm = () => {
       });
 
       if (res.ok) {
-        toast.success("Usuario registrado exitosamente", { id: 'register-success' });
-        router.push("/login");
+        const result = await res.json();
+        toast.success(
+          result.message || "Registro completado. Revisa tu correo institucional para activar tu cuenta.",
+          { id: 'register-success', duration: 6000 }
+        );
+        setTimeout(() => {
+          router.push("/login?verify=pending");
+        }, 1800);
       } else {
         const result = await res.json();
         setServerError(result.error || "Error al registrarse");
@@ -113,7 +119,7 @@ export const RegisterForm = () => {
         
         {/* LOGO & ENCABEZADO */}
         <div className="flex flex-col items-center mb-6">
-<div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-sm border border-gray-100 mb-3 bg-white p-1">
+          <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-sm border border-gray-100 mb-3 bg-white p-1">
             <Image src="/images/Logo-.png" alt="Logo" fill className="object-contain" sizes="48px" priority />
             
           </div>

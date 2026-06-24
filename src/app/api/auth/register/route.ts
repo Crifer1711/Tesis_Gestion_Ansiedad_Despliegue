@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { RegisterUserUseCase } from "@/application/use-cases/auth/register-user.use-case";
 import { PgUserRepository } from "@/infrastructure/repositories/pg-user.repository";
+import { sendVerificationEmail } from "@/infrastructure/external-services/email.service";
 
 export async function POST(request: Request) {
   try {
@@ -11,7 +12,12 @@ export async function POST(request: Request) {
     const useCase = new RegisterUserUseCase(repository);
 
     const result = await useCase.execute(body);
-    return NextResponse.json(result, { status: 201 });
+    await sendVerificationEmail(result.email, result.verificationToken);
+
+    return NextResponse.json(
+      { message: result.message },
+      { status: 201 }
+    );
   } catch (error: unknown) {
   if (error instanceof Error) {
     return NextResponse.json({ error: error.message }, { status: 400 });

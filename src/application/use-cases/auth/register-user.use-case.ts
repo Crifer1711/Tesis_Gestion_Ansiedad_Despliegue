@@ -1,6 +1,7 @@
 import { IAuthRepository } from "@/domain/repositories/auth.repository";
 import { User } from "@/domain/entities/user";
 import bcrypt from "bcrypt";
+import crypto from 'crypto';
 
 export class RegisterUserUseCase {
   constructor(private authRepository: IAuthRepository) {}
@@ -22,12 +23,22 @@ export class RegisterUserUseCase {
     const hashedPassword = await bcrypt.hash(userData.password!, salt);
 
     // 4. Guardar en la base de datos
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const tokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
     const newUser: User = {
       ...userData,
       password: hashedPassword,
+      status: 'pendiente',
+      verificationToken,
+      verificationTokenExpiresAt: tokenExpiresAt,
     };
 
     await this.authRepository.save(newUser);
-    return { message: "Usuario registrado con éxito" };
+    return {
+      message: "Cuenta creada. Revisa tu correo institucional para verificar y activar tu acceso.",
+      email: userData.email,
+      verificationToken,
+    };
   }
 }

@@ -10,4 +10,7 @@ export interface User {
   contacto: string;
   status: string;
   especialidad: string | null;
+  verificationToken?: string | null;
+  verificationTokenExpiresAt?: Date | null;
+  emailVerifiedAt?: Date | null;
 }

@@ -3,11 +3,22 @@ import { IAuthRepository } from "@/domain/repositories/auth.repository";
 import { User } from "@/domain/entities/user";
 
 export class PgUserRepository implements IAuthRepository {
+  private async ensureVerificationColumns() {
+    await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_token TEXT');
+    await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_token_expires_at TIMESTAMP');
+    await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified_at TIMESTAMP');
+  }
+
   async save(user: User): Promise<void> {
+    await this.ensureVerificationColumns();
+
     // 1. Actualizamos la consulta para incluir los nuevos campos
     const query = `
-      INSERT INTO users (email, password, name, lastname, role, contacto, status, especialidad) 
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      INSERT INTO users (
+        email, password, name, lastname, role, contacto, status, especialidad,
+        verification_token, verification_token_expires_at, email_verified_at
+      ) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
     `;
 
     // 2. Definimos los valores con las reglas que pediste
@@ -18,9 +29,12 @@ export class PgUserRepository implements IAuthRepository {
       user.lastname,
       user.role || 'PACIENTE',             // Evita el error NOT NULL si no viene el rol
       user.contacto,                        // Capturado desde el nuevo input del registro
-      // Los usuarios quedan activos desde el registro
-      (user.status || 'activo').toLowerCase(),
-      user.especialidad || 'Psicología Clínica' // Valor por defecto solicitado
+      // Registro con verificación por correo
+      (user.status || 'pendiente').toLowerCase(),
+      user.especialidad || 'Psicología Clínica', // Valor por defecto solicitado
+      user.verificationToken || null,
+      user.verificationTokenExpiresAt || null,
+      user.emailVerifiedAt || null,
     ];
 
     await pool.query(query, values);
