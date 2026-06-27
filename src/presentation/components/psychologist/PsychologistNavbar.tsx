@@ -42,7 +42,7 @@ export function PsychologistNavbar() {
         <Link href="/dashboard/psicologo" className="flex items-center gap-3 hover:opacity-80 transition">
           <div className="relative h-10 w-10 overflow-hidden rounded-2xl bg-white/90 p-1 shadow-inner">
             <Image
-              src="/images/Logo.png"
+              src="/images/Logo-.png"
               alt="MindPeace"
               fill
               className="object-contain"

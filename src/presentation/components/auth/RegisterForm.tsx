@@ -65,10 +65,14 @@ export const RegisterForm = () => {
   
   const router = useRouter();
 
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<RegisterFormData>({
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     mode: "onChange", 
   });
+
+  // ✅ Obtener valores para los contadores
+  const nameValue = watch("name") || "";
+  const lastnameValue = watch("lastname") || "";
 
   const onSubmit = async (data: RegisterFormData) => {
     setLoading(true);
@@ -128,8 +132,14 @@ export const RegisterForm = () => {
           
           {/* CAMPO: NOMBRES */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Nombres</label>
-            <div className="relative">
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider">Nombres</label>
+              {/* ✅ CONTADOR DE CARACTERES */}
+              <span className={`text-[10px] font-medium ${nameValue.length > 40 ? 'text-red-500' : 'text-gray-400'}`}>
+                {nameValue.length}/40
+              </span>
+            </div>
+            <div className="relative mt-1.5">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                 <User size={18} />
               </div>
@@ -151,8 +161,14 @@ export const RegisterForm = () => {
 
           {/* CAMPO: APELLIDOS */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Apellidos</label>
-            <div className="relative">
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider">Apellidos</label>
+              {/* ✅ CONTADOR DE CARACTERES */}
+              <span className={`text-[10px] font-medium ${lastnameValue.length > 40 ? 'text-red-500' : 'text-gray-400'}`}>
+                {lastnameValue.length}/40
+              </span>
+            </div>
+            <div className="relative mt-1.5">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                 <User size={18} />
               </div>
@@ -241,9 +257,8 @@ export const RegisterForm = () => {
                 <span className="text-xs font-semibold">{showPassword ? "Ocultar" : "Mostrar"}</span>
               </button>
             </div>
-            {/* ✅ TEXTO DE AYUDA CON REQUISITOS - MÁS GRANDE */}
             <p className="text-xs text-gray-500 mt-1.5 pl-1">
-              <span className="font-semibold text-gray-600">Requisitos:</span> Mínimo 8 caracteres, una mayúscula, una minúscula y un número
+              Mínimo 8 caracteres, una mayúscula, una minúscula y un número
             </p>
             {errors.password && <p className="text-red-500 text-xs mt-0.5 font-medium pl-1">{errors.password.message}</p>}
           </div>
@@ -272,6 +287,12 @@ export const RegisterForm = () => {
             </div>
             {errors.confirmPassword && <p className="text-red-500 text-xs mt-1 font-medium pl-1">{errors.confirmPassword.message}</p>}
           </div>
+
+          {serverError && (
+            <p className="text-red-600 text-center font-semibold text-xs bg-red-50 p-2.5 rounded-xl border border-red-200 shadow-sm animate-fade-in">
+              {serverError}
+            </p>
+          )}
 
           {/* BOTÓN DE ENVÍO */}
           <button

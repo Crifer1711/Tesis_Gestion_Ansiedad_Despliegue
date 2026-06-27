@@ -18,7 +18,7 @@ export default function SaberMasPage() {
           <Link href="/" className="flex items-center gap-3">
             <div className="relative h-10 w-10 overflow-hidden rounded-2xl bg-white/90 p-1 shadow-inner">
               <Image
-                src="/images/Logo.png"
+                src="/images/Logo-.png"
                 alt="MindPeace"
                 fill
                 className="object-contain"
@@ -99,11 +99,6 @@ export default function SaberMasPage() {
 
         <div className="relative space-y-8 pt-8">
           <InformateSection description="Información y educación sobre ansiedad y salud mental" onModalChange={setIsModalOpen} />
-          <RecursosSection
-            description="Guías y herramientas para cuidar tu salud mental"
-            transparent
-            onModalChange={setIsModalOpen}
-          />
         </div>
       </main>
 

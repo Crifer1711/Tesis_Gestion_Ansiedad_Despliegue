@@ -105,7 +105,7 @@ export function Biblioteca({ onHomeClick }: { onHomeClick: () => void }) {
   return (
     <div className="max-w-7xl mx-auto px-6 pt-6">
       <div className="text-center mb-12">
-        <h1 className="text-5xl font-black text-[#1E4D8C] mb-4">Biblioteca</h1>
+        <h1 className="text-5xl font-black text-[#1E4D8C] mb-4">Guía de Autoayuda</h1>
         <p className="text-xl text-slate-700">Recursos prácticos y verificados para manejar ansiedad, depresión y mejorar tu salud mental.</p>
       </div>
 
