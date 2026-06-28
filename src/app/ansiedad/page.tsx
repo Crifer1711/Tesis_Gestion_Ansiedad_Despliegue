@@ -1,10 +1,7 @@
 'use client';
 
 import { Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
-import { navigateAndScroll } from '@/presentation/utils/scrollWithOffset';
 
 export default function AnsiedadPage() {
   return (
@@ -19,31 +16,16 @@ function AnsiedadLoading() {
 }
 
 function AnsiedadContent() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const isModal = searchParams.get('modal') === '1';
-
-  const handleVolver = () => {
-    navigateAndScroll(router, '/#info', 'info', 100);
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 py-16">
       <div className="max-w-7xl mx-auto px-6">
-        {!isModal && (
-          <div className="mb-6">
-            <button
-              onClick={handleVolver}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white text-[#1E4D8C] font-semibold rounded-lg shadow-sm border border-[#71A5D9] hover:bg-[#71A5D9] hover:text-white transition"
-            >
-              <ArrowLeft size={18} /> Volver a Infórmate
-            </button>
-          </div>
-        )}
-        {/* Header Centrado */}
+        {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-6xl font-black text-[#1E4D8C] mb-4">Ansiedad</h1>
-          <p className="text-lg text-slate-700 max-w-2xl mx-auto">La ansiedad es una respuesta natural del cuerpo ante situaciones de estrés. Aprende a reconocerla, entenderla y manejarla con estrategias prácticas.</p>
+          <p className="text-lg text-slate-700 max-w-2xl mx-auto">
+            La ansiedad es una respuesta natural del cuerpo ante situaciones de estrés. 
+            Aprende a reconocerla, entenderla y manejarla con estrategias prácticas.
+          </p>
         </div>
 
         {/* Síntomas */}
@@ -83,7 +65,6 @@ function AnsiedadContent() {
               }
             ].map((categoria, i) => (
               <div key={i} className="bg-white rounded-lg border-2 border-[#71A5D9] overflow-hidden">
-                {/* Imagen más alta */}
                 <div className="relative w-full h-56">
                   <Image
                     src={categoria.image}
@@ -135,7 +116,6 @@ function AnsiedadContent() {
               }
             ].map((area, i) => (
               <div key={i} className="bg-white rounded-lg border-2 border-[#71A5D9] overflow-hidden">
-                {/* Imagen más alta */}
                 <div className="relative w-full h-56">
                   <Image
                     src={area.image}
@@ -145,7 +125,7 @@ function AnsiedadContent() {
                   />
                 </div>
                 <div className="p-6">
-                    <h3 className="font-black text-[#1E4D8C] mb-6 text-2xl text-center">{area.title}</h3>
+                  <h3 className="font-black text-[#1E4D8C] mb-6 text-2xl text-center">{area.title}</h3>
                   <div className="bg-blue-50 rounded-lg p-6">
                     {area.items.map((item, i) => (
                       <div key={i} className="flex items-start gap-3 py-2">
@@ -160,22 +140,22 @@ function AnsiedadContent() {
           </div>
         </div>
 
-        {/* Consejos Adicionales */}
+        {/* Consejos */}
         <div className="mb-16">
           <h2 className="text-3xl font-black text-[#1E4D8C] mb-8">Consejos adicionales para manejar la ansiedad</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               { 
                 title: 'Actividades de relajación', 
-                desc: 'Participa en actividades que disfrutes: meditación, yoga, música, deportes o tiempo en espacios verdes del campus. Tu bienestar mental es fundamental' 
+                desc: 'Participa en actividades que disfrutes: meditación, yoga, música, deportes o tiempo en espacios verdes del campus. Tu bienestar mental es fundamental.' 
               },
               { 
                 title: 'Comunidad estudiantil', 
-                desc: 'Conecta con otros estudiantes de ESPE a través de grupos de estudio, clubes y actividades extracurriculares. El apoyo de tus pares es invaluable' 
+                desc: 'Conecta con otros estudiantes de ESPE a través de grupos de estudio, clubes y actividades extracurriculares. El apoyo de tus pares es invaluable.' 
               },
               { 
                 title: 'Equilibrio académico', 
-                desc: 'Organiza tu tiempo de estudio, establece límites saludables y no dudes en buscar apoyo académico cuando lo necesites. Tu éxito va más allá de las calificaciones' 
+                desc: 'Organiza tu tiempo de estudio, establece límites saludables y no dudes en buscar apoyo académico cuando lo necesites. Tu éxito va más allá de las calificaciones.' 
               }
             ].map((consejo, i) => (
               <div key={i} className="bg-white rounded-lg p-6 border-2 border-[#71A5D9]">
@@ -185,9 +165,6 @@ function AnsiedadContent() {
             ))}
           </div>
         </div>
-
-        {/* Footer */}
-        {/* removed footer volver (now at top) */}
       </div>
     </div>
   );

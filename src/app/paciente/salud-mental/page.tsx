@@ -1,25 +1,16 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
-import { Heart, Lightbulb, AlertCircle, TrendingUp, ArrowRight, ArrowLeft } from 'lucide-react';
-import { PatientHeader } from '@/presentation/components/patient/PatientHeader';
 import Image from 'next/image';
-import { navigateAndScroll } from '@/presentation/utils/scrollWithOffset';
 
 export default function PacienteSaludMentalPage() {
-  const [activeSection, setActiveSection] = useState('info');
   const { data: session, status } = useSession();
-  const router = useRouter();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    if (status === 'unauthenticated') {
-      router.push('/login');
-    }
-  }, [status, router]);
+  }, []);
 
   if (!mounted || status === 'loading' || !session) {
     return null;
@@ -27,26 +18,16 @@ export default function PacienteSaludMentalPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100">
-      <PatientHeader
-        activeSection={activeSection}
-        onNavClick={setActiveSection}
-        userName={session?.user?.name || 'Paciente'}
-        userRole={session?.user?.role || 'ESTUDIANTE'}
-      />
-      <div className="py-16">
+      <div className="py-8">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="mb-6">
-            <button
-              onClick={() => navigateAndScroll(router, '/dashboard/paciente#info', 'info', 100)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white text-[#1E4D8C] font-semibold rounded-lg shadow-sm border border-[#71A5D9] hover:bg-[#71A5D9] hover:text-white transition"
-            >
-              <ArrowLeft size={18} /> Volver a Infórmate
-            </button>
-          </div>
-          {/* Header Centrado */}
+          {/* ❌ ELIMINADO botón "Volver a Infórmate" */}
+
+          {/* Header */}
           <div className="text-center mb-16">
             <h1 className="text-6xl font-black text-[#1E4D8C] mb-4">Salud Mental</h1>
-            <p className="text-lg text-slate-700 max-w-2xl mx-auto">Tu bienestar emocional es fundamental. Descubre los pilares para cuidar tu salud mental integral.</p>
+            <p className="text-lg text-slate-700 max-w-2xl mx-auto">
+              Tu bienestar emocional es fundamental. Descubre los pilares para cuidar tu salud mental integral.
+            </p>
           </div>
 
           {/* 5 Pilares */}
@@ -61,7 +42,6 @@ export default function PacienteSaludMentalPage() {
                 { title: 'Estrés', image: '/images/educational/SaludMental-Estre.jpg', desc: 'Gestión consciente del estrés' }
               ].map((pilar, i) => (
                 <div key={i} className="bg-white rounded-lg border-2 border-[#71A5D9] overflow-hidden">
-                  {/* Imagen que ocupa todo el ancho */}
                   <div className="relative w-full h-56">
                     <Image
                       src={pilar.image}
@@ -72,7 +52,7 @@ export default function PacienteSaludMentalPage() {
                   </div>
                   <div className="p-4 text-center">
                     <h3 className="font-black text-[#1E4D8C] mb-2 text-lg">{pilar.title}</h3>
-                  <p className="text-slate-700 text-base">{pilar.desc}</p>
+                    <p className="text-slate-700 text-base">{pilar.desc}</p>
                   </div>
                 </div>
               ))}
@@ -83,9 +63,7 @@ export default function PacienteSaludMentalPage() {
           <div className="mb-16">
             <h2 className="text-4xl font-black text-[#1E4D8C] mb-12 text-center">Reconoce y maneja tu bienestar</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Señales */}
               <div className="bg-white rounded-lg border-2 border-[#71A5D9] overflow-hidden">
-                {/* Imagen encima del título */}
                 <div className="relative w-full h-76">
                   <Image
                     src="/images/educational/Señales-Alerta.jpg"
@@ -97,27 +75,25 @@ export default function PacienteSaludMentalPage() {
                 <div className="p-6">
                   <h3 className="text-2xl font-black text-[#1E4D8C] mb-6">Señales de alerta</h3>
                   <p className="text-black text-base mb-6">Estos signos pueden indicar que necesitas prestar más atención a tu salud mental:</p>
-                <div className="bg-blue-50 rounded-lg p-6">
-                  {[
-                    'Cambios persistentes de humor, irritabilidad o tristeza sin razón aparente',
-                    'Pérdida de interés en actividades que normalmente disfrutabas',
-                    'Cambios en patrones de sueño (insomnio o somnolencia) o apetito',
-                    'Aislamiento social o evitar contacto con amigos y familia',
-                    'Pensamientos negativos recurrentes o autocrítica excesiva',
-                    'Dificultad para concentrarse, recordar o tomar decisiones'
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-start gap-3 py-2">
-                      <div className="w-1.5 h-1.5 bg-[#71A5D9] rounded-full mt-2.5 flex-shrink-0"></div>
-                      <p className="text-black text-base font-medium leading-relaxed">{item}</p>
-                    </div>
-                  ))}
-                </div>
+                  <div className="bg-blue-50 rounded-lg p-6">
+                    {[
+                      'Cambios persistentes de humor, irritabilidad o tristeza sin razón aparente',
+                      'Pérdida de interés en actividades que normalmente disfrutabas',
+                      'Cambios en patrones de sueño (insomnio o somnolencia) o apetito',
+                      'Aislamiento social o evitar contacto con amigos y familia',
+                      'Pensamientos negativos recurrentes o autocrítica excesiva',
+                      'Dificultad para concentrarse, recordar o tomar decisiones'
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-start gap-3 py-2">
+                        <div className="w-1.5 h-1.5 bg-[#71A5D9] rounded-full mt-2.5 flex-shrink-0"></div>
+                        <p className="text-black text-base font-medium leading-relaxed">{item}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              {/* Estrategias */}
               <div className="bg-white rounded-lg border-2 border-[#71A5D9] overflow-hidden">
-                {/* Imagen encima del título */}
                 <div className="relative w-full h-76">
                   <Image
                     src="/images/educational/Estrategias-bienestar.png"
@@ -129,21 +105,21 @@ export default function PacienteSaludMentalPage() {
                 <div className="p-6">
                   <h3 className="text-2xl font-black text-[#1E4D8C] mb-6">Estrategias de bienestar</h3>
                   <p className="text-black text-base mb-6">Acciones prácticas que puedes implementar hoy para mejorar tu salud mental:</p>
-                <div className="bg-blue-50 rounded-lg p-6">
-                  {[
-                    'Practica respiración profunda 5 minutos diarios - calma el sistema nervioso',
-                    'Realiza actividades que te traigan alegría o paz cada día',
-                    'Mantén horarios consistentes para dormir y comer - estabiliza tu estado emocional',
-                    'Busca conversaciones significativas con personas que te apoyan',
-                    'Desafía pensamientos negativos cuestionando si son realmente ciertos',
-                    'No dudes en consultar con un profesional de salud mental cuando sea necesario'
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-start gap-3 py-2">
-                      <div className="w-1.5 h-1.5 bg-[#71A5D9] rounded-full mt-2.5 flex-shrink-0"></div>
-                      <p className="text-black text-base font-medium leading-relaxed">{item}</p>
-                    </div>
+                  <div className="bg-blue-50 rounded-lg p-6">
+                    {[
+                      'Practica respiración profunda 5 minutos diarios - calma el sistema nervioso',
+                      'Realiza actividades que te traigan alegría o paz cada día',
+                      'Mantén horarios consistentes para dormir y comer - estabiliza tu estado emocional',
+                      'Busca conversaciones significativas con personas que te apoyan',
+                      'Desafía pensamientos negativos cuestionando si son realmente ciertos',
+                      'No dudes en consultar con un profesional de salud mental cuando sea necesario'
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-start gap-3 py-2">
+                        <div className="w-1.5 h-1.5 bg-[#71A5D9] rounded-full mt-2.5 flex-shrink-0"></div>
+                        <p className="text-black text-base font-medium leading-relaxed">{item}</p>
+                      </div>
                     ))}
-                </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -186,7 +162,6 @@ export default function PacienteSaludMentalPage() {
                 }
               ].map((habito, i) => (
                 <div key={i} className="bg-white rounded-lg border-2 border-[#71A5D9] overflow-hidden">
-                  {/* Imagen que ocupa todo el ancho */}
                   <div className="relative w-full h-56">
                     <Image
                       src={habito.image}
@@ -196,15 +171,15 @@ export default function PacienteSaludMentalPage() {
                     />
                   </div>
                   <div className="p-6">
-                  <h3 className="font-black text-[#1E4D8C] mb-4 text-2xl text-center">{habito.title}</h3>
-                  <div className="bg-blue-50 rounded-lg p-6">
-                    {habito.items.map((item, j) => (
-                      <div key={j} className="flex items-start gap-3 py-2">
-                        <div className="w-1.5 h-1.5 bg-[#1E4D8C] rounded-full mt-2.5 flex-shrink-0"></div>
-                        <p className="text-black text-base font-medium leading-relaxed">{item}</p>
-                      </div>
-                    ))}
-                  </div>
+                    <h3 className="font-black text-[#1E4D8C] mb-4 text-2xl text-center">{habito.title}</h3>
+                    <div className="bg-blue-50 rounded-lg p-6">
+                      {habito.items.map((item, j) => (
+                        <div key={j} className="flex items-start gap-3 py-2">
+                          <div className="w-1.5 h-1.5 bg-[#1E4D8C] rounded-full mt-2.5 flex-shrink-0"></div>
+                          <p className="text-black text-base font-medium leading-relaxed">{item}</p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -221,13 +196,11 @@ export default function PacienteSaludMentalPage() {
                 'Experimentas pensamientos de autolesión o desesperanza'
               ].map((item, i) => (
                 <div key={i} className="bg-blue-50 rounded-lg p-6 border-2 border-[#71A5D9] text-center">
-                <p className="text-black text-base font-medium">{item}</p>
+                  <p className="text-black text-base font-medium">{item}</p>
                 </div>
               ))}
             </div>
           </div>
-
-          {/* Footer (Volver moved to top) */}
         </div>
       </div>
     </div>

@@ -12,13 +12,26 @@ interface PatientHeaderProps {
   onNavClick?: (section: string) => void;
   userName?: string;
   userRole?: string;
+  isModalOpen?: boolean;
 }
 
-export function PatientHeader({ activeSection, onNavClick, userName = 'Paciente', userRole = 'ESTUDIANTE' }: PatientHeaderProps) {
+export function PatientHeader({ 
+  activeSection, 
+  onNavClick, 
+  userName = 'Paciente', 
+  userRole = 'ESTUDIANTE',
+  isModalOpen = false
+}: PatientHeaderProps) {
   const [isVisible, setIsVisible] = useState(true);
   const lastScrollYRef = useRef(0);
 
   useEffect(() => {
+    // ✅ SI EL MODAL ESTÁ ABIERTO, EL HEADER SIEMPRE VISIBLE Y NO ESCUCHA SCROLL
+    if (isModalOpen) {
+      setIsVisible(true);
+      return; // ✅ SALIMOS ANTES DE AGREGAR EL EVENT LISTENER
+    }
+
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       if (currentScrollY > lastScrollYRef.current && currentScrollY > 20) {
@@ -31,10 +44,10 @@ export function PatientHeader({ activeSection, onNavClick, userName = 'Paciente'
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [isModalOpen]);
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/50 backdrop-blur-xl transition-transform duration-300 ${
+    <header className={`fixed top-0 left-0 right-0 z-40 border-b border-white/10 bg-black/50 backdrop-blur-xl transition-transform duration-300 ${
       isVisible ? 'translate-y-0' : '-translate-y-full'
     }`}>
       <div className="flex items-center justify-between px-5 py-4 md:px-8 md:py-5">

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Play, X } from 'lucide-react';
 
 interface VideoProps {
   title: string;
@@ -14,11 +14,49 @@ function VideoCard({ title, videoId, onClick }: VideoProps & { onClick: () => vo
   return (
     <div 
       onClick={onClick}
-      className="bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer transform hover:scale-105 transition duration-300 hover:shadow-xl"
+      className="bg-white rounded-2xl border-2 border-[#71A5D9] overflow-hidden cursor-pointer transform hover:scale-105 transition duration-300 hover:shadow-xl group"
     >
-      <img src={thumbnail} alt={title} className="w-full h-48 object-cover" />
-      <div className="p-4">
-        <h4 className="text-lg font-semibold text-[#1E4D8C]">{title}</h4>
+      <div className="relative w-full aspect-video bg-slate-200">
+        <img 
+          src={thumbnail} 
+          alt={title} 
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="bg-[#1E4D8C]/90 rounded-full p-4">
+            <Play className="w-8 h-8 text-white" />
+          </div>
+        </div>
+      </div>
+      <div className="p-5">
+        <h4 className="text-lg font-black text-[#1E4D8C] line-clamp-2">{title}</h4>
+      </div>
+    </div>
+  );
+}
+
+function Modal({ videoId, title, onClose }: { videoId: string; title: string; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl max-w-4xl w-full overflow-hidden shadow-2xl">
+        <div className="bg-[#1E4D8C] px-6 py-4 flex justify-between items-center">
+          <h3 className="text-white font-black text-lg">{title}</h3>
+          <button 
+            onClick={onClose} 
+            className="text-white hover:text-gray-300 transition text-2xl"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+        <div className="aspect-video bg-black">
+          <iframe
+            src={`https://www.youtube.com/embed/${videoId}`}
+            title={title}
+            className="w-full h-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
+        </div>
       </div>
     </div>
   );
@@ -51,37 +89,16 @@ const EDUCATIONAL_VIDEOS = [
   },
 ];
 
-function Modal({ videoId, title, onClose }: { videoId: string; title: string; onClose: () => void }) {
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-4 max-w-4xl w-full mx-4">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-bold text-[#1E4D8C]">{title}</h3>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
-        </div>
-        <div className="aspect-video">
-          <iframe
-            src={`https://www.youtube.com/embed/${videoId}`}
-            title={title}
-            className="w-full h-full rounded"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          ></iframe>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export function VideosEducativos({ onHomeClick }: { onHomeClick: () => void }) {
   const [selectedVideo, setSelectedVideo] = useState<{ videoId: string; title: string } | null>(null);
-  const router = useRouter();
 
   return (
     <div className="max-w-7xl mx-auto px-6 pt-6">
       <div className="text-center mb-12">
         <h1 className="text-5xl font-black text-[#1E4D8C] mb-4">Videos educativos</h1>
-        <p className="text-xl text-slate-700">Aprende técnicas de respiración, atención plena y estrategias para regular tus emociones.</p>
+        <p className="text-xl text-slate-700 max-w-3xl mx-auto">
+          Aprende técnicas de respiración, atención plena y estrategias para regular tus emociones.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -101,8 +118,6 @@ export function VideosEducativos({ onHomeClick }: { onHomeClick: () => void }) {
           onClose={() => setSelectedVideo(null)} 
         />
       )}
-      {/* Volver al inicio moved to page wrapper for consistent placement */}
     </div>
-    
   );
 }

@@ -100,8 +100,6 @@ const PERSONAL_GUIDES = [
 ];
 
 export function Biblioteca({ onHomeClick }: { onHomeClick: () => void }) {
-  const router = useRouter();
-
   return (
     <div className="max-w-7xl mx-auto px-6 pt-6">
       <div className="text-center mb-12">
@@ -135,7 +133,6 @@ export function Biblioteca({ onHomeClick }: { onHomeClick: () => void }) {
           ))}
         </div>
       </section>
-      {/* Volver al inicio moved to page wrapper for consistent placement */}
     </div>
   );
 }

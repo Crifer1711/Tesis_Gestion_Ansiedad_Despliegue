@@ -1,12 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useSession } from 'next-auth/react';
-import { ArrowLeft, AlertCircle, Loader2 } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { saveGAD7ResultAction } from '@/infrastructure/actions/anxiety.actions';
 
-// Definición de Interfaz (Debe estar arriba del componente)
+// Definición de Interfaz
 interface TestResult {
   color: 'green' | 'yellow' | 'orange' | 'red';
   label: string;
@@ -30,7 +28,6 @@ const OPTIONS = [
   { value: 3, label: 'Todos los días' },
 ];
 
-// Función con retorno tipado para evitar el error en setResult
 function getSemaphoreData(score: number): TestResult {
   if (score <= 4) return { color: 'green', label: 'Bajo', msg: 'Tus niveles de ansiedad parecen estar bajo control.' };
   if (score <= 9) return { color: 'yellow', label: 'Leve', msg: 'Presentas algunas señales leves de inquietud.' };
@@ -38,11 +35,10 @@ function getSemaphoreData(score: number): TestResult {
   return { color: 'red', label: 'Elevado', msg: 'Tus síntomas de ansiedad son persistentes y significativos.' };
 }
 
-export function GAD7Test({ onHomeClick }: { onHomeClick: () => void }) {
-  const { data: session, status } = useSession();
+export function GAD7Test({ onHomeClick }: { onHomeClick?: () => void }) {
   const [responses, setResponses] = useState<number[]>(new Array(7).fill(-1));
   const [result, setResult] = useState<TestResult | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
+  const [isCalculating, setIsCalculating] = useState(false);
 
   const handleResponseChange = (questionIndex: number, value: number) => {
     const newResponses = [...responses];
@@ -56,22 +52,17 @@ export function GAD7Test({ onHomeClick }: { onHomeClick: () => void }) {
       return;
     }
 
+    setIsCalculating(true);
     const score = responses.reduce((sum, val) => sum + val, 0);
     const data = getSemaphoreData(score);
     
+    // Simular guardado (opcional)
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
     setResult(data);
-
-    if (status === "authenticated" && session?.user?.role === "PACIENTE") {
-      setIsSaving(true);
-      
-      // --- CAMBIO AQUÍ: Ahora enviamos 'responses' como tercer argumento ---
-      await saveGAD7ResultAction(score, data.label, responses); 
-      
-      setIsSaving(false);
-    }
+    setIsCalculating(false);
   };
 
-  // NUEVA FUNCIÓN: Limpia el resultado y resetea las respuestas
   const handleResetTest = () => {
     setResult(null);
     setResponses(new Array(7).fill(-1));
@@ -79,11 +70,12 @@ export function GAD7Test({ onHomeClick }: { onHomeClick: () => void }) {
 
   return (
     <div className="space-y-6 pt-12 max-w-4xl mx-auto">
-
       <div className="bg-white rounded-3xl border-4 border-[#71A5D9] p-8 shadow-2xl">
         {!result ? (
           <>
-            <h1 className="text-3xl font-black text-[#1E4D8C] mb-6 text-center uppercase">Test de Autoevaluación: Conoce tu Nivel de Ansiedad GAD-7</h1>
+            <h1 className="text-3xl font-black text-[#1E4D8C] mb-6 text-center uppercase">
+              Test de Autoevaluación: Conoce tu Nivel de Ansiedad GAD-7
+            </h1>
             <div className="space-y-6">
               {QUESTIONS.map((q, i) => (
                 <div key={i} className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
@@ -96,7 +88,7 @@ export function GAD7Test({ onHomeClick }: { onHomeClick: () => void }) {
                         className={`p-3 rounded-xl border-2 transition-all font-medium ${
                           responses[i] === opt.value 
                             ? 'border-[#1E4D8C] bg-[#1E4D8C] text-white shadow-md' 
-                            : 'border-slate-200 bg-white text-slate-700 hover:border-[#71A5D9] hover:bg-blue-50' // <-- TEXTO OSCURO AQUÍ
+                            : 'border-slate-200 bg-white text-slate-700 hover:border-[#71A5D9] hover:bg-blue-50'
                         }`}
                       >
                         {opt.label}
@@ -107,8 +99,12 @@ export function GAD7Test({ onHomeClick }: { onHomeClick: () => void }) {
               ))}
             </div>
             <div className="mt-10 text-center">
-              <button onClick={calculateResult} className="py-4 px-10 bg-[#1E4D8C] text-white font-black text-xl rounded-full hover:scale-105 transition shadow-xl">
-                VER MI NIVEL ACTUAL
+              <button 
+                onClick={calculateResult} 
+                disabled={isCalculating}
+                className="py-4 px-10 bg-[#1E4D8C] text-white font-black text-xl rounded-full hover:scale-105 transition shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isCalculating ? 'Calculando...' : 'VER MI NIVEL ACTUAL'}
               </button>
             </div>
           </>
@@ -124,12 +120,6 @@ export function GAD7Test({ onHomeClick }: { onHomeClick: () => void }) {
 
             <div className="space-y-4 max-w-md mx-auto">
               <p className="text-2xl font-bold text-slate-800 italic">{`"${result.msg}"`}</p>
-              
-              {isSaving && (
-                <div className="flex justify-center items-center gap-2 text-blue-600 text-sm font-bold">
-                  <Loader2 className="animate-spin" size={16} /> Guardando en tu expediente...
-                </div>
-              )}
 
               <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-xl flex items-start gap-3 mt-8">
                 <AlertCircle className="text-blue-500 shrink-0" size={24} />
@@ -139,8 +129,10 @@ export function GAD7Test({ onHomeClick }: { onHomeClick: () => void }) {
               </div>
             </div>
 
-            {/* SE ACTUALIZÓ EL ONCLICK AQUÍ PARA REINICIAR TODO */}
-            <button onClick={handleResetTest} className="mt-12 text-slate-500 font-bold hover:text-[#1E4D8C] underline">
+            <button 
+              onClick={handleResetTest} 
+              className="mt-12 text-slate-500 font-bold hover:text-[#1E4D8C] underline"
+            >
               Repetir el test
             </button>
           </div>

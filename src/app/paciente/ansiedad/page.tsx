@@ -1,25 +1,18 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
-import { AlertCircle, Shield, HelpCircle, Lightbulb, ArrowRight, ArrowLeft } from 'lucide-react';
 import { PatientHeader } from '@/presentation/components/patient/PatientHeader';
 import Image from 'next/image';
-import { navigateAndScroll } from '@/presentation/utils/scrollWithOffset';
 
 export default function PacienteAnsiedadPage() {
   const [activeSection, setActiveSection] = useState('info');
   const { data: session, status } = useSession();
-  const router = useRouter();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    if (status === 'unauthenticated') {
-      router.push('/login');
-    }
-  }, [status, router]);
+  }, []);
 
   if (!mounted || status === 'loading' || !session) {
     return null;
@@ -27,26 +20,18 @@ export default function PacienteAnsiedadPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100">
-      <PatientHeader
-        activeSection={activeSection}
-        onNavClick={setActiveSection}
-        userName={session?.user?.name || 'Paciente'}
-        userRole={session?.user?.role || 'ESTUDIANTE'}
-      />
-      <div className="py-16">
+      {/* ❌ ELIMINADO PatientHeader porque ya está en el modal */}
+      <div className="py-8">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="mb-6">
-            <button
-              onClick={() => navigateAndScroll(router, '/dashboard/paciente#info', 'info', 100)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white text-[#1E4D8C] font-semibold rounded-lg shadow-sm border border-[#71A5D9] hover:bg-[#71A5D9] hover:text-white transition"
-            >
-              <ArrowLeft size={18} /> Volver a Infórmate
-            </button>
-          </div>
-          {/* Header Centrado */}
+          {/* ❌ ELIMINADO botón "Volver a Infórmate" */}
+
+          {/* Header */}
           <div className="text-center mb-16">
             <h1 className="text-6xl font-black text-[#1E4D8C] mb-4">Ansiedad</h1>
-            <p className="text-lg text-slate-700 max-w-2xl mx-auto">La ansiedad es una respuesta natural del cuerpo ante situaciones de estrés. Aprende a reconocerla, entenderla y manejarla con estrategias prácticas.</p>
+            <p className="text-lg text-slate-700 max-w-2xl mx-auto">
+              La ansiedad es una respuesta natural del cuerpo ante situaciones de estrés. 
+              Aprende a reconocerla, entenderla y manejarla con estrategias prácticas.
+            </p>
           </div>
 
           {/* Síntomas */}
@@ -86,7 +71,6 @@ export default function PacienteAnsiedadPage() {
                 }
               ].map((categoria, i) => (
                 <div key={i} className="bg-white rounded-lg border-2 border-[#71A5D9] overflow-hidden">
-                  {/* Imagen que ocupa todo el ancho */}
                   <div className="relative w-full h-56">
                     <Image
                       src={categoria.image}
@@ -97,14 +81,14 @@ export default function PacienteAnsiedadPage() {
                   </div>
                   <div className="p-6">
                     <h3 className="font-black text-[#1E4D8C] mb-4 text-lg text-center">{categoria.title}</h3>
-                  <div className="bg-blue-50 rounded-lg p-6">
-                    {categoria.items.map((item, i) => (
-                      <div key={i} className="flex items-start gap-3 py-2">
-                        <div className="w-1.5 h-1.5 bg-[#71A5D9] rounded-full mt-2.5 flex-shrink-0"></div>
-                        <p className="text-black text-base font-medium leading-relaxed">{item}</p>
-                      </div>
-                    ))}
-                  </div>
+                    <div className="bg-blue-50 rounded-lg p-6">
+                      {categoria.items.map((item, i) => (
+                        <div key={i} className="flex items-start gap-3 py-2">
+                          <div className="w-1.5 h-1.5 bg-[#71A5D9] rounded-full mt-2.5 flex-shrink-0"></div>
+                          <p className="text-black text-base font-medium leading-relaxed">{item}</p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -138,7 +122,6 @@ export default function PacienteAnsiedadPage() {
                 }
               ].map((area, i) => (
                 <div key={i} className="bg-white rounded-lg border-2 border-[#71A5D9] overflow-hidden">
-                  {/* Imagen que ocupa todo el ancho */}
                   <div className="relative w-full h-56">
                     <Image
                       src={area.image}
@@ -149,36 +132,36 @@ export default function PacienteAnsiedadPage() {
                   </div>
                   <div className="p-6">
                     <h3 className="font-black text-[#1E4D8C] mb-6 text-2xl text-center">{area.title}</h3>
-                  <div className="bg-blue-50 rounded-lg p-6">
-                    {area.items.map((item, i) => (
-                      <div key={i} className="flex items-start gap-3 py-2">
-                        <div className="w-1.5 h-1.5 bg-[#71A5D9] rounded-full mt-2.5 flex-shrink-0"></div>
-                        <p className="text-black text-base font-medium leading-relaxed">{item}</p>
-                      </div>
-                    ))}
-                  </div>
+                    <div className="bg-blue-50 rounded-lg p-6">
+                      {area.items.map((item, i) => (
+                        <div key={i} className="flex items-start gap-3 py-2">
+                          <div className="w-1.5 h-1.5 bg-[#71A5D9] rounded-full mt-2.5 flex-shrink-0"></div>
+                          <p className="text-black text-base font-medium leading-relaxed">{item}</p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Consejos Adicionales */}
+          {/* Consejos */}
           <div className="mb-16">
             <h2 className="text-3xl font-black text-[#1E4D8C] mb-8">Consejos adicionales para manejar la ansiedad</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[
                 { 
                   title: 'Actividades de relajación', 
-                  desc: 'Participa en actividades que disfrutes: meditación, yoga, música, deportes o tiempo en espacios verdes del campus. Tu bienestar mental es fundamental' 
+                  desc: 'Participa en actividades que disfrutes: meditación, yoga, música, deportes o tiempo en espacios verdes del campus. Tu bienestar mental es fundamental.' 
                 },
                 { 
                   title: 'Comunidad estudiantil', 
-                  desc: 'Conecta con otros estudiantes de ESPE a través de grupos de estudio, clubes y actividades extracurriculares. El apoyo de tus pares es invaluable' 
+                  desc: 'Conecta con otros estudiantes de ESPE a través de grupos de estudio, clubes y actividades extracurriculares. El apoyo de tus pares es invaluable.' 
                 },
                 { 
                   title: 'Equilibrio académico', 
-                  desc: 'Organiza tu tiempo de estudio, establece límites saludables y no dudes en buscar apoyo académico cuando lo necesites. Tu éxito va más allá de las calificaciones' 
+                  desc: 'Organiza tu tiempo de estudio, establece límites saludables y no dudes en buscar apoyo académico cuando lo necesites. Tu éxito va más allá de las calificaciones.' 
                 }
               ].map((consejo, i) => (
                 <div key={i} className="bg-white rounded-lg p-6 border-2 border-[#71A5D9]">
@@ -188,8 +171,6 @@ export default function PacienteAnsiedadPage() {
               ))}
             </div>
           </div>
-
-          {/* Footer (Volver moved to top) */}
         </div>
       </div>
     </div>

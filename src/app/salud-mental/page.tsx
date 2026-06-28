@@ -1,10 +1,7 @@
 'use client';
 
 import { Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Heart, Lightbulb, AlertCircle, TrendingUp, ArrowRight, ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
-import { navigateAndScroll } from '@/presentation/utils/scrollWithOffset';
 
 export default function SaludMentalPage() {
   return (
@@ -19,27 +16,15 @@ function SaludMentalLoading() {
 }
 
 function SaludMentalContent() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const isModal = searchParams.get('modal') === '1';
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 py-16">
       <div className="max-w-7xl mx-auto px-6">
-        {!isModal && (
-          <div className="mb-6">
-            <button
-              onClick={() => navigateAndScroll(router, '/#info', 'info', 100)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white text-[#1E4D8C] font-semibold rounded-lg shadow-sm border border-[#71A5D9] hover:bg-[#71A5D9] hover:text-white transition"
-            >
-              <ArrowLeft size={18} /> Volver a Infórmate
-            </button>
-          </div>
-        )}
-        {/* Header Centrado */}
+        {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-6xl font-black text-[#1E4D8C] mb-4">Salud Mental</h1>
-          <p className="text-lg text-slate-700 max-w-2xl mx-auto">Tu bienestar emocional es fundamental. Descubre los pilares para cuidar tu salud mental integral.</p>
+          <p className="text-lg text-slate-700 max-w-2xl mx-auto">
+            Tu bienestar emocional es fundamental. Descubre los pilares para cuidar tu salud mental.
+          </p>
         </div>
 
         {/* 5 Pilares */}
@@ -54,7 +39,6 @@ function SaludMentalContent() {
               { title: 'Estrés', image: '/images/educational/SaludMental-Estre.jpg', desc: 'Gestión consciente del estrés' }
             ].map((pilar, i) => (
               <div key={i} className="bg-white rounded-lg border-2 border-[#71A5D9] overflow-hidden">
-                {/* Imagen que ocupa todo el ancho */}
                 <div className="relative w-full h-56">
                   <Image
                     src={pilar.image}
@@ -76,9 +60,7 @@ function SaludMentalContent() {
         <div className="mb-16">
           <h2 className="text-4xl font-black text-[#1E4D8C] mb-12 text-center">Reconoce y maneja tu bienestar</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Señales */}
             <div className="bg-white rounded-lg border-2 border-[#71A5D9] overflow-hidden">
-              {/* Imagen encima del título */}
               <div className="relative w-full h-76">
                 <Image
                   src="/images/educational/Señales-Alerta.jpg"
@@ -108,9 +90,7 @@ function SaludMentalContent() {
               </div>
             </div>
 
-            {/* Estrategias */}
             <div className="bg-white rounded-lg border-2 border-[#71A5D9] overflow-hidden">
-              {/* Imagen encima del título */}
               <div className="relative w-full h-76">
                 <Image
                   src="/images/educational/Estrategias-bienestar.png"
@@ -179,7 +159,6 @@ function SaludMentalContent() {
               }
             ].map((habito, i) => (
               <div key={i} className="bg-white rounded-lg border-2 border-[#71A5D9] overflow-hidden">
-                {/* Imagen que ocupa todo el ancho */}
                 <div className="relative w-full h-56">
                   <Image
                     src={habito.image}
@@ -219,8 +198,6 @@ function SaludMentalContent() {
             ))}
           </div>
         </div>
-
-        {/* Footer (Volver moved to top) */}
       </div>
     </div>
   );
