@@ -7,7 +7,7 @@ import { PatientHeader } from '@/presentation/components/patient/PatientHeader';
 import { scrollToTop } from '@/presentation/utils/scrollWithOffset';
 import { EmotionWheelModal, type Emocion } from '@/presentation/components/patient/EmotionWheelModal';
 // 1. Agregamos ArrowLeft a lucide-react
-import { CheckCircle2, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react'; 
+import { CheckCircle2, ChevronDown, ChevronUp, ArrowLeft, Home } from 'lucide-react'; 
 // 2. Importamos Link
 import Link from 'next/link';
 
@@ -232,9 +232,9 @@ export default function TareasPage() {
           <div className="mb-6">
             <Link 
               href="/dashboard/paciente" 
-              className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-[#1E4D8C] shadow-sm transition hover:bg-blue-50 border border-blue-200 hover:shadow-md"
+              className="inline-flex w-fit items-center gap-2 rounded-xl bg-[#1d42fb] px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-[#D95536] hover:shadow-lg"
             >
-              <ArrowLeft size={18} />
+              <Home size={18} />
               Volver al Inicio
             </Link>
           </div>
