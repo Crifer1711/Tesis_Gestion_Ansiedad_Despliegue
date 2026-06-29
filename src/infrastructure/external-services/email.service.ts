@@ -1,4 +1,4 @@
-// emailservice.ts - VERSIÓN CORREGIDA CON SENDGRID
+// emailservice.ts - VERSIÓN CON MIND PEACE
 import sgMail from '@sendgrid/mail';
 
 const getBaseUrl = () =>
@@ -8,7 +8,7 @@ export const sendVerificationEmail = async (email: string, token: string) => {
   const verifyUrl = `${getBaseUrl()}/api/auth/verify-email?token=${encodeURIComponent(token)}`;
 
   const apiKey = process.env.SENDGRID_API_KEY;
-  const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'cfloachamin@espe.edu.ec';
+  const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'mindpeaceespe@gmail.com';
 
   if (!apiKey) {
     console.info('[Verification Email] SENDGRID_API_KEY not set. Verification URL:', verifyUrl);
@@ -34,7 +34,10 @@ export const sendVerificationEmail = async (email: string, token: string) => {
   try {
     const response = await sgMail.send({
       to: email,
-      from: fromEmail,
+      from: {
+        email: fromEmail,      // ← mindpeaceespe@gmail.com
+        name: 'MindPeace'      // ← Esto es lo que ve el estudiante
+      },
       subject: 'Verifica tu cuenta de MindPeace',
       html: html,
       text: `Activa tu cuenta de MindPeace: ${verifyUrl}`,
