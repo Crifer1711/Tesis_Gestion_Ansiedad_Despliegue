@@ -88,18 +88,18 @@ export function CitasComponent() {
   const [loading, setLoading] = useState(true);
   const [enviando, setEnviando] = useState(false);
   const [horasOcupadas, setHorasOcupadas] = useState<string[]>([]);
-  const [now, setNow] = useState(() => new Date());
+  const [now, setNow] = useState<Date | null>(null);
   const [activeTab, setActiveTab] = useState<'proximas' | 'historial'>('proximas');
   const [historyFilter, setHistoryFilter] = useState<'Todas' | 'Pendiente' | 'Aceptada' | 'Rechazada' | 'Cancelada'>('Todas');
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [cancelDialogId, setCancelDialogId] = useState<string | null>(null);
   const [cancelReason, setCancelReason] = useState('');
 
-  const today = getLocalDateString(now);
+  const today = now ? getLocalDateString(now) : '';
   const motivoWords = countWords(formData.motivo);
 
   const isHoraPasada = (fecha: string, hora: string) => {
-    if (!fecha || !hora) {
+    if (!fecha || !hora || !now) {
       return false;
     }
 
@@ -116,11 +116,13 @@ export function CitasComponent() {
   };
 
   const isAppointmentUpcoming = (cita: Cita) => {
+    if (!now) return false;
     const dt = getAppointmentDateTime(cita.fecha, cita.hora);
     return dt >= now && cita.estado !== 'Cancelada' && cita.estado !== 'Rechazada';
   };
 
   const isAppointmentRecentHistory = (cita: Cita) => {
+    if (!now) return false;
     const dt = getAppointmentDateTime(cita.fecha, cita.hora);
     const diffDays = (now.getTime() - dt.getTime()) / (1000 * 60 * 60 * 24);
     return diffDays >= 0 && diffDays <= 30;
@@ -140,6 +142,8 @@ export function CitasComponent() {
     .sort((a, b) => getAppointmentDateTime(b.fecha, b.hora).getTime() - getAppointmentDateTime(a.fecha, a.hora).getTime());
 
   useEffect(() => {
+    // Establece la hora inicialmente en el cliente y actualiza cada minuto
+    setNow(new Date());
     const timer = setInterval(() => setNow(new Date()), 60000);
     return () => clearInterval(timer);
   }, []);
