@@ -1,7 +1,10 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Zap, PlayCircle, Filter, X } from 'lucide-react';
+// 1. Añadimos ArrowLeft a los iconos
+import { Zap, PlayCircle, Filter, X, ArrowLeft } from 'lucide-react';
+// 2. Importamos Link de Next.js
+import Link from 'next/link'; 
 import { Activity } from '@/domain/dtos/activity.dto';
 
 type Props = {
@@ -43,6 +46,18 @@ export function TechnicasRapidasGallery({ activities }: Props) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#eef6ff] via-white to-[#dfeeff]">
       <div className="mx-auto max-w-7xl px-6 py-8 md:py-10">
+        
+        {/* 3. BOTÓN DE REGRESO AQUÍ */}
+        <div className="mb-4">
+          <Link 
+            href="dashboard/paciente" 
+            className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-[#1E4D8C] shadow-sm transition hover:bg-blue-50 border border-blue-200 hover:shadow-md"
+          >
+            <ArrowLeft size={18} />
+            Volver al Inicio
+          </Link>
+        </div>
+
         <div className="mb-8 rounded-[28px] border border-blue-200 bg-white/80 p-6 shadow-[0_10px_40px_rgba(30,77,140,0.10)] backdrop-blur">
           <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
             <div className="max-w-3xl">

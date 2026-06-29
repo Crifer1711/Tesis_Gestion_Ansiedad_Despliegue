@@ -249,50 +249,55 @@ function DashboardContent() {
             </section>
 
             {/* SECCIÓN 4: ACTIVIDADES */}
+            {/* SECCIÓN 4: ACTIVIDADES */}
             <section className={`min-w-full flex flex-col ${SECTION_HEIGHT}`}>
-            <div className="max-w-7xl mx-auto px-6 py-8 md:py-10">
-              <h2 className="text-4xl md:text-5xl font-black text-[#1E4D8C] mb-2">Actividades</h2>
-              <div className="h-1 w-32 bg-[#71A5D9] rounded-full mb-8" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="rounded-2xl border-2 border-purple-200 bg-purple-50/80 p-6 shadow-lg hover:shadow-xl transition">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="rounded-xl bg-purple-100 p-3">
-                      <ClipboardList className="h-6 w-6 text-purple-600" />
+              <div className="max-w-7xl mx-auto px-6 py-8 md:py-10">
+                <h2 className="text-4xl md:text-5xl font-black text-[#1E4D8C] mb-2">Actividades</h2>
+                <div className="h-1 w-32 bg-[#71A5D9] rounded-full mb-8" />
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* TARJETA MORADA: Siempre visible */}
+                  <div className="rounded-2xl border-2 border-purple-200 bg-purple-50/80 p-6 shadow-lg hover:shadow-xl transition">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="rounded-xl bg-purple-100 p-3">
+                        <ClipboardList className="h-6 w-6 text-purple-600" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-purple-700">Técnicas rápidas</p>
+                        <p className="text-lg font-black text-purple-800">Ejercicios para el manejo de ansiedad</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-wide text-purple-700">Técnicas rápidas</p>
-                      <p className="text-lg font-black text-purple-800">Ejercicios para el manejo de ansiedad</p>
+                    <p className="text-sm text-purple-700">Encuentra actividades para la gestión de ansiedad en momentos de tensión.</p>
+                    <div className="mt-4">
+                      <Link
+                        href="/tecnicas-rapidas"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition"
+                      >
+                        Ir a Actividades <ArrowRight className="h-4 w-4" />
+                      </Link>
                     </div>
                   </div>
-                  <p className="text-sm text-purple-700">Encuentra actividades para la gestión de ansiedad en momentos de tensión.</p>
-                  <div className="mt-4">
-                    {/* ✅ USAR Link EN VEZ DE IMPORTAR EL COMPONENTE */}
-                    <Link
-                      href="/tecnicas-rapidas"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition"
-                    >
-                      Ir a Actividades <ArrowRight className="h-4 w-4" />
-                    </Link>
-                  </div>
-                </div>
 
-                <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50/80 p-6 shadow-lg hover:shadow-xl transition">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="rounded-xl bg-emerald-100 p-3">
-                      <CalendarDays className="h-6 w-6 text-emerald-600" />
+                  {/* TARJETA VERDE: Solo visible si tiene citas (totalCount > 0) */}
+                  {totalCount > 0 && (
+                    <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50/80 p-6 shadow-lg hover:shadow-xl transition">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="rounded-xl bg-emerald-100 p-3">
+                          <CalendarDays className="h-6 w-6 text-emerald-600" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Próximamente</p>
+                          <p className="text-lg font-black text-emerald-800">Más actividades</p>
+                        </div>
+                      </div>
+                      <p className="text-sm text-emerald-700">Nuevas actividades estarán disponibles pronto para apoyar tu bienestar.</p>
                     </div>
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Próximamente</p>
-                      <p className="text-lg font-black text-emerald-800">Más actividades</p>
-                    </div>
-                  </div>
-                  <p className="text-sm text-emerald-700">Nuevas actividades estarán disponibles pronto para apoyar tu bienestar.</p>
+                  )}
+                  
                 </div>
               </div>
-            </div>
-            <div className="flex-1 min-h-4" />
-          </section>
-
+              <div className="flex-1 min-h-4" />
+            </section>
             {/* SECCIÓN 5: CITAS */}
             <section className={`min-w-full flex flex-col ${SECTION_HEIGHT}`}>
               <div className="max-w-7xl mx-auto px-6 py-8 md:py-10">
