@@ -280,17 +280,32 @@ function DashboardContent() {
 
                   {/* TARJETA VERDE: Solo visible si tiene citas (totalCount > 0) */}
                   {totalCount > 0 && (
-                    <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50/80 p-6 shadow-lg hover:shadow-xl transition">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="rounded-xl bg-emerald-100 p-3">
-                          <CalendarDays className="h-6 w-6 text-emerald-600" />
+                    <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50/80 p-6 shadow-lg hover:shadow-xl transition flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="rounded-xl bg-emerald-100 p-3">
+                            <CalendarDays className="h-6 w-6 text-emerald-600" />
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Tareas</p>
+                            <p className="text-lg font-black text-emerald-800">Mis tareas</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Próximamente</p>
-                          <p className="text-lg font-black text-emerald-800">Más actividades</p>
-                        </div>
+                        <p className="text-sm text-emerald-700 mb-5">
+                          Aquí encontrarás los ejercicios y actividades que tu psicóloga ha preparado para ti. Recuerda completarlos siguiendo las indicaciones de tu sesión.
+                        </p>
                       </div>
-                      <p className="text-sm text-emerald-700">Nuevas actividades estarán disponibles pronto para apoyar tu bienestar.</p>
+                      
+                      {/* NUEVO BOTÓN PARA MIS TAREAS */}
+                      <div>
+                        <Link 
+                          href="/paciente/tareas" 
+                          className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700 hover:shadow-md"
+                        >
+                          Ir a Mis Tareas
+                          <ArrowRight size={18} />
+                        </Link>
+                      </div>
                     </div>
                   )}
                   

@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Calendar, Clock, User, Send, Lock, Video, Link2, XCircle } from 'lucide-react';
+import { Calendar, Clock, User, Send, Lock, Video, Link2, XCircle, Home } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useSession } from 'next-auth/react';
-
+import Link from 'next/link';
+// Asegúrate de agregar 'Home' a tu lista de íconos de lucide-react
 interface Cita {
   id: string;
   fecha: string;
@@ -372,6 +373,16 @@ export function CitasComponent() {
     <div className="min-h-screen bg-[radial-gradient(circle_at_15%_20%,#dff1ff_0%,#eef6ff_35%,#f8fbff_70%)] px-4 py-6 md:px-8 md:py-10">
       <div className="mx-auto max-w-[1450px] space-y-7">
         <section className="rounded-3xl border border-[#c7ddf8] bg-white/85 p-6 shadow-[0_20px_45px_rgba(29,78,140,0.12)] backdrop-blur md:p-8">
+          {/* NUEVO BOTÓN: Volver al inicio */}
+          <div className="mb-6">
+            <Link 
+              href="/dashboard/paciente" 
+              className="inline-flex w-fit items-center gap-2 rounded-xl bg-[#1d42fb] px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-[#D95536] hover:shadow-lg"
+            >
+              <Home size={18} />
+              Volver al Inicio
+            </Link>
+          </div>
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.22em] text-[#4c82bf]">Agenda Clínica</p>
