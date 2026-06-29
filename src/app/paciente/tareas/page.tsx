@@ -21,6 +21,7 @@ export default function TareasPage() {
   const [selectedAsignacion, setSelectedAsignacion] = useState<any | null>(null);
   const [currentIntentoId, setCurrentIntentoId] = useState<string | null>(null);
   const [showCompleted, setShowCompleted] = useState(false);
+  const [startTime, setStartTime] = useState<number | null>(null);
 
   // Estado para la rueda de emociones post-actividad
   const [showEmotionWheel, setShowEmotionWheel] = useState(false);
@@ -66,7 +67,11 @@ export default function TareasPage() {
         const pathPartsStr = (selectedAsignacion?.embed_url || '').split('/');
         const fallbackSlug = pathPartsStr[pathPartsStr.length - 1] || 'actividad';
 
-        // Normalize fields (accept both snake_case, camelCase or alternate names, with robust fallbacks)
+        let duracionCalculada = null;
+        if (type === 'BIENESTAR_ACTIVIDAD_COMPLETADA' && startTime) {
+          duracionCalculada = Math.floor((Date.now() - startTime) / 1000);
+        }
+
         const normalizedData = {
           type,
           intento_id: data.intento_id ?? data.intentoId ?? currentIntentoId,
@@ -75,7 +80,7 @@ export default function TareasPage() {
           asignacion_id: data.asignacion_id ?? data.asignacionId ?? selectedAsignacion?.id,
           entrada_estudiante: data.entrada_estudiante ?? data.entradaEstudiante ?? (data.entrada ? JSON.stringify(data.entrada) : undefined),
           respuesta_ia: data.respuesta_ia ?? data.respuestaIa ?? data.respuesta ?? data.iaResponse ?? data.ia_response ?? null,
-          duracion_segundos: data.duracion_segundos ?? data.duracionSegundos ?? data.duracion ?? null,
+          duracion_segundos: data.duracion_segundos ?? data.duracionSegundos ?? data.duracion ?? duracionCalculada,
           resumen: data.resumen ?? null,
           completed_at: data.completed_at ?? data.completedAt ?? data.timestamp ?? new Date().toISOString()
         };
@@ -133,7 +138,7 @@ export default function TareasPage() {
     return () => {
       window.removeEventListener('message', handleMessage);
     };
-  }, [loadAsign, currentIntentoId, selectedAsignacion, session]);
+  }, [loadAsign, currentIntentoId, selectedAsignacion, session, startTime]);
 
   if (!mounted || status === 'loading' || !session) {
     return null;
@@ -146,11 +151,13 @@ export default function TareasPage() {
       : Math.random().toString(36).substring(2) + Date.now().toString(36);
     setCurrentIntentoId(newIntentoId);
     setSelectedAsignacion(asignacion);
+    setStartTime(Date.now());
   };
 
   const handleCloseAsignacion = () => {
     setSelectedAsignacion(null);
     setCurrentIntentoId(null);
+    setStartTime(null);
   };
 
   const handleEmotionConfirm = async (emocion: Emocion) => {
@@ -192,10 +199,11 @@ export default function TareasPage() {
         urlObj.searchParams.set('intento_id', currentIntentoId);
         urlObj.searchParams.set('intentoId', currentIntentoId);
       }
-      if (session?.user?.id) {
-        urlObj.searchParams.set('estudiante_id', String(session.user.id));
-        urlObj.searchParams.set('estudianteId', String(session.user.id));
-      }
+      // No enviamos la información del usuario por petición
+      // if (session?.user?.id) {
+      //   urlObj.searchParams.set('estudiante_id', String(session.user.id));
+      //   urlObj.searchParams.set('estudianteId', String(session.user.id));
+      // }
       if (selectedAsignacion.id) {
         urlObj.searchParams.set('asignacion_id', selectedAsignacion.id);
         urlObj.searchParams.set('asignacionId', selectedAsignacion.id);
@@ -206,6 +214,13 @@ export default function TareasPage() {
       urlObj.searchParams.set('actividad_slug', slug);
       urlObj.searchParams.set('actividadSlug', slug);
       urlObj.searchParams.set('actividad', slug);
+      
+      // Pasar el rol para que las actividades sepan si deben mostrar consentimiento o no
+      if (session?.user?.role) {
+        urlObj.searchParams.set('role', session.user.role);
+      } else {
+        urlObj.searchParams.set('role', 'PACIENTE');
+      }
 
       return urlObj.toString();
     } catch (e) {

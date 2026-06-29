@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 // 1. Añadimos ArrowLeft a los iconos
 import { Zap, PlayCircle, Filter, X, ArrowLeft, Home } from 'lucide-react';
 // 2. Importamos Link de Next.js
-import Link from 'next/link'; 
+import Link from 'next/link';
 import { Activity } from '@/domain/dtos/activity.dto';
 
 type Props = {
@@ -46,17 +46,17 @@ export function TechnicasRapidasGallery({ activities }: Props) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#eef6ff] via-white to-[#dfeeff]">
       <div className="mx-auto max-w-7xl px-6 py-8 md:py-10">
-        
+
         {/* 3. BOTÓN DE REGRESO AQUÍ */}
         <div className="mb-6">
-            <Link 
-              href="/dashboard/paciente" 
-              className="inline-flex w-fit items-center gap-2 rounded-xl bg-[#1d42fb] px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-[#D95536] hover:shadow-lg"
-            >
-              <Home size={18} />
-              Volver al Inicio
-            </Link>
-          </div>
+          <Link
+            href="/dashboard/paciente"
+            className="inline-flex w-fit items-center gap-2 rounded-xl bg-[#1d42fb] px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-[#D95536] hover:shadow-lg"
+          >
+            <Home size={18} />
+            Volver al Inicio
+          </Link>
+        </div>
 
         <div className="mb-8 rounded-[28px] border border-blue-200 bg-white/80 p-6 shadow-[0_10px_40px_rgba(30,77,140,0.10)] backdrop-blur">
           <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
@@ -67,7 +67,7 @@ export function TechnicasRapidasGallery({ activities }: Props) {
               <h1 className="text-4xl md:text-5xl font-black text-[#1E4D8C] leading-tight">Apoyos inmediatos para recuperar el control</h1>
               <p className="mt-3 text-base md:text-lg text-slate-700 leading-relaxed">
                 Aquí encuentras actividades del sistema pensadas para practicar en momentos de ansiedad o tensión.
-                Explora una técnica, ábrela y úsala cuando necesites un apoyo rápido para estabilizarte.
+                Explora una técnica, ábrela y úsala cuando necesites un apoyo rápido.
               </p>
             </div>
           </div>
@@ -144,7 +144,9 @@ export function TechnicasRapidasGallery({ activities }: Props) {
                 <div className="rounded-3xl border border-blue-100 bg-white p-4 shadow-sm">
                   {selected.embed_url ? (
                     <iframe
-                      src={selected.embed_url}
+                      src={
+                        selected.embed_url + (selected.embed_url.includes('?') ? '&' : '?') + 'role=PACIENTE'
+                      }
                       title={selected.nombre}
                       className="h-[74vh] w-full rounded-2xl border-0"
                       allow="geolocation; microphone; camera; midi; encrypted-media; xr-spatial-tracking"

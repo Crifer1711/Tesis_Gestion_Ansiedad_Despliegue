@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface GuideCardProps {
@@ -7,10 +8,11 @@ interface GuideCardProps {
   image: string;
   url: string;
   resourceType?: string;
+  onClick: (url: string, title: string) => void;
 }
-function GuideCard({ title, image, url, resourceType }: GuideCardProps) {
+function GuideCard({ title, image, url, resourceType, onClick }: GuideCardProps) {
   const handleClick = () => {
-    window.open(url, '_blank');
+    onClick(url, title);
   };
 
   return (
@@ -100,6 +102,20 @@ const PERSONAL_GUIDES = [
 ];
 
 export function Biblioteca({ onHomeClick }: { onHomeClick: () => void }) {
+  const [selectedPdf, setSelectedPdf] = useState<{ url: string, title: string } | null>(null);
+  const [isPdfLoading, setIsPdfLoading] = useState(false);
+
+  const handleOpenPdf = (url: string, title: string) => {
+    setIsPdfLoading(true);
+    // Usamos el visor de Google Docs para evitar bloqueos por X-Frame-Options de sitios externos
+    const viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`;
+    setSelectedPdf({ url: viewerUrl, title });
+  };
+
+  const handleClosePdf = () => {
+    setSelectedPdf(null);
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-6 pt-6">
       <div className="text-center mb-12">
@@ -111,7 +127,7 @@ export function Biblioteca({ onHomeClick }: { onHomeClick: () => void }) {
         <h2 className="text-3xl font-black text-[#1E4D8C] mb-8">Área académica</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {ACADEMIC_GUIDES.map((guide, index) => (
-            <GuideCard key={index} {...guide} />
+            <GuideCard key={index} {...guide} onClick={handleOpenPdf} />
           ))}
         </div>
       </section>
@@ -120,7 +136,7 @@ export function Biblioteca({ onHomeClick }: { onHomeClick: () => void }) {
         <h2 className="text-3xl font-black text-[#1E4D8C] mb-8">Área social</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {SOCIAL_GUIDES.map((guide, index) => (
-            <GuideCard key={index} {...guide} />
+            <GuideCard key={index} {...guide} onClick={handleOpenPdf} />
           ))}
         </div>
       </section>
@@ -129,10 +145,43 @@ export function Biblioteca({ onHomeClick }: { onHomeClick: () => void }) {
         <h2 className="text-3xl font-black text-[#1E4D8C] mb-8">Área personal</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {PERSONAL_GUIDES.map((guide, index) => (
-            <GuideCard key={index} {...guide} />
+            <GuideCard key={index} {...guide} onClick={handleOpenPdf} />
           ))}
         </div>
       </section>
+
+      {/* Modal to open PDF */}
+      {selectedPdf && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50 p-2 md:p-6">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-[98vw] md:max-w-[90vw] lg:max-w-6xl h-[95vh] md:h-[90vh] overflow-hidden flex flex-col border border-[#71A5D9]">
+            <div className="bg-[#D1E7FF] text-gray-800 px-6 py-4 flex items-center justify-between border-b border-[#71A5D9] flex-shrink-0">
+              <h3 className="font-black text-xl text-[#1E4D8C] truncate pr-4">{selectedPdf.title}</h3>
+              <button 
+                onClick={handleClosePdf} 
+                className="text-[#1E4D8C] bg-white/50 hover:bg-white p-2 rounded-full font-bold transition flex items-center justify-center w-9 h-9 flex-shrink-0 shadow-sm"
+                aria-label="Cerrar modal"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="flex-1 w-full relative bg-slate-100">
+              {isPdfLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-slate-50 z-10">
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="w-10 h-10 border-4 border-[#1E4D8C] border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-[#1E4D8C] font-bold">Cargando documento...</p>
+                  </div>
+                </div>
+              )}
+              <iframe 
+                src={selectedPdf.url} 
+                className="absolute inset-0 w-full h-full border-0" 
+                onLoad={() => setIsPdfLoading(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

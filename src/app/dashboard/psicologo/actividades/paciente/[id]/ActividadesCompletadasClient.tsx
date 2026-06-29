@@ -195,7 +195,7 @@ export function ActividadesCompletadasClient({ actividades }: Props) {
               </button>
             </div>
 
-            <div className="p-6 space-y-5">
+            <div className="p-6 space-y-5 text-gray-800">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="font-bold text-gray-600">Completado:</span>{" "}
