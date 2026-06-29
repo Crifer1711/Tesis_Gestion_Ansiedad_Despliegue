@@ -4,9 +4,12 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useCallback } from 'react';
 import { PatientHeader } from '@/presentation/components/patient/PatientHeader';
-import { CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
 import { scrollToTop } from '@/presentation/utils/scrollWithOffset';
 import { EmotionWheelModal, type Emocion } from '@/presentation/components/patient/EmotionWheelModal';
+// 1. Agregamos ArrowLeft a lucide-react
+import { CheckCircle2, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react'; 
+// 2. Importamos Link
+import Link from 'next/link';
 
 export default function TareasPage() {
   const [activeSection, setActiveSection] = useState('tareas');
@@ -224,6 +227,18 @@ export default function TareasPage() {
       />
       <div className="pt-28 pb-16">
         <div className="max-w-7xl mx-auto px-6">
+          
+          {/* BOTÓN DE REGRESO AQUÍ */}
+          <div className="mb-6">
+            <Link 
+              href="/dashboard/paciente" 
+              className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-[#1E4D8C] shadow-sm transition hover:bg-blue-50 border border-blue-200 hover:shadow-md"
+            >
+              <ArrowLeft size={18} />
+              Volver al Inicio
+            </Link>
+          </div>
+
           <h1 className="text-4xl font-black text-[#1E4D8C] mb-4">Mis Tareas</h1>
           <p className="text-slate-700 leading-relaxed mb-6">
             Aquí se muestran las actividades, ejercicios o tareas que tu psicólogo te haya asignado para acompañar tu proceso. Podrás abrir cada actividad, revisar sus instrucciones, ver su estado y la fecha límite, y completar el contenido desde esta misma pantalla. Si tu psicólogo aún no te ha asignado tareas, verás el aviso de que no tienes asignaciones disponibles.
