@@ -7,7 +7,7 @@ import db from '@/infrastructure/database/db';
 const MAX_MOTIVO_WORDS = 200;
 const APPOINTMENT_TIME_ZONE = 'America/Lima';
 const MIN_APPOINTMENT_HOUR = 7;
-const MAX_APPOINTMENT_HOUR = 22;
+const MAX_APPOINTMENT_HOUR = 18;
 
 const countWords = (text: string) => {
   const trimmed = text.trim();

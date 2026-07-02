@@ -25,8 +25,8 @@ interface Psicologo {
   email: string;
 }
 
-// Generar horarios de 07:00 a 22:00 (hora por hora)
-const HORAS = Array.from({ length: 16 }, (_, i) => {
+// Generar horarios de 07:00 a 18:00 (hora por hora)
+const HORAS = Array.from({ length: 12 }, (_, i) => {
   const hour = 7 + i;
   return `${String(hour).padStart(2, '0')}:00`;
 });
