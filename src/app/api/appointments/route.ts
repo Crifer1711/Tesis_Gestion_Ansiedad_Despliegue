@@ -5,6 +5,9 @@ import { authOptions } from '@/infrastructure/auth/auth.options';
 import db from '@/infrastructure/database/db';
 
 const MAX_MOTIVO_WORDS = 200;
+const APPOINTMENT_TIME_ZONE = 'America/Lima';
+const MIN_APPOINTMENT_HOUR = 7;
+const MAX_APPOINTMENT_HOUR = 22;
 
 const countWords = (text: string) => {
   const trimmed = text.trim();
@@ -15,18 +18,58 @@ const countWords = (text: string) => {
   return trimmed.split(/\s+/).filter(Boolean).length;
 };
 
-const getLocalDateString = (date: Date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+const getDateTimePartsInTimeZone = (date: Date, timeZone: string) => {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  });
+
+  const parts = formatter.formatToParts(date);
+  const getPart = (type: Intl.DateTimeFormatPartTypes) =>
+    Number(parts.find((part) => part.type === type)?.value || 0);
+
+  return {
+    year: getPart('year'),
+    month: getPart('month'),
+    day: getPart('day'),
+    hour: getPart('hour'),
+    minute: getPart('minute'),
+    second: getPart('second'),
+  };
+};
+
+const getLocalDateString = (date: Date, timeZone: string) => {
+  const { year, month, day } = getDateTimePartsInTimeZone(date, timeZone);
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 };
 
 const isPastAppointment = (fecha: string, hora: string) => {
   const [year, month, day] = fecha.split('-').map(Number);
-  const [hour] = hora.split(':').map(Number);
-  const slot = new Date(year, month - 1, day, hour, 0, 0, 0);
-  return slot < new Date();
+  const [hour, minute] = hora.split(':').map(Number);
+  const now = getDateTimePartsInTimeZone(new Date(), APPOINTMENT_TIME_ZONE);
+
+  const slotStamp = Date.UTC(year, month - 1, day, hour, minute || 0, 0, 0);
+  const nowStamp = Date.UTC(now.year, now.month - 1, now.day, now.hour, now.minute, now.second, 0);
+  return slotStamp < nowStamp;
+};
+
+const isAllowedAppointmentHour = (hora: string) => {
+  const [hour, minute] = hora.split(':').map(Number);
+  if (Number.isNaN(hour) || Number.isNaN(minute)) {
+    return false;
+  }
+
+  if (minute !== 0) {
+    return false;
+  }
+
+  return hour >= MIN_APPOINTMENT_HOUR && hour <= MAX_APPOINTMENT_HOUR;
 };
 
 const getAppointmentColumnFlags = async () => {
@@ -225,12 +268,19 @@ export async function POST(request: Request) {
     const { psychologistId, fecha, hora, modalidad, motivo, requestLink } = await request.json();
     const motivoNormalizado = typeof motivo === 'string' ? motivo.trim() : '';
     const motivoWords = countWords(motivoNormalizado);
-    const hoy = getLocalDateString(new Date());
+    const hoy = getLocalDateString(new Date(), APPOINTMENT_TIME_ZONE);
     const { hasRequestLink } = await getAppointmentColumnFlags();
 
     if (!psychologistId || !fecha || !hora || !modalidad) {
       return NextResponse.json(
         { error: 'Faltan campos requeridos: psicólogo, fecha, hora, modalidad' },
+        { status: 400 }
+      );
+    }
+
+    if (!isAllowedAppointmentHour(hora)) {
+      return NextResponse.json(
+        { error: `La hora debe estar entre ${String(MIN_APPOINTMENT_HOUR).padStart(2, '0')}:00 y ${String(MAX_APPOINTMENT_HOUR).padStart(2, '0')}:00` },
         { status: 400 }
       );
     }
