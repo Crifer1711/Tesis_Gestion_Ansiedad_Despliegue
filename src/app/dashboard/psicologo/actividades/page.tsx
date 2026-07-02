@@ -7,6 +7,9 @@ import { getPatientsForPsychologistAction } from '@/infrastructure/actions/psico
 import PsychologistActivitiesClient from '@/presentation/components/psychologist/PsychologistActivitiesClient';
 import { PatientListItemDTO } from '@/domain/dtos/patient-management.dto';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function PsychologistActividadesPage() {
   const session = await getServerSession(authOptions);
   const repo = new ActivityRepository();

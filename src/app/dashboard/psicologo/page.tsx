@@ -4,6 +4,9 @@ import { getServerSession } from "next-auth"; // Importamos para leer la sesión
 import { authOptions } from "@/infrastructure/auth/auth.options";
 import { redirect } from "next/navigation";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function PsychologistPage() {
   // 1. Obtenemos la sesión del servidor
   const session = await getServerSession(authOptions);

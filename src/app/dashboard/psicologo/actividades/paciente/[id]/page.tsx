@@ -1,14 +1,17 @@
 import pool from "@/infrastructure/database/db";
 import { ActividadesCompletadasClient } from "./ActividadesCompletadasClient";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export interface CompletedActivityRow {
   paciente: string;
   actividad: string;
   completed_at: string;
   duracion_segundos: number;
-  resumen: any;
+  resumen: unknown;
   entrada_estudiante: string;
-  respuesta_ia: any;
+  respuesta_ia: unknown;
 }
 
 export default async function PacienteActividadesCompletadasPage({

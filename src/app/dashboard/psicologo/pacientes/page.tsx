@@ -5,6 +5,9 @@ import { getServerSession } from "next-auth"; // [CAMBIO] Importar sesión
 import { authOptions } from "@/infrastructure/auth/auth.options"; // [CAMBIO] Opciones de auth
 import { redirect } from "next/navigation";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function PacientesPsicologoPage() {
   // 1. Obtener la sesión del servidor para identificar al psicólogo
   const session = await getServerSession(authOptions);
