@@ -1,5 +1,6 @@
 @import url('https://fonts.cdnfonts.com/css/opendyslexic');
 @import "tailwindcss";
+@import "../presentation/styles/accessibility.css";
 
 
 :root {
@@ -41,36 +42,6 @@ body {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
-}
-
-/* =========================================
-   SISTEMA DE ACCESIBILIDAD 
-========================================= */
-
-/* 1. TIPOGRAFÍAS */
-html.font-family-dyslexic,
-html.font-family-dyslexic body,
-html.font-family-dyslexic button,
-html.font-family-dyslexic input,
-html.font-family-dyslexic select,
-html.font-family-dyslexic textarea {
-  font-family: 'OpenDyslexic', sans-serif !important;
-}
-
-html.font-family-dyslexic * {
-  font-family: 'OpenDyslexic', sans-serif !important;
-}
-
-html.font-family-serif,
-html.font-family-serif body,
-html.font-family-serif button,
-html.font-family-serif input,
-html.font-family-serif select,
-html.font-family-serif textarea {
-  font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif !important;
-}
-
-html.font-family-serif * {
 }
 
 html.theme-dark .psychologist-dashboard-page .bg-white\/80,

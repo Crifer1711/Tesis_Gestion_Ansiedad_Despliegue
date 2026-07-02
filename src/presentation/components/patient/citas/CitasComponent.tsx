@@ -1,81 +1,21 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Calendar, Clock, User, Send, Lock, Video, Link2, XCircle, Home, ChevronDown, CalendarDays } from 'lucide-react';
+import { Home } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-// Asegúrate de agregar 'Home' a tu lista de íconos de lucide-react
-interface Cita {
-  id: string;
-  fecha: string;
-  hora: string;
-  psicologo: string;
-  modalidad: 'Presencial' | 'Virtual';
-  motivo: string;
-  estado: 'Pendiente' | 'Aceptada' | 'Rechazada' | 'Cancelada';
-  requestLink?: boolean;
-  meetingLink?: string | null;
-  cancelReason?: string | null;
-}
+import { AppointmentBookingForm } from './AppointmentBookingForm';
+import { AppointmentListPanel } from './AppointmentListPanel';
+import { CancelAppointmentDialog } from './CancelAppointmentDialog';
+import type { AppointmentApiItem, AppointmentFormData, AppointmentTab, Cita, HistoryFilter, Psicologo } from './types';
+import { countWords, getAppointmentDateTime, getLocalDateString, MAX_MOTIVO_WORDS, normalizeAppointmentStatus } from './utils';
 
-interface Psicologo {
-  id: string;
-  name: string;
-  email: string;
-}
-
-// Generar horarios de 07:00 a 18:00 (hora por hora)
-const HORAS = Array.from({ length: 12 }, (_, i) => {
-  const hour = 7 + i;
-  return `${String(hour).padStart(2, '0')}:00`;
-});
-
-const MAX_MOTIVO_WORDS = 200;
-
-const getLocalDateString = (date: Date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
-
-const countWords = (text: string) => {
-  const trimmed = text.trim();
-  if (!trimmed) {
-    return 0;
-  }
-
-  return trimmed.split(/\s+/).filter(Boolean).length;
-};
-
-// Función para parsear fecha sin timezone issues
-const parseDate = (dateStr: string) => {
-  const [year, month, day] = dateStr.split('-').map(Number);
-  return new Date(year, month - 1, day);
-};
-
-const normalizeAppointmentStatus = (status: string | null | undefined): Cita['estado'] => {
-  const value = (status || '').trim().toLowerCase();
-
-  if (value === 'aceptada') {
-    return 'Aceptada';
-  }
-
-  if (value === 'cancelada') {
-    return 'Cancelada';
-  }
-
-  if (value === 'rechazada') {
-    return 'Rechazada';
-  }
-
-  return 'Pendiente';
-};
+const APPOINTMENTS_POLL_INTERVAL_MS = 30000;
 
 export function CitasComponent() {
   const { data: session } = useSession();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<AppointmentFormData>({
     psicologo: '',
     fecha: '',
     hora: '',
@@ -89,8 +29,8 @@ export function CitasComponent() {
   const [enviando, setEnviando] = useState(false);
   const [horasOcupadas, setHorasOcupadas] = useState<string[]>([]);
   const [now, setNow] = useState<Date | null>(null);
-  const [activeTab, setActiveTab] = useState<'proximas' | 'historial'>('proximas');
-  const [historyFilter, setHistoryFilter] = useState<'Todas' | 'Pendiente' | 'Aceptada' | 'Rechazada' | 'Cancelada'>('Todas');
+  const [activeTab, setActiveTab] = useState<AppointmentTab>('proximas');
+  const [historyFilter, setHistoryFilter] = useState<HistoryFilter>('Todas');
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [cancelDialogId, setCancelDialogId] = useState<string | null>(null);
   const [cancelReason, setCancelReason] = useState('');
@@ -126,23 +66,10 @@ export function CitasComponent() {
     return slot < now;
   };
 
-  const getAppointmentDateTime = (fecha: string, hora: string) => {
-    const [year, month, day] = fecha.split('-').map(Number);
-    const [hour, minute] = hora.split(':').map(Number);
-    return new Date(year, month - 1, day, hour || 0, minute || 0, 0, 0);
-  };
-
   const isAppointmentUpcoming = (cita: Cita) => {
     if (!now) return false;
     const dt = getAppointmentDateTime(cita.fecha, cita.hora);
     return dt >= now && cita.estado !== 'Cancelada' && cita.estado !== 'Rechazada';
-  };
-
-  const isAppointmentRecentHistory = (cita: Cita) => {
-    if (!now) return false;
-    const dt = getAppointmentDateTime(cita.fecha, cita.hora);
-    const diffDays = (now.getTime() - dt.getTime()) / (1000 * 60 * 60 * 24);
-    return diffDays >= 0 && diffDays <= 30;
   };
 
   const horaSeleccionadaInvalida =
@@ -180,7 +107,6 @@ export function CitasComponent() {
       try {
         const res = await fetch('/api/auth/psychologists');
         const data = await res.json();
-        console.log('Psicólogos cargados:', data);
         setPsicologos(Array.isArray(data) ? data : (data.data || []));
       } catch (error) {
         console.error('Error fetching psychologists:', error);
@@ -199,7 +125,7 @@ export function CitasComponent() {
       const res = await fetch(`/api/appointments?patientId=${session.user.id}`, { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
-        const citasFormateadas: Cita[] = data.map((apt: any) => ({
+        const citasFormateadas: Cita[] = (data as AppointmentApiItem[]).map((apt) => ({
           id: apt.id,
           fecha: apt.fecha,
           hora: apt.hora,
@@ -222,9 +148,19 @@ export function CitasComponent() {
   useEffect(() => {
     fetchCitasDelPaciente();
 
-    // Re-fetch cada 5 segundos para detectar cambios (cuando psicólogo acepta o se cancela)
-    const interval = setInterval(fetchCitasDelPaciente, 5000);
-    return () => clearInterval(interval);
+    const pollAppointments = () => {
+      if (document.visibilityState === 'visible') {
+        fetchCitasDelPaciente();
+      }
+    };
+
+    const interval = setInterval(pollAppointments, APPOINTMENTS_POLL_INTERVAL_MS);
+    document.addEventListener('visibilitychange', pollAppointments);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', pollAppointments);
+    };
   }, [fetchCitasDelPaciente]);
 
   // Cargar horas ocupadas cuando cambia psicólogo o fecha
@@ -242,11 +178,10 @@ export function CitasComponent() {
         const data = await res.json();
         
         // Extraer horas de las citas que NO están canceladas (Pendiente, Aceptada, etc)
-        const citas = Array.isArray(data) ? data : [];
+        const citas = Array.isArray(data) ? (data as AppointmentApiItem[]) : [];
         const horas = citas
-          .filter((cita: any) => cita.status !== 'Cancelada' && cita.status !== 'Rechazada')
-          .map((cita: any) => cita.hora);
-        console.log('Horas ocupadas para', formData.fecha, ':', horas);
+          .filter((cita) => cita.status !== 'Cancelada' && cita.status !== 'Rechazada')
+          .map((cita) => cita.hora);
         setHorasOcupadas(horas);
       } catch (error) {
         console.error('Error fetching occupied hours:', error);
@@ -325,7 +260,7 @@ export function CitasComponent() {
           fecha: formData.fecha,
           hora: formData.hora,
           psicologo: psicologos.find(p => p.id === formData.psicologo)?.name || 'Psicólogo',
-          modalidad: formData.modalidad as 'Presencial' | 'Virtual',
+          modalidad: formData.modalidad,
           motivo: formData.motivo || 'Sin especificar',
           estado: 'Pendiente',
         };
@@ -396,21 +331,6 @@ export function CitasComponent() {
     await handleCancelAppointment(appointmentId, cancelReason.trim());
   };
 
-  const getEstadoColor = (estado: string) => {
-    switch (estado) {
-      case 'Aceptada':
-        return 'bg-green-100 text-green-700 border-green-300';
-      case 'Pendiente':
-        return 'bg-yellow-100 text-yellow-700 border-yellow-300';
-      case 'Cancelada':
-        return 'bg-red-100 text-red-700 border-red-300';
-      case 'Rechazada':
-        return 'bg-rose-100 text-rose-700 border-rose-300';
-      default:
-        return 'bg-gray-100 text-gray-700 border-gray-300';
-    }
-  };
-
   return (
     <>
     <div className="citas-page-shell min-h-screen bg-[radial-gradient(circle_at_15%_20%,#dff1ff_0%,#eef6ff_35%,#f8fbff_70%)] px-4 py-6 md:px-8 md:py-10">
@@ -458,455 +378,52 @@ export function CitasComponent() {
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start">
           <section className="xl:col-span-7">
-            <div className="overflow-hidden rounded-3xl border border-[#c7ddf8] bg-white shadow-[0_18px_35px_rgba(21,74,130,0.12)]">
-              <div className="bg-gradient-to-r from-[#2f6ca9] via-[#4e8ecf] to-[#79b0e3] px-6 py-5 text-white md:px-8">
-                <h2 className="text-2xl font-black">Solicitar nueva cita</h2>
-                <p className="mt-1 text-sm text-white/90">Completa el formulario y confirma una hora disponible.</p>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-6 p-6 md:p-8">
-                <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                  <div className="md:col-span-2">
-                    <label className="mb-2 block text-sm font-bold text-[#1E4D8C]">
-                      <User size={16} className="mr-1 inline" />
-                      Psicólogo
-                    </label>
-                    <div ref={psychologistSelectRef} className="relative">
-                      <button
-                        type="button"
-                        onClick={() => setIsPsychologistMenuOpen((prev) => !prev)}
-                        className="citas-field citas-select-trigger flex w-full items-center justify-between rounded-xl border border-blue-100 bg-slate-50 px-4 py-3 text-left text-sm font-medium text-slate-700 outline-none transition focus:border-[#71A5D9] focus:bg-white"
-                        aria-haspopup="listbox"
-                        aria-expanded={isPsychologistMenuOpen}
-                        aria-label="Seleccionar psicólogo"
-                      >
-                        <span>{selectedPsychologistName || (loading ? 'Cargando psicólogos...' : psicologos.length === 0 ? 'No hay psicólogos disponibles' : 'Selecciona un psicólogo')}</span>
-                        <ChevronDown size={16} className={`transition-transform ${isPsychologistMenuOpen ? 'rotate-180' : ''}`} />
-                      </button>
-
-                      {isPsychologistMenuOpen && (
-                        <ul
-                          role="listbox"
-                          className="citas-select-menu absolute z-30 mt-2 max-h-56 w-full overflow-auto rounded-xl border border-blue-100 bg-white p-1 shadow-xl"
-                        >
-                          {psicologos.length === 0 ? (
-                            <li className="citas-select-option px-3 py-2 text-sm">No hay psicólogos disponibles</li>
-                          ) : (
-                            psicologos.map((p) => (
-                              <li key={p.id}>
-                                <button
-                                  type="button"
-                                  role="option"
-                                  aria-selected={formData.psicologo === p.id}
-                                  onClick={() => {
-                                    setFormData({ ...formData, psicologo: p.id });
-                                    setIsPsychologistMenuOpen(false);
-                                  }}
-                                  className={`citas-select-option w-full rounded-lg px-3 py-2 text-left text-sm font-semibold transition ${formData.psicologo === p.id ? 'citas-select-option--selected bg-blue-50 text-[#1E4D8C]' : 'text-slate-700 hover:bg-slate-100'}`}
-                                >
-                                  {p.name}
-                                </button>
-                              </li>
-                            ))
-                          )}
-                        </ul>
-                      )}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="mb-2 block text-sm font-bold text-[#1E4D8C]">
-                      <Calendar size={16} className="mr-1 inline" />
-                      Fecha
-                    </label>
-                    <div className="citas-date-wrapper relative">
-                      <input
-                        ref={dateInputRef}
-                        type="date"
-                        value={formData.fecha}
-                        onChange={(e) => setFormData({ ...formData, fecha: e.target.value })}
-                        min={today}
-                        className="citas-field citas-date-field w-full rounded-xl border border-blue-100 bg-slate-50 px-4 py-3 pr-11 text-sm font-medium text-slate-700 outline-none transition focus:border-[#71A5D9] focus:bg-white"
-                      />
-                      <button
-                        type="button"
-                        onClick={openDatePicker}
-                        aria-label="Abrir calendario"
-                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1.5 transition hover:bg-black/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#71A5D9]"
-                      >
-                        <CalendarDays size={16} className="citas-date-icon text-[#1E4D8C]" />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="mb-2 block text-sm font-bold text-[#1E4D8C]">Modalidad</label>
-                    <div className="grid grid-cols-2 gap-3">
-                      <label className={`citas-modalidad-option ${formData.modalidad === 'Presencial' ? 'citas-modalidad-option--selected' : ''} flex cursor-pointer items-center justify-center rounded-xl border-2 p-3 text-sm font-semibold transition ${
-                        formData.modalidad === 'Presencial' ? 'text-[#0f3f74]' : 'text-slate-700'
-                      }`}
-                        style={{ borderColor: formData.modalidad === 'Presencial' ? '#71A5D9' : '#d8e8f9', background: formData.modalidad === 'Presencial' ? '#ebf4ff' : '#f8fbff' }}>
-                        <input
-                          type="radio"
-                          value="Presencial"
-                          checked={formData.modalidad === 'Presencial'}
-                          onChange={(e) => setFormData({ ...formData, modalidad: e.target.value })}
-                          className="mr-2 h-4 w-4 accent-[#1E4D8C]"
-                        />
-                        Presencial
-                      </label>
-                      <label className={`citas-modalidad-option ${formData.modalidad === 'Virtual' ? 'citas-modalidad-option--selected' : ''} flex cursor-pointer items-center justify-center rounded-xl border-2 p-3 text-sm font-semibold transition ${
-                        formData.modalidad === 'Virtual' ? 'text-[#0f3f74]' : 'text-slate-700'
-                      }`}
-                        style={{ borderColor: formData.modalidad === 'Virtual' ? '#71A5D9' : '#d8e8f9', background: formData.modalidad === 'Virtual' ? '#ebf4ff' : '#f8fbff' }}>
-                        <input
-                          type="radio"
-                          value="Virtual"
-                          checked={formData.modalidad === 'Virtual'}
-                          onChange={(e) => setFormData({ ...formData, modalidad: e.target.value })}
-                          className="mr-2 h-4 w-4 accent-[#1E4D8C]"
-                        />
-                        Virtual
-                      </label>
-                    </div>
-                    <p className="mt-2 text-xs font-medium text-slate-600">
-                      Presencial: atencion en consultorio. Virtual: sesion por Google Meet.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border border-blue-100 bg-[#f7fbff] p-4 md:p-5">
-                  <label className="mb-3 block text-sm font-bold text-[#1E4D8C]">
-                    <Clock size={16} className="mr-1 inline" />
-                    Selecciona una hora
-                  </label>
-                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
-                    {HORAS.map((h) => {
-                      const estaOcupada = horasOcupadas.includes(h);
-                      const estaPasada = isHoraPasada(formData.fecha, h);
-                      const estaInhabilitada = estaOcupada || estaPasada;
-                      return (
-                        <button
-                          key={h}
-                          type="button"
-                          onClick={() => !estaInhabilitada && setFormData({ ...formData, hora: h })}
-                          disabled={estaInhabilitada}
-                          className={`citas-hour-slot ${formData.hora === h ? 'citas-hour-slot--selected' : ''} ${estaPasada ? 'citas-hour-slot--past' : ''} ${estaOcupada ? 'citas-hour-slot--busy' : ''} rounded-lg border-2 px-2 py-2 text-sm font-bold transition ${
-                            estaPasada
-                              ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400'
-                              : estaOcupada
-                              ? 'cursor-not-allowed border-slate-300 bg-gray-200 text-gray-400 line-through'
-                              : formData.hora === h
-                              ? 'border-[#1E4D8C] bg-[#71A5D9] text-white'
-                              : 'border-[#89b7e8] bg-white text-[#1E4D8C] hover:bg-blue-50'
-                          }`}
-                        >
-                          {estaPasada ? <Clock size={13} className="mr-1 inline" /> : estaOcupada ? <Lock size={13} className="mr-1 inline" /> : null}
-                          {h}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs text-slate-500">
-                    <p className="flex items-center gap-1"><Lock size={12} /> Tachadas: espacio reservado</p>
-                    <p className="flex items-center gap-1"><Clock size={12} /> En gris: hora vencida</p>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm font-bold text-[#1E4D8C]">
-                    Motivo de la consulta (opcional, máximo {MAX_MOTIVO_WORDS} palabras)
-                  </label>
-                  <textarea
-                    value={formData.motivo}
-                    onChange={(e) => {
-                      const nextValue = e.target.value;
-                      if (countWords(nextValue) <= MAX_MOTIVO_WORDS) {
-                        setFormData({ ...formData, motivo: nextValue });
-                      }
-                    }}
-                    placeholder="Describe brevemente lo que deseas tratar en la sesión..."
-                    rows={4}
-                    className="citas-field w-full resize-none rounded-xl border border-blue-100 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 outline-none transition focus:border-[#71A5D9] focus:bg-white"
-                  />
-                  <div className="mt-2 flex items-center justify-between text-xs">
-                    <span className="text-slate-500">Opcional, pero útil para orientar la sesión.</span>
-                    <span className={`${motivoWords > MAX_MOTIVO_WORDS ? 'font-semibold text-red-600' : 'text-slate-500'}`}>{motivoWords}/{MAX_MOTIVO_WORDS}</span>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={enviando || !formData.psicologo || !formData.fecha || !formData.hora || horaSeleccionadaInvalida || motivoWords > MAX_MOTIVO_WORDS}
-                  className="citas-submit-btn inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#2f6ca9] to-[#1E4D8C] px-6 py-3.5 text-sm font-black text-white shadow-lg transition hover:from-[#25588a] hover:to-[#163b68] disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  <Send size={18} />
-                  {enviando ? 'Agendando...' : 'Confirmar solicitud de cita'}
-                </button>
-              </form>
-            </div>
+            <AppointmentBookingForm
+              formData={formData}
+              setFormData={setFormData}
+              psicologos={psicologos}
+              loading={loading}
+              selectedPsychologistName={selectedPsychologistName}
+              isPsychologistMenuOpen={isPsychologistMenuOpen}
+              setIsPsychologistMenuOpen={setIsPsychologistMenuOpen}
+              psychologistSelectRef={psychologistSelectRef}
+              dateInputRef={dateInputRef}
+              today={today}
+              horasOcupadas={horasOcupadas}
+              openDatePicker={openDatePicker}
+              isHoraPasada={isHoraPasada}
+              motivoWords={motivoWords}
+              enviando={enviando}
+              horaSeleccionadaInvalida={horaSeleccionadaInvalida}
+              onSubmit={handleSubmit}
+            />
           </section>
 
           <section className="xl:col-span-5">
-            <div className="space-y-5 rounded-3xl border border-blue-100 bg-white p-5 shadow-[0_12px_30px_rgba(15,70,128,0.10)] md:p-6 xl:sticky xl:top-24 xl:max-h-[calc(100vh-7rem)] xl:overflow-y-auto">
-            <div className="flex items-end justify-between gap-4 flex-wrap">
-              <h2 className="text-2xl font-black text-[#1E4D8C]">Mis Citas</h2>
-              <div className="inline-flex rounded-xl border border-blue-100 bg-white p-1 shadow-sm">
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('proximas')}
-                  className={`citas-tab-btn ${activeTab === 'proximas' ? 'citas-tab-btn--active' : ''} px-4 py-2 rounded-lg text-sm font-semibold transition ${activeTab === 'proximas' ? 'bg-[#71A5D9] text-white' : 'text-slate-600 hover:text-[#1E4D8C]'}`}
-                >
-                  Próximas
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('historial')}
-                  className={`citas-tab-btn ${activeTab === 'historial' ? 'citas-tab-btn--active' : ''} px-4 py-2 rounded-lg text-sm font-semibold transition ${activeTab === 'historial' ? 'bg-[#71A5D9] text-white' : 'text-slate-600 hover:text-[#1E4D8C]'}`}
-                >
-                  Historial
-                </button>
-              </div>
-            </div>
-
-            {activeTab === 'proximas' ? (
-              upcomingAppointments.length === 0 ? (
-                <div className="bg-white rounded-xl shadow-md border border-gray-200 p-8 text-center">
-                  <Calendar size={52} className="mx-auto text-slate-300 mb-4" />
-                  <p className="text-gray-700 text-base font-semibold">No hay citas próximas</p>
-                  <p className="text-gray-500 text-sm mt-2">Agenda tu primera cita llenando el formulario</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {upcomingAppointments.map((cita) => (
-                    <div
-                      key={cita.id}
-                      className="bg-white rounded-2xl shadow-md border-2 border-blue-100 p-5 hover:shadow-lg transition hover:border-[#71A5D9]"
-                    >
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex-1">
-                          <p className="font-bold text-[#1E4D8C] text-lg">{cita.psicologo}</p>
-                        </div>
-                        <span className={`px-3 py-1.5 text-xs font-bold rounded-full border ${getEstadoColor(cita.estado)}`}>
-                          {cita.estado}
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4 mb-4">
-                        <div>
-                          <p className="text-xs font-bold text-gray-500 uppercase">Fecha y Hora</p>
-                          <p className="text-sm font-semibold text-[#1E4D8C] mt-1.5">
-                            {parseDate(cita.fecha).toLocaleDateString('es-ES', {
-                              weekday: 'short',
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric',
-                            })} a las {cita.hora}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold text-gray-500 uppercase">Modalidad</p>
-                          <p className="text-sm font-semibold text-[#1E4D8C] mt-1.5 capitalize">{cita.modalidad}</p>
-                        </div>
-                      </div>
-
-                      {cita.modalidad === 'Virtual' && (
-                        <div className="mb-4 rounded-xl border border-sky-200 bg-sky-50 p-3">
-                          <p className="text-xs font-bold uppercase text-sky-700 mb-2 flex items-center gap-2">
-                            <Video size={14} />
-                            Videollamada Google Meet
-                          </p>
-                          {cita.meetingLink ? (
-                            <a
-                              href={cita.meetingLink}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-flex items-center gap-2 text-sm font-semibold text-sky-700 hover:underline break-all"
-                            >
-                              <Link2 size={14} />
-                              Unirse a la sesión
-                            </a>
-                          ) : (
-                            <p className="text-sm text-sky-700">El psicólogo aún no ha compartido el enlace de Google Meet.</p>
-                          )}
-                        </div>
-                      )}
-
-                      {cita.motivo && cita.motivo !== 'Sin especificar' && (
-                        <div className="bg-blue-50 p-3.5 rounded-lg border border-blue-200">
-                          <p className="text-xs font-bold text-gray-500 uppercase">Motivo</p>
-                          <p className="text-sm text-gray-700 mt-1.5">{cita.motivo}</p>
-                        </div>
-                      )}
-
-                      {cita.estado === 'Cancelada' && cita.cancelReason && (
-                        <div className="mt-3 bg-red-50 p-3.5 rounded-lg border border-red-200">
-                          <p className="text-xs font-bold text-red-700 uppercase">Cancelada por ti</p>
-                          <p className="text-sm text-red-800 mt-1.5">{cita.cancelReason}</p>
-                        </div>
-                      )}
-
-                      {cita.estado === 'Rechazada' && (
-                        <div className="mt-3 bg-rose-50 p-3.5 rounded-lg border border-rose-200">
-                          <p className="text-xs font-bold text-rose-700 uppercase">Rechazada por la psicóloga</p>
-                          <p className="text-sm text-rose-800 mt-1.5">
-                            La cita fue rechazada y no podrá continuar.
-                          </p>
-                        </div>
-                      )}
-
-                      <div className="mt-4 flex justify-end">
-                        <button
-                          type="button"
-                          disabled={cancellingId === cita.id}
-                          onClick={() => openCancelDialog(cita.id)}
-                          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition disabled:opacity-60 disabled:cursor-not-allowed"
-                        >
-                          <XCircle size={16} />
-                          {cancellingId === cita.id ? 'Cancelando...' : 'Cancelar cita'}
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )
-            ) : (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between gap-3 flex-wrap rounded-2xl border border-blue-100 bg-[#f5f9ff] px-4 py-3">
-                  <p className="text-sm text-slate-600">Aquí verás tus citas aceptadas y canceladas.</p>
-                  <select
-                    value={historyFilter}
-                    onChange={(e) => setHistoryFilter(e.target.value as 'Todas' | 'Aceptada' | 'Cancelada')}
-                    className="px-3 py-2 rounded-lg border border-blue-100 bg-white text-sm text-slate-700"
-                  >
-                    <option>Todas</option>
-                    <option>Aceptada</option>
-                    <option>Cancelada</option>
-                  </select>
-                </div>
-
-                {historyAppointments.length === 0 ? (
-                  <div className="bg-white rounded-xl shadow-md border border-gray-200 p-8 text-center">
-                    <Calendar size={52} className="mx-auto text-slate-300 mb-4" />
-                    <p className="text-gray-700 text-base font-semibold">No hay citas en este historial</p>
-                    <p className="text-gray-500 text-sm mt-2">Cuando se acepten o cancelen, aparecerán aquí</p>
-                  </div>
-                ) : (
-                  historyAppointments.map((cita) => (
-                    <div key={cita.id} className="bg-white rounded-2xl shadow-md border-2 border-blue-100 p-5">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex-1">
-                          <p className="font-bold text-[#1E4D8C] text-lg">{cita.psicologo}</p>
-                        </div>
-                        <span className={`px-3 py-1.5 text-xs font-bold rounded-full border ${getEstadoColor(cita.estado)}`}>
-                          {cita.estado}
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4 mb-4">
-                        <div>
-                          <p className="text-xs font-bold text-gray-500 uppercase">Fecha y Hora</p>
-                          <p className="text-sm font-semibold text-[#1E4D8C] mt-1.5">
-                            {parseDate(cita.fecha).toLocaleDateString('es-ES', {
-                              weekday: 'short',
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric',
-                            })} a las {cita.hora}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold text-gray-500 uppercase">Modalidad</p>
-                          <p className="text-sm font-semibold text-[#1E4D8C] mt-1.5 capitalize">{cita.modalidad}</p>
-                        </div>
-                      </div>
-
-                      {cita.modalidad === 'Virtual' && cita.meetingLink && (
-                        <div className="mb-4 rounded-xl border border-sky-200 bg-sky-50 p-3">
-                          <p className="text-xs font-bold uppercase text-sky-700 mb-2 flex items-center gap-2">
-                            <Video size={14} />
-                            Enlace de Google Meet
-                          </p>
-                          <a
-                            href={cita.meetingLink}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex items-center gap-2 text-sm font-semibold text-sky-700 hover:underline break-all"
-                          >
-                            <Link2 size={14} />
-                            Abrir enlace
-                          </a>
-                        </div>
-                      )}
-
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
-            </div>
+            <AppointmentListPanel
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              historyFilter={historyFilter}
+              setHistoryFilter={setHistoryFilter}
+              upcomingAppointments={upcomingAppointments}
+              historyAppointments={historyAppointments}
+              cancellingId={cancellingId}
+              onOpenCancelDialog={openCancelDialog}
+            />
           </section>
         </div>
       </div>
     </div>
 
-    {cancelDialogId && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-        <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl border border-slate-200 p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-11 h-11 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
-              <XCircle size={22} />
-            </div>
-            <div>
-              <h3 className="text-lg font-black text-slate-900">Cancelar cita</h3>
-              <p className="text-sm text-slate-600">Puedes cancelar esta cita ahora y volver a agendar después.</p>
-            </div>
-          </div>
-
-          <p className="text-sm text-slate-700 mb-6">¿Deseas cancelar esta cita?</p>
-
-          <div className="mb-4">
-            <label className="block text-xs font-bold text-slate-700 uppercase mb-2">
-              Motivo de cancelación
-            </label>
-            <textarea
-              value={cancelReason}
-              onChange={(e) => {
-                const nextValue = e.target.value;
-                if (countWords(nextValue) <= MAX_MOTIVO_WORDS) {
-                  setCancelReason(nextValue);
-                }
-              }}
-              rows={4}
-              placeholder="Explica brevemente por qué cancelas esta cita"
-              className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-800 outline-none focus:border-[#71A5D9] focus:ring-2 focus:ring-[#71A5D9]/20"
-            />
-            <div className="mt-2 flex items-center justify-between text-xs text-slate-500">
-              <span>Requerido para cancelar la cita.</span>
-              <span>{countWords(cancelReason)}/{MAX_MOTIVO_WORDS}</span>
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={closeCancelDialog}
-              className="px-4 py-2 rounded-lg border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50"
-            >
-              Volver
-            </button>
-            <button
-              type="button"
-              onClick={confirmCancelDialog}
-              disabled={!cancelReason.trim() || cancellingId === cancelDialogId}
-              className="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Sí, cancelar
-            </button>
-          </div>
-        </div>
-      </div>
-    )}
+    <CancelAppointmentDialog
+      open={Boolean(cancelDialogId)}
+      cancelReason={cancelReason}
+      onCancelReasonChange={setCancelReason}
+      cancellingId={cancellingId}
+      cancelDialogId={cancelDialogId}
+      onClose={closeCancelDialog}
+      onConfirm={confirmCancelDialog}
+    />
     </>
   );
 }

@@ -1,0 +1,382 @@
+/* =========================================
+   SISTEMA DE ACCESIBILIDAD
+========================================= */
+
+/* 1. TIPOGRAFÍAS */
+html.font-family-dyslexic,
+html.font-family-dyslexic body,
+html.font-family-dyslexic button,
+html.font-family-dyslexic input,
+html.font-family-dyslexic select,
+html.font-family-dyslexic textarea {
+  font-family: 'OpenDyslexic', sans-serif !important;
+}
+
+html.font-family-dyslexic * {
+  font-family: 'OpenDyslexic', sans-serif !important;
+}
+
+html.font-family-serif,
+html.font-family-serif body,
+html.font-family-serif button,
+html.font-family-serif input,
+html.font-family-serif select,
+html.font-family-serif textarea {
+  font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif !important;
+}
+
+html.font-family-serif * {
+}
+
+html.font-family-sans,
+html.font-family-sans body,
+html.font-family-sans * {
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif !important;
+}
+
+/* 2. TAMAÑOS DE LETRA */
+html.font-size-small {
+  font-size: 15px;
+}
+
+html.font-size-large {
+  font-size: 18px;
+}
+
+.accessibility-font-select,
+.accessibility-font-select option {
+  color: #f8fafc !important;
+  background-color: #0f172a !important;
+}
+
+.accessibility-font-select:focus {
+  border-color: #60a5fa !important;
+}
+
+.accessibility-panel {
+  background-color: #1e293b;
+  border-color: #475569;
+}
+
+.accessibility-panel-title-icon,
+.accessibility-panel-title {
+  color: #93c5fd;
+}
+
+.accessibility-panel-divider {
+  background-color: #60a5fa;
+}
+
+.accessibility-panel-label {
+  color: #e2e8f0;
+}
+
+.accessibility-panel-btn--idle {
+  background-color: #334155;
+  color: #f1f5f9;
+  border-color: #64748b;
+}
+
+.accessibility-panel-btn--idle:hover {
+  background-color: #475569;
+}
+
+.accessibility-panel-btn--active-light {
+  background-color: #0ea5e9;
+  color: #ffffff;
+}
+
+.accessibility-panel-btn--active-dark {
+  background-color: #0f172a;
+  color: #e2e8f0;
+  border-color: #64748b;
+}
+
+.accessibility-panel-btn--active-contrast {
+  background-color: #0b1220;
+  color: #bfdbfe;
+  border-color: #93c5fd;
+}
+
+html.theme-dark .accessibility-panel {
+  background-color: #0f172a;
+  border-color: #334155;
+}
+
+html.theme-dark .accessibility-panel-title-icon,
+html.theme-dark .accessibility-panel-title {
+  color: #7dd3fc;
+}
+
+html.theme-dark .accessibility-panel-divider {
+  background-color: #38bdf8;
+}
+
+html.theme-dark .accessibility-panel-btn--idle {
+  background-color: #1e293b;
+  color: #e2e8f0;
+  border-color: #475569;
+}
+
+html.theme-dark .accessibility-panel-btn--idle:hover {
+  background-color: #334155;
+}
+
+html.theme-dark .accessibility-font-select,
+html.theme-dark .accessibility-font-select option {
+  background-color: #111827 !important;
+  color: #e5e7eb !important;
+  border-color: #475569 !important;
+}
+
+/* 3. FOCO Y ACCIONES INTERACTIVAS */
+*:focus-visible {
+  outline: 3px solid #1e40af;
+  outline-offset: 2px;
+}
+
+a,
+button,
+[role="button"],
+summary,
+select,
+input[type="checkbox"],
+input[type="radio"] {
+  transition: box-shadow 0.2s ease, outline-color 0.2s ease, transform 0.2s ease;
+}
+
+.accessibility-fab:hover {
+  box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.45);
+}
+
+.accessibility-launcher {
+  top: 7rem;
+}
+
+.accessibility-launcher .accessibility-fab {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* 4. MODO OSCURO */
+html.theme-dark body,
+html.theme-dark main,
+html.theme-dark section {
+  background-color: #0b1220 !important;
+  color: #e5e7eb !important;
+}
+
+html.theme-dark [class*="bg-gradient-to-"] {
+  background-image: none !important;
+  background-color: #0f172a !important;
+}
+
+html.theme-dark .bg-white,
+html.theme-dark [class*="bg-slate-"],
+html.theme-dark [class*="bg-gray-"],
+html.theme-dark [class*="bg-blue-"] {
+  background-color: #162235 !important;
+}
+
+html.theme-dark [class*="text-slate-"],
+html.theme-dark [class*="text-gray-"],
+html.theme-dark p,
+html.theme-dark span,
+html.theme-dark label,
+html.theme-dark li,
+html.theme-dark h1,
+html.theme-dark h2,
+html.theme-dark h3,
+html.theme-dark h4,
+html.theme-dark h5,
+html.theme-dark h6 {
+  color: #e5e7eb !important;
+}
+
+html.theme-dark .text-\[\#1E4D8C\],
+html.theme-dark [class*="text-blue-"] {
+  color: #93c5fd !important;
+}
+
+html.theme-dark input,
+html.theme-dark select,
+html.theme-dark textarea {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  border-color: #94a3b8 !important;
+}
+
+html.theme-dark ::placeholder {
+  color: #cbd5e1 !important;
+}
+
+html.theme-dark button:hover,
+html.theme-dark a:hover,
+html.theme-dark [role="button"]:hover {
+  box-shadow: 0 0 0 2px rgba(147, 197, 253, 0.45);
+}
+
+/* 5. ALTO CONTRASTE */
+html.theme-high-contrast body,
+html.theme-high-contrast main,
+html.theme-high-contrast section,
+html.theme-high-contrast [class*="bg-"] {
+  background-color: #000000 !important;
+  color: #ffeb3b !important;
+}
+
+html.theme-high-contrast [class*="bg-gradient-to-"] {
+  background-image: none !important;
+  background-color: #000000 !important;
+}
+
+html.theme-high-contrast .hero-home-bg {
+  background-image: url('/images/psico1.png') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-color: transparent !important;
+  filter: grayscale(100%) contrast(125%);
+}
+
+html.theme-high-contrast .hero-home-overlay {
+  background-image: none !important;
+  background-color: rgba(0, 0, 0, 0.35) !important;
+}
+
+html.theme-high-contrast .citas-page-shell,
+html.theme-high-contrast .citas-route-shell {
+  background: #000000 !important;
+}
+
+html.theme-high-contrast .citas-field {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffeb3b !important;
+}
+
+html.theme-high-contrast .citas-field:focus,
+html.theme-high-contrast .citas-field:focus-visible {
+  outline: 3px solid #ffffff !important;
+  outline-offset: 1px;
+  border-color: #ffffff !important;
+}
+
+html.theme-high-contrast .citas-field option {
+  background-color: #000000 !important;
+  color: #ffeb3b !important;
+}
+
+html.theme-high-contrast .citas-field option:checked,
+html.theme-high-contrast .citas-field option:hover,
+html.theme-high-contrast .citas-field option:focus {
+  background: #ffeb3b !important;
+  color: #000000 !important;
+}
+
+.citas-date-field::-webkit-calendar-picker-indicator {
+  opacity: 0 !important;
+}
+
+.citas-date-icon {
+  color: #1e4d8c;
+}
+
+html.theme-high-contrast input.citas-field[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0 !important;
+}
+
+html.theme-high-contrast .citas-date-icon {
+  color: #ffeb3b !important;
+}
+
+html.theme-high-contrast .citas-hour-slot {
+  background-color: #000000 !important;
+  color: #ffeb3b !important;
+  border-color: #ffeb3b !important;
+}
+
+html.theme-high-contrast .citas-hour-slot:hover,
+html.theme-high-contrast .citas-hour-slot:focus-visible {
+  outline: 3px solid #ffffff !important;
+  outline-offset: 1px;
+  border-color: #ffffff !important;
+}
+
+html.theme-high-contrast .citas-hour-slot--selected {
+  background-color: #ffeb3b !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+}
+
+html.theme-high-contrast button.citas-hour-slot--selected,
+html.theme-high-contrast .citas-hour-slot.citas-hour-slot--selected {
+  color: #000000 !important;
+}
+
+html.theme-high-contrast .citas-hour-slot--busy,
+html.theme-high-contrast .citas-hour-slot--past {
+  opacity: 0.55 !important;
+}
+
+html.theme-high-contrast .citas-tab-btn {
+  background-color: #000000 !important;
+  color: #ffeb3b !important;
+  border: 1px solid #ffeb3b !important;
+}
+
+html.theme-high-contrast .citas-tab-btn--active {
+  background-color: #ffeb3b !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+}
+
+html.theme-high-contrast button.citas-tab-btn--active,
+html.theme-high-contrast .citas-tab-btn.citas-tab-btn--active {
+  color: #000000 !important;
+}
+
+html.theme-high-contrast .citas-submit-btn {
+  background-image: none !important;
+  background-color: #000000 !important;
+  color: #ffeb3b !important;
+  border: 2px solid #ffeb3b !important;
+}
+
+html.theme-high-contrast .citas-submit-btn,
+html.theme-high-contrast .citas-submit-btn span,
+html.theme-high-contrast .citas-submit-btn svg {
+  color: #ffeb3b !important;
+  stroke: #ffeb3b !important;
+}
+
+html.theme-high-contrast .citas-submit-btn:hover,
+html.theme-high-contrast .citas-submit-btn:focus-visible {
+  background-color: #ffeb3b !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+}
+
+html.theme-high-contrast .citas-submit-btn:hover svg,
+html.theme-high-contrast .citas-submit-btn:focus-visible svg {
+  color: #000000 !important;
+  stroke: #000000 !important;
+}
+
+html.theme-high-contrast .citas-select-trigger,
+html.theme-high-contrast .citas-select-menu {
+  background-color: #000000 !important;
+  border-color: #ffeb3b !important;
+  color: #ffeb3b !important;
+}
+
+html.theme-high-contrast .citas-select-option {
+  background-color: #000000 !important;
+  color: #ffeb3b !important;
+}
+
+html.theme-high-contrast .citas-select-option:hover,
+html.theme-high-contrast .citas-select-option:focus-visible,
+html.theme-high-contrast .citas-select-option--selected {
+  background-color: #ffeb3b !important;
+  color: #000000 !important;
+  border: 1px solid #ffffff !important;
+}

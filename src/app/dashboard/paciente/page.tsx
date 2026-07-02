@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { Palette, X, Calendar, ClipboardList, Clock, CheckCircle2, ArrowUpRight, ListChecks, FileEdit, Bell, CircleAlert, ArrowRight, CalendarDays, ArrowLeft } from 'lucide-react';
+import { Palette, X, Calendar, ClipboardList, Clock, CheckCircle2, ArrowRight, CalendarDays, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import {
   HeroSection,
@@ -11,12 +11,12 @@ import {
   RecursosSection,
 } from '@/presentation/components/home';
 import { AccessibilityPanel } from '@/presentation/components/accessibility/AccessibilityPanel';
+import { AnxietyContent } from '@/presentation/components/educational/AnxietyContent';
+import { MentalHealthContent } from '@/presentation/components/educational/MentalHealthContent';
+import { GAD7Content } from '@/presentation/components/educational/GAD7Content';
+import { Biblioteca } from '@/presentation/components/biblioteca/Biblioteca';
 import { PatientHeader } from '@/presentation/components/patient/PatientHeader';
-import PacienteAnsiedadPage from '@/app/paciente/ansiedad/page';
-import PacienteSaludMentalPage from '@/app/paciente/salud-mental/page';
-import PacienteTestPage from '@/app/paciente/test/page';
-import PacienteBibliotecaPage from '@/app/paciente/biblioteca/page';
-import PacienteVideosPage from '@/app/paciente/videos/page';
+import { VideosEducativos } from '@/presentation/components/videos';
 
 type AppointmentItem = {
   id: string;
@@ -25,6 +25,15 @@ type AppointmentItem = {
   modalidad: string;
   psicologoName?: string;
   status: 'Pendiente' | 'Aceptada' | 'Rechazada' | 'Cancelada';
+};
+
+type AppointmentApiItem = {
+  id: string;
+  fecha: string;
+  hora: string;
+  modalidad: string;
+  psychologistName?: string;
+  status: AppointmentItem['status'];
 };
 
 type ModalView = 'ansiedad' | 'salud-mental' | 'analisis' | 'biblioteca' | 'videos' | null;
@@ -64,18 +73,40 @@ function DashboardContent() {
   const [isAccessibilityOpen, setIsAccessibilityOpen] = useState(false);
   const [appointments, setAppointments] = useState<AppointmentItem[]>([]);
   const [loadingAppointments, setLoadingAppointments] = useState(true);
-  const [tasks, setTasks] = useState<any[]>([]);
-  const [loadingTasks, setLoadingTasks] = useState(true);
   const [modalView, setModalView] = useState<ModalView>(null);
   const router = useRouter();
   const { data: session, status } = useSession();
 
   const sections: { id: ModalView; label: string; component: React.ReactNode }[] = [
-    { id: 'ansiedad', label: 'Ansiedad', component: <PacienteAnsiedadPage /> },
-    { id: 'salud-mental', label: 'Salud mental', component: <PacienteSaludMentalPage /> },
-    { id: 'analisis', label: 'Análisis personal', component: <PacienteTestPage /> },
-    { id: 'biblioteca', label: 'Biblioteca', component: <PacienteBibliotecaPage /> },
-    { id: 'videos', label: 'Videos educativos', component: <PacienteVideosPage /> },
+    { id: 'ansiedad', label: 'Ansiedad', component: <AnxietyContent padded={false} /> },
+    { id: 'salud-mental', label: 'Salud mental', component: <MentalHealthContent padded={false} /> },
+    { id: 'analisis', label: 'Análisis personal', component: <GAD7Content padded={false} /> },
+    {
+      id: 'biblioteca',
+      label: 'Biblioteca',
+      component: (
+        <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100">
+          <div className="py-8">
+            <div className="max-w-7xl mx-auto px-6">
+              <Biblioteca onHomeClick={() => {}} />
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: 'videos',
+      label: 'Videos educativos',
+      component: (
+        <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100">
+          <div className="py-8">
+            <div className="max-w-7xl mx-auto px-6">
+              <VideosEducativos onHomeClick={() => {}} />
+            </div>
+          </div>
+        </div>
+      ),
+    },
   ];
 
   const currentIndex = sections.findIndex(s => s.id === modalView);
@@ -112,7 +143,7 @@ function DashboardContent() {
 
       const data = await response.json();
       const mapped: AppointmentItem[] = Array.isArray(data)
-        ? data.map((item: any) => ({
+        ? (data as AppointmentApiItem[]).map((item) => ({
             id: item.id,
             fecha: item.fecha,
             hora: item.hora,
@@ -130,29 +161,12 @@ function DashboardContent() {
     }
   }, [session?.user?.id]);
 
-  const fetchTasks = useCallback(async () => {
-    if (!session?.user?.id) return;
-    setLoadingTasks(true);
-    try {
-      const response = await fetch('/api/paciente/asignaciones', { cache: 'no-store' });
-      if (!response.ok) throw new Error('No se pudieron cargar las tareas');
-      const data = await response.json();
-      setTasks(data.data ?? []);
-    } catch (error) {
-      console.error('Error cargando tareas:', error);
-      setTasks([]);
-    } finally {
-      setLoadingTasks(false);
-    }
-  }, [session?.user?.id]);
-
   useEffect(() => {
     fetchAppointments();
-    fetchTasks();
     // ✅ AUMENTAR EL INTERVALO A 30 SEGUNDOS (en lugar de 5)
     const interval = setInterval(fetchAppointments, 30000);
     return () => clearInterval(interval);
-  }, [fetchAppointments, fetchTasks]);
+  }, [fetchAppointments]);
 
   // ✅ USAR useMemo CON DEPENDENCIAS CORRECTAS
   const now = useMemo(() => new Date(), []);
@@ -168,11 +182,6 @@ function DashboardContent() {
   const acceptedCount = useMemo(() => appointments.filter((item) => item.status === 'Aceptada').length, [appointments]);
   const canceledCount = useMemo(() => appointments.filter((item) => item.status === 'Cancelada').length, [appointments]);
   const totalCount = useMemo(() => appointments.length, [appointments]);
-
-  const taskTotal = useMemo(() => tasks.length, [tasks]);
-  const taskPending = useMemo(() => tasks.filter((t) => t.estado === 'asignada' || t.estado === 'en_progreso').length, [tasks]);
-  const taskCompleted = useMemo(() => tasks.filter((t) => t.estado === 'completada').length, [tasks]);
-  const taskProgress = useMemo(() => taskTotal > 0 ? Math.round((taskCompleted / taskTotal) * 100) : 0, [taskTotal, taskCompleted]);
 
   const SECTION_HEIGHT = 'min-h-[calc(100dvh-72px)]';
 
