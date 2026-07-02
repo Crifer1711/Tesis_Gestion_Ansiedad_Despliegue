@@ -36,8 +36,12 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
     const useCase = new ManageSettingsUseCase(repository);
     
     const savedSettings = useCase.executeLoad();
-    if (savedSettings && savedSettings.theme) {
-      setSettings(savedSettings);
+    if (savedSettings) {
+      setSettings({
+        ...defaultSettings,
+        ...savedSettings,
+        theme: 'light',
+      });
     }
     setIsHydrated(true);
   }, []);
