@@ -12,14 +12,26 @@ function parseEntrada(raw: string | null | undefined): Record<string, string> {
   }
 }
 
-function parseSatisfaccion(resumen: any): { emocion: string; categoria: string } | null {
+function parseSatisfaccion(resumen: unknown): { emocion: string; categoria: string } | null {
   if (!resumen) return null;
   try {
     const obj = typeof resumen === 'string' ? JSON.parse(resumen) : resumen;
-    if (obj?.satisfaccion_paciente?.emocion) {
+    if (
+      typeof obj === 'object' &&
+      obj !== null &&
+      'satisfaccion_paciente' in obj &&
+      typeof obj.satisfaccion_paciente === 'object' &&
+      obj.satisfaccion_paciente !== null &&
+      'emocion' in obj.satisfaccion_paciente
+    ) {
+      const satisfaccion = obj.satisfaccion_paciente as { emocion?: string; categoria?: string };
+      if (!satisfaccion.emocion) {
+        return null;
+      }
+
       return {
-        emocion: obj.satisfaccion_paciente.emocion,
-        categoria: obj.satisfaccion_paciente.categoria || '',
+        emocion: satisfaccion.emocion,
+        categoria: satisfaccion.categoria || '',
       };
     }
   } catch {
@@ -49,7 +61,7 @@ const CATEGORIA_EMOJIS: Record<string, string> = {
 };
 
 
-function renderRespuesta(ia: any): React.ReactNode {
+function renderRespuesta(ia: unknown): React.ReactNode {
   if (!ia) return "—";
   if (typeof ia === "string") {
     try {
@@ -59,22 +71,26 @@ function renderRespuesta(ia: any): React.ReactNode {
       return ia;
     }
   }
-  if (typeof ia === "object") {
+  if (typeof ia === "object" && ia !== null) {
+    const respuesta = ia as Record<string, unknown>;
+    const distorsion = respuesta.distorsion;
+    const sugerencia = respuesta.sugerencia;
+
     return (
       <div className="space-y-2">
-        {ia.distorsion && (
+        {Boolean(distorsion) && (
           <div>
             <span className="font-bold text-gray-600">Distorsión:</span>{" "}
-            <span>{ia.distorsion}</span>
+            <span>{String(distorsion)}</span>
           </div>
         )}
-        {ia.sugerencia && (
+        {Boolean(sugerencia) && (
           <div>
             <span className="font-bold text-gray-600">Sugerencia:</span>{" "}
-            <span>{ia.sugerencia}</span>
+            <span>{String(sugerencia)}</span>
           </div>
         )}
-        {Object.entries(ia)
+        {Object.entries(respuesta)
           .filter(([k]) => k !== "distorsion" && k !== "sugerencia")
           .map(([k, v]) => (
             <div key={k}>
@@ -215,7 +231,7 @@ export function ActividadesCompletadasClient({ actividades }: Props) {
                 </div>
               </div>
 
-              {selected.resumen && (
+              {Boolean(selected.resumen) && (
                 <div>
                   <h4 className="font-bold text-gray-700 mb-2">Satisfacción del Paciente</h4>
                   {(() => {
@@ -264,7 +280,7 @@ export function ActividadesCompletadasClient({ actividades }: Props) {
                 </div>
               )}
 
-              {selected.respuesta_ia && (
+              {Boolean(selected.respuesta_ia) && (
                 <div>
                   <h4 className="font-bold text-gray-700 mb-1">Respuesta de la IA</h4>
                   <div className="bg-blue-50 p-3 rounded text-sm text-gray-700">

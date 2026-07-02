@@ -1,5 +1,4 @@
 // src/app/dashboard/psicologo/actividades/page.tsx
-'use server'
 import { ActivityRepository } from '@/infrastructure/repositories/activity.repository';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/infrastructure/auth/auth.options';
