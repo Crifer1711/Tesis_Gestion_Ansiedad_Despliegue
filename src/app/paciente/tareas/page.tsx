@@ -1,24 +1,29 @@
 "use client";
 
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import { useState, useEffect, useCallback } from 'react';
 import { PatientHeader } from '@/presentation/components/patient/PatientHeader';
-import { scrollToTop } from '@/presentation/utils/scrollWithOffset';
+import { PatientRouteGuard } from '@/presentation/components/patient/PatientRouteGuard';
 import { EmotionWheelModal, type Emocion } from '@/presentation/components/patient/EmotionWheelModal';
-// 1. Agregamos ArrowLeft a lucide-react
-import { CheckCircle2, ChevronDown, ChevronUp, ArrowLeft, Home } from 'lucide-react'; 
-// 2. Importamos Link
+import { CheckCircle2, ChevronDown, ChevronUp, Home } from 'lucide-react';
 import Link from 'next/link';
+
+type AssignmentItem = {
+  id: string;
+  titulo?: string;
+  descripcion?: string;
+  estado?: string;
+  fecha_limite?: string;
+  instrucciones_psicologo?: string;
+  embed_url?: string;
+};
 
 export default function TareasPage() {
   const [activeSection, setActiveSection] = useState('tareas');
   const { data: session, status } = useSession();
-  const router = useRouter();
-  const [mounted, setMounted] = useState(false);
-  const [asignaciones, setAsignaciones] = useState<any[]>([]);
+  const [asignaciones, setAsignaciones] = useState<AssignmentItem[]>([]);
   const [loadingAsign, setLoadingAsign] = useState(false);
-  const [selectedAsignacion, setSelectedAsignacion] = useState<any | null>(null);
+  const [selectedAsignacion, setSelectedAsignacion] = useState<AssignmentItem | null>(null);
   const [currentIntentoId, setCurrentIntentoId] = useState<string | null>(null);
   const [showCompleted, setShowCompleted] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
@@ -35,7 +40,9 @@ export default function TareasPage() {
       try {
         const res = await fetch('/api/paciente/asignaciones');
         const data = await res.json();
-        if (res.ok && data.success) setAsignaciones(data.data || []);
+        if (res.ok && data.success) {
+          setAsignaciones(Array.isArray(data.data) ? (data.data as AssignmentItem[]) : []);
+        }
       } catch (err) {
         console.error(err);
       } finally {
@@ -46,12 +53,8 @@ export default function TareasPage() {
 
   // Initial load
   useEffect(() => {
-    setMounted(true);
-    if (status === 'unauthenticated') {
-      router.push('/login');
-    }
     loadAsign();
-  }, [status, router, loadAsign]);
+  }, [loadAsign]);
 
   // Listen for iframe postMessage events to save student interactions and completion
   useEffect(() => {
@@ -140,11 +143,7 @@ export default function TareasPage() {
     };
   }, [loadAsign, currentIntentoId, selectedAsignacion, session, startTime]);
 
-  if (!mounted || status === 'loading' || !session) {
-    return null;
-  }
-
-  const handleOpenAsignacion = (asignacion: any) => {
+  const handleOpenAsignacion = (asignacion: AssignmentItem) => {
     // Generate a unique Attempt ID for this session
     const newIntentoId = typeof crypto.randomUUID === 'function' 
       ? crypto.randomUUID() 
@@ -233,15 +232,16 @@ export default function TareasPage() {
   const completedTasks = asignaciones.filter((task) => String(task.estado || '').toLowerCase() === 'completada');
 
   return (
-    <div className="tareas-page-shell min-h-screen bg-gradient-to-b from-blue-50 to-blue-100">
-      <PatientHeader
-        activeSection={activeSection}
-        onNavClick={setActiveSection}
-        userName={session?.user?.name || 'Paciente'}
-        userRole={session?.user?.role || 'ESTUDIANTE'}
-      />
-      <div className="pt-28 pb-16">
-        <div className="max-w-7xl mx-auto px-6">
+    <PatientRouteGuard>
+      <div className="tareas-page-shell min-h-screen bg-gradient-to-b from-blue-50 to-blue-100">
+        <PatientHeader
+          activeSection={activeSection}
+          onNavClick={setActiveSection}
+          userName={session?.user?.name || 'Paciente'}
+          userRole={session?.user?.role || 'ESTUDIANTE'}
+        />
+        <div className="pt-28 pb-16">
+          <div className="max-w-7xl mx-auto px-6">
           
           {/* BOTÓN DE REGRESO AQUÍ */}
           <div className="mb-6">
@@ -254,10 +254,10 @@ export default function TareasPage() {
             </Link>
           </div>
 
-          <h1 className="text-4xl font-black text-[#1E4D8C] mb-4">Mis Tareas</h1>
-          <p className="text-slate-700 leading-relaxed mb-6">
-            Aquí se muestran las actividades, ejercicios o tareas que tu psicólogo te haya asignado para acompañar tu proceso. Podrás abrir cada actividad, revisar sus instrucciones, ver su estado y la fecha límite, y completar el contenido desde esta misma pantalla. Si tu psicólogo aún no te ha asignado tareas, verás el aviso de que no tienes asignaciones disponibles.
-          </p>
+            <h1 className="text-4xl font-black text-[#1E4D8C] mb-4">Mis Tareas</h1>
+            <p className="text-slate-700 leading-relaxed mb-6">
+              Aquí se muestran las actividades, ejercicios o tareas que tu psicólogo te haya asignado para acompañar tu proceso. Podrás abrir cada actividad, revisar sus instrucciones, ver su estado y la fecha límite, y completar el contenido desde esta misma pantalla. Si tu psicólogo aún no te ha asignado tareas, verás el aviso de que no tienes asignaciones disponibles.
+            </p>
           <div className="mt-6">
             {loadingAsign ? (
               <div className="text-sm text-gray-600">Cargando asignaciones...</div>
@@ -384,6 +384,7 @@ export default function TareasPage() {
           onSkip={handleEmotionSkip}
         />
       )}
-    </div>
+      </div>
+    </PatientRouteGuard>
   );
 }

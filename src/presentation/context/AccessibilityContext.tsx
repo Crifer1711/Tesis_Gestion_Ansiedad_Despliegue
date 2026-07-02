@@ -23,13 +23,15 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
   const [isHydrated, setIsHydrated] = useState(false);
   const pathname = usePathname();
 
-  const forceLightTheme = useMemo(() => {
-    return pathname.startsWith('/dashboard/admin') || pathname.startsWith('/dashboard/psicologo');
-  }, [pathname]);
+  // ❌ ELIMINA ESTAS LÍNEAS:
+  // const forceLightTheme = useMemo(() => {
+  //   return pathname.startsWith('/dashboard/admin') || pathname.startsWith('/dashboard/psicologo');
+  // }, [pathname]);
 
+  // ✅ AHORA usa settings directamente SIN forzar nada
   const effectiveSettings = useMemo(() => {
-    return forceLightTheme ? { ...settings, theme: 'light' as const } : settings;
-  }, [forceLightTheme, settings]);
+    return settings; // Ya no forzamos 'light' en ningún lado
+  }, [settings]);
 
   useEffect(() => {
     const repository = new LocalStorageAccessibilityRepository();
@@ -55,7 +57,7 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
     
     const root = window.document.documentElement;
     
-    // Eliminamos solo las clases viejas de accesibilidad sin tocar las fuentes propias de Next (Geist)
+    // Eliminamos solo las clases viejas de accesibilidad
     root.className = root.className.replace(/\b(theme|font-size|font-family)-\S+/g, '').trim(); 
     
     // Inyectamos las clases nuevas al HTML

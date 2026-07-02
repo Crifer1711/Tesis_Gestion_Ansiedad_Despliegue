@@ -133,7 +133,7 @@ export default function SaberMasPage() {
           <div className="mx-auto w-full max-w-7xl px-6">
             <Link
               href="/"
-              className="saber-mas-home-back inline-flex items-center gap-2 rounded-xl bg-[#1d42fb] px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-[#163bd1] hover:shadow-lg"
+              className="saber-mas-home-back inline-flex items-center gap-2 rounded-xl bg-[#71A5D9] px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-[#1E4D8C] hover:shadow-lg"
             >
               <ArrowLeft className="h-4 w-4" />
               Volver al inicio
@@ -152,9 +152,9 @@ export default function SaberMasPage() {
       </main>
 
       {/* FOOTER */}
-      <footer className="saber-mas-footer relative z-10 bg-[#71A5D9] py-4 text-sm text-center">
+      <footer className="saber-mas-footer relative z-10 bg-[#525457] py-4 text-sm text-center">
         <div className="mx-auto max-w-7xl px-5">
-          <p className="saber-mas-footer-text font-semibold text-[#1E4D8C]">© 2026 MindPeace • Todos los derechos reservados</p>
+          <p className="saber-mas-footer-text font-semibold text-[#EAEAEA]">© 2026 MindPeace • Todos los derechos reservados</p>
         </div>
       </footer>
 

@@ -1,4 +1,5 @@
 import { AdminNavbar } from "@/presentation/components/admin/AdminNavbar";
+import { AccessibilityLauncher } from "@/presentation/components/accessibility/AccessibilityLauncher";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -7,6 +8,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <main className="px-4 md:px-8 pb-4 md:pb-8 pt-28">
         {children}
       </main>
+      {/* ✅ Botón de accesibilidad para Admin */}
+      <AccessibilityLauncher />
     </div>
   );
 }

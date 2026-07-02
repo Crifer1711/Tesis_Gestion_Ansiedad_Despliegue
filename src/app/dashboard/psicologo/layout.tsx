@@ -1,4 +1,5 @@
 import { PsychologistNavbar } from "@/presentation/components/psychologist/PsychologistNavbar";
+import { AccessibilityLauncher } from "@/presentation/components/accessibility/AccessibilityLauncher";
 
 export default function PsychologistLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -7,6 +8,8 @@ export default function PsychologistLayout({ children }: { children: React.React
       <main className="px-8 pb-8 pt-28">
         {children}
       </main>
+      {/* ✅ Botón de accesibilidad para Psicólogo */}
+      <AccessibilityLauncher />
     </div>
   );
 }

@@ -1,3 +1,4 @@
+// components/accessibility/AccessibilityLauncher.tsx
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
@@ -5,31 +6,34 @@ import { usePathname } from 'next/navigation';
 import { AccessibilityPanel } from '@/presentation/components/accessibility/AccessibilityPanel';
 import { Palette, X } from 'lucide-react';
 
-const routesWithLocalAccessibilityButton = ['/', '/saber-mas', '/dashboard/paciente'];
+// Solo ocultar en home y saber-mas
+const routesWithoutAccessibility = ['/', '/saber-mas'];
 
 export function AccessibilityLauncher() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
   const shouldHide = useMemo(() => {
-    return routesWithLocalAccessibilityButton.some((route) => pathname === route);
+    // ✅ Ocultar en home, saber-mas Y en dashboard/paciente (porque ya tiene su propio botón)
+    return routesWithoutAccessibility.some((route) => pathname === route) || 
+           pathname.startsWith('/dashboard/paciente');
   }, [pathname]);
 
   useEffect(() => {
     setIsOpen(false);
   }, [pathname]);
 
-  const isAdminDashboard = pathname.startsWith('/dashboard/admin');
-  const isPsychologistDashboard = pathname.startsWith('/dashboard/psicologo');
-  const isDenseDashboard = isAdminDashboard || isPsychologistDashboard;
-
-  if (shouldHide || isAdminDashboard || isPsychologistDashboard) {
+  if (shouldHide) {
     return null;
   }
 
+  const isPsychologistDashboard = pathname.startsWith('/dashboard/psicologo');
+  const isAdminDashboard = pathname.startsWith('/dashboard/admin');
+  const isDenseDashboard = isPsychologistDashboard || isAdminDashboard;
+
   return (
     <>
-      <div className={`accessibility-launcher fixed z-[70] flex flex-col items-center gap-1 ${isPsychologistDashboard ? 'right-5 top-28' : 'left-5 top-28'}`}>
+      <div className={`accessibility-launcher fixed z-[70] flex flex-col items-center gap-1 ${isDenseDashboard ? 'right-5 top-28' : 'left-5 top-28'}`}>
         {!isDenseDashboard && (
           <span className="rounded-full bg-slate-800/70 px-2 py-0.5 text-xs font-semibold text-white/90 backdrop-blur-sm">
             Accesibilidad
