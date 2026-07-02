@@ -1737,3 +1737,1636 @@ input[type="password"]::-webkit-credentials-auto-fill-button,
 input[type="password"]::-webkit-textfield-decoration-container {
   display: none !important;
 }
+
+
+/* =========================================
+   PSICÓLOGO - BOTONES AZULES Y MODAL OPACO
+========================================= */
+
+/* --- BOTÓN "ASIGNAR" (AZUL) --- */
+html.theme-dark .psychologist-dashboard-shell button.bg-\[\#DDEEFF\],
+html.theme-dark .psychologist-dashboard-shell .bg-\[\#DDEEFF\] {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  border-color: #60a5fa !important;
+}
+
+html.theme-dark .psychologist-dashboard-shell button.bg-\[\#DDEEFF\]:hover,
+html.theme-dark .psychologist-dashboard-shell .bg-\[\#DDEEFF\]:hover {
+  background-color: #2563eb !important;
+}
+
+html.theme-dark .psychologist-dashboard-shell button.bg-\[\#DDEEFF\] *,
+html.theme-dark .psychologist-dashboard-shell .bg-\[\#DDEEFF\] * {
+  color: #ffffff !important;
+}
+
+/* --- BOTÓN "SALIR" (AZUL) --- */
+html.theme-dark .psychologist-dashboard-shell .bg-red-500,
+html.theme-dark .psychologist-dashboard-shell button.bg-red-500,
+html.theme-dark .psychologist-dashboard-shell .bg-red-600,
+html.theme-dark .psychologist-dashboard-shell button.bg-red-600,
+html.theme-dark .psychologist-dashboard-shell [class*="bg-red"]:not([class*="bg-red-50"]):not([class*="bg-red-100"]) {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  border: 2px solid #60a5fa !important;
+}
+
+html.theme-dark .psychologist-dashboard-shell .bg-red-500:hover,
+html.theme-dark .psychologist-dashboard-shell button.bg-red-500:hover {
+  background-color: #2563eb !important;
+}
+
+html.theme-dark .psychologist-dashboard-shell .bg-red-500 *,
+html.theme-dark .psychologist-dashboard-shell button.bg-red-500 * {
+  color: #ffffff !important;
+}
+
+/* --- MODAL - FONDO OPACO --- */
+html.theme-dark .psychologist-dashboard-shell .fixed.inset-0,
+html.theme-dark .psychologist-dashboard-shell [class*="fixed.inset-0"],
+html.theme-dark .psychologist-dashboard-shell [class*="bg-black/50"],
+html.theme-dark .psychologist-dashboard-shell [class*="bg-black/60"] {
+  background-color: rgba(0, 0, 0, 0.88) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+html.theme-dark .psychologist-dashboard-shell .bg-white.rounded-xl,
+html.theme-dark .psychologist-dashboard-shell .bg-white.rounded-2xl,
+html.theme-dark .psychologist-dashboard-shell .bg-white.rounded-lg,
+html.theme-dark .psychologist-dashboard-shell .bg-white {
+  background-color: #0f1f3a !important;
+  border: 2px solid #2563eb !important;
+}
+
+html.theme-dark .psychologist-dashboard-shell .bg-white * {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .psychologist-dashboard-shell select,
+html.theme-dark .psychologist-dashboard-shell input {
+  background-color: #0a1628 !important;
+  color: #f8fafc !important;
+  border: 2px solid #2563eb !important;
+  border-radius: 8px !important;
+  padding: 10px 12px !important;
+}
+
+html.theme-dark .psychologist-dashboard-shell select option {
+  background-color: #0a1628 !important;
+  color: #f8fafc !important;
+}
+
+html.theme-dark .psychologist-dashboard-shell .bg-blue-600,
+html.theme-dark .psychologist-dashboard-shell button.bg-blue-600 {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  border: 2px solid #3b82f6 !important;
+}
+
+html.theme-dark .psychologist-dashboard-shell .bg-gray-200,
+html.theme-dark .psychologist-dashboard-shell button.bg-gray-200 {
+  background-color: #1e293b !important;
+  border: 2px solid #475569 !important;
+  color: #e2e8f0 !important;
+}
+
+/* --- FILTRO DE BÚSQUEDA (texto detrás de la lupa) --- */
+html.theme-dark .psychologist-dashboard-shell input[type="text"],
+html.theme-dark .psychologist-dashboard-shell input[type="search"],
+html.theme-dark .psychologist-dashboard-shell .search-input,
+html.theme-dark .psychologist-dashboard-shell [class*="search"] input,
+html.theme-dark .psychologist-dashboard-shell input[class*="search"],
+html.theme-dark .psychologist-dashboard-shell input[placeholder*="Buscar"],
+html.theme-dark .psychologist-dashboard-shell input[placeholder*="buscar"] {
+  padding-left: 40px !important;
+  background-color: #0a1628 !important;
+  color: #f8fafc !important;
+  border: 2px solid #2563eb !important;
+  border-radius: 8px !important;
+}
+
+html.theme-dark .psychologist-dashboard-shell input[type="text"]::placeholder,
+html.theme-dark .psychologist-dashboard-shell input[type="search"]::placeholder {
+  color: #94a3b8 !important;
+}
+
+
+/* =========================================
+   LOGIN: MENSAJES DE ERROR (FONDO OSCURO INTEGRADO)
+========================================= */
+
+/* --- Eliminar fondo y borde del mensaje de error --- */
+html.theme-dark .bg-red-50,
+html.theme-dark .border-red-200,
+html.theme-dark .bg-red-100,
+html.theme-dark .bg-sky-50,
+html.theme-dark .border-sky-200,
+html.theme-dark .bg-emerald-50,
+html.theme-dark .border-emerald-200,
+html.theme-dark .bg-amber-50,
+html.theme-dark .border-amber-200,
+html.theme-dark .bg-rose-50,
+html.theme-dark .border-rose-200 {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* --- Texto del mensaje (azul claro como el resto) --- */
+html.theme-dark .text-red-600,
+html.theme-dark .text-red-500,
+html.theme-dark .text-sky-800,
+html.theme-dark .text-sky-700,
+html.theme-dark .text-emerald-800,
+html.theme-dark .text-emerald-700,
+html.theme-dark .text-amber-800,
+html.theme-dark .text-amber-700,
+html.theme-dark .text-rose-800,
+html.theme-dark .text-rose-700 {
+  color: #93c5fd !important;
+}
+
+/* --- Si el mensaje usa p-2.5 rounded-xl, quitar padding y borde --- */
+html.theme-dark .p-2\.5.rounded-xl.border,
+html.theme-dark [class*="p-2.5"][class*="rounded-xl"] {
+  padding: 0 !important;
+  background-color: transparent !important;
+  border: none !important;
+}
+
+
+
+
+/* =========================================
+   TEMA OSCURO - ADMIN (COMPLETO Y UNIFICADO)
+========================================= */
+
+/* --- FONDO GENERAL --- */
+html.theme-dark .admin-dashboard-shell,
+html.theme-dark .admin-dashboard-page {
+  background-color: #0b1220 !important;
+}
+
+/* =========================================
+   1. TARJETAS DE ESTADÍSTICAS
+========================================= */
+html.theme-dark .admin-stats-grid .bg-white,
+html.theme-dark .admin-stats-grid .bg-gray-50,
+html.theme-dark .admin-dashboard-page .bg-white.rounded-xl,
+html.theme-dark .admin-dashboard-page .bg-white.rounded-2xl,
+html.theme-dark .admin-dashboard-page .bg-white.shadow-sm {
+  background-color: #13233b !important;
+  border: 1px solid #3b82f6 !important;
+}
+
+html.theme-dark .admin-stats-grid .text-gray-900,
+html.theme-dark .admin-stats-grid .text-2xl,
+html.theme-dark .admin-stats-grid .text-sm {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .admin-stats-grid .text-gray-500 {
+  color: #94a3b8 !important;
+}
+
+/* --- Tarjetas de estadísticas (bg-[#D4EDDA]) --- */
+html.theme-dark .admin-dashboard-stat-card,
+html.theme-dark .bg-\[\#D4EDDA\].p-6.rounded-2xl {
+  background-color: #13233b !important;
+  border-color: #3b82f6 !important;
+}
+
+html.theme-dark .admin-dashboard-stat-card .text-gray-800,
+html.theme-dark .bg-\[\#D4EDDA\].p-6.rounded-2xl .text-gray-800,
+html.theme-dark .admin-dashboard-stat-card .font-bold,
+html.theme-dark .bg-\[\#D4EDDA\].p-6.rounded-2xl .font-bold {
+  color: #dbeafe !important;
+}
+
+/* =========================================
+   2. TARJETAS DE CONTROL (Actividades, Gestión Pacientes, etc.)
+========================================= */
+html.theme-dark .admin-dashboard-control-card,
+html.theme-dark .bg-\[\#B6D4F5\].p-6.rounded-xl {
+  background-color: #13233b !important;
+  border-color: #3b82f6 !important;
+}
+
+html.theme-dark .admin-dashboard-control-card .text-gray-800,
+html.theme-dark .bg-\[\#B6D4F5\].p-6.rounded-xl .text-gray-800,
+html.theme-dark .admin-dashboard-control-card h3,
+html.theme-dark .bg-\[\#B6D4F5\].p-6.rounded-xl h3 {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .admin-dashboard-control-card .text-gray-700,
+html.theme-dark .bg-\[\#B6D4F5\].p-6.rounded-xl .text-gray-700 {
+  color: #94a3b8 !important;
+}
+
+/* Botón "Agregar Actividad" dentro de las tarjetas de control */
+html.theme-dark .admin-dashboard-control-card a,
+html.theme-dark .bg-\[\#B6D4F5\].p-6.rounded-xl a {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  border-color: #60a5fa !important;
+}
+
+html.theme-dark .admin-dashboard-control-card a:hover,
+html.theme-dark .bg-\[\#B6D4F5\].p-6.rounded-xl a:hover {
+  background-color: #2563eb !important;
+}
+
+/* =========================================
+   3. HEADERS DE SECCIONES (Psicólogos, Pacientes, Actividades)
+========================================= */
+html.theme-dark .admin-psychologists-header,
+html.theme-dark .admin-patients-header,
+html.theme-dark [class*="admin-psychologists-header"],
+html.theme-dark [class*="admin-patients-header"],
+html.theme-dark .bg-\[\#D1E7FF\].p-6.rounded-xl,
+html.theme-dark .bg-\[\#D1E7FF\].p-8.rounded-xl {
+  background-color: #13233b !important;
+  border: 2px solid #3b82f6 !important;
+}
+
+html.theme-dark .admin-psychologists-header h1,
+html.theme-dark .admin-patients-header h1,
+html.theme-dark .admin-psychologists-header .text-gray-900,
+html.theme-dark .admin-patients-header .text-gray-900,
+html.theme-dark [class*="admin-psychologists-header"] h1,
+html.theme-dark [class*="admin-patients-header"] h1,
+html.theme-dark .bg-\[\#D1E7FF\].p-6.rounded-xl h1,
+html.theme-dark .bg-\[\#D1E7FF\].p-8.rounded-xl h2 {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .admin-psychologists-header p,
+html.theme-dark .admin-patients-header p,
+html.theme-dark [class*="admin-psychologists-header"] p,
+html.theme-dark [class*="admin-patients-header"] p,
+html.theme-dark .bg-\[\#D1E7FF\].p-6.rounded-xl p,
+html.theme-dark .bg-\[\#D1E7FF\].p-8.rounded-xl p {
+  color: #94a3b8 !important;
+}
+
+html.theme-dark .admin-psychologists-header .border-blue-200,
+html.theme-dark .admin-patients-header .border-blue-200,
+html.theme-dark [class*="admin-psychologists-header"] .border-blue-200,
+html.theme-dark [class*="admin-patients-header"] .border-blue-200 {
+  border-color: #3b82f6 !important;
+}
+
+/* Botón "NUEVO PSICÓLOGO" / "NUEVO PACIENTE" */
+html.theme-dark .admin-psychologists-header button,
+html.theme-dark .admin-patients-header button,
+html.theme-dark [class*="admin-psychologists-header"] button,
+html.theme-dark [class*="admin-patients-header"] button,
+html.theme-dark .bg-\[\#D1E7FF\].p-6.rounded-xl button {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  border: 2px solid #60a5fa !important;
+}
+
+html.theme-dark .admin-psychologists-header button:hover,
+html.theme-dark .admin-patients-header button:hover {
+  background-color: #2563eb !important;
+}
+
+/* =========================================
+   4. ACTIVIDADES
+========================================= */
+/* Fondo principal de actividades */
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen,
+html.theme-dark [class*="bg-[#E3F2FD]"] {
+  background-color: #0b1220 !important;
+}
+
+/* Tarjeta principal de actividades */
+html.theme-dark .bg-\[\#D1E7FF\].p-8.rounded-xl.border.border-blue-200,
+html.theme-dark [class*="bg-[#D1E7FF]"].p-8.rounded-xl {
+  background-color: #13233b !important;
+  border: 2px solid #3b82f6 !important;
+}
+
+html.theme-dark .bg-\[\#D1E7FF\].p-8.rounded-xl h2,
+html.theme-dark .bg-\[\#D1E7FF\].p-8.rounded-xl .text-gray-900 {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .bg-\[\#D1E7FF\].p-8.rounded-xl p,
+html.theme-dark .bg-\[\#D1E7FF\].p-8.rounded-xl .text-gray-700 {
+  color: #94a3b8 !important;
+}
+
+/* Input de búsqueda en actividades */
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen input,
+html.theme-dark [class*="bg-[#E3F2FD]"] input,
+html.theme-dark .bg-\[\#D1E7FF\].p-8.rounded-xl input {
+  background-color: #0a1628 !important;
+  color: #f8fafc !important;
+  border: 2px solid #3b82f6 !important;
+}
+
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen input::placeholder,
+html.theme-dark [class*="bg-[#E3F2FD]"] input::placeholder {
+  color: #94a3b8 !important;
+}
+
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen .text-gray-600,
+html.theme-dark [class*="bg-[#E3F2FD]"] .text-gray-600 {
+  color: #94a3b8 !important;
+}
+
+/* Botón Buscar en actividades */
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen .bg-gray-200,
+html.theme-dark [class*="bg-[#E3F2FD]"] .bg-gray-200 {
+  background-color: #1e293b !important;
+  color: #dbeafe !important;
+  border-color: #3b82f6 !important;
+}
+
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen .bg-gray-200:hover,
+html.theme-dark [class*="bg-[#E3F2FD]"] .bg-gray-200:hover {
+  background-color: #334155 !important;
+}
+
+/* Filtros de actividades (Todos, Respiración, etc.) */
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen .bg-gray-800,
+html.theme-dark [class*="bg-[#E3F2FD]"] .bg-gray-800 {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  border-color: #60a5fa !important;
+}
+
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen .bg-white.text-gray-800,
+html.theme-dark [class*="bg-[#E3F2FD]"] .bg-white.text-gray-800 {
+  background-color: #0a1628 !important;
+  color: #dbeafe !important;
+  border-color: #3b82f6 !important;
+}
+
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen .bg-white.text-gray-800:hover,
+html.theme-dark [class*="bg-[#E3F2FD]"] .bg-white.text-gray-800:hover {
+  background-color: #1e293b !important;
+}
+
+/* Tabla de actividades */
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen .overflow-hidden.rounded-2xl,
+html.theme-dark [class*="bg-[#E3F2FD]"] .overflow-hidden.rounded-2xl {
+  background-color: #13233b !important;
+  border: 2px solid #3b82f6 !important;
+}
+
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen .bg-gradient-to-r.from-\[\#1E4D8C\],
+html.theme-dark [class*="bg-[#E3F2FD]"] .bg-gradient-to-r.from-\[\#1E4D8C\] {
+  background: #0a1a30 !important;
+  background-image: none !important;
+}
+
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen thead th,
+html.theme-dark [class*="bg-[#E3F2FD]"] thead th {
+  color: #93c5fd !important;
+}
+
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen .bg-white,
+html.theme-dark [class*="bg-[#E3F2FD]"] .bg-white {
+  background-color: #13233b !important;
+}
+
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen .bg-blue-50\/30,
+html.theme-dark [class*="bg-[#E3F2FD]"] .bg-blue-50\/30 {
+  background-color: #0a1a30 !important;
+}
+
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen .border-blue-100,
+html.theme-dark [class*="bg-[#E3F2FD]"] .border-blue-100 {
+  border-color: #334155 !important;
+}
+
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen .text-gray-800,
+html.theme-dark [class*="bg-[#E3F2FD]"] .text-gray-800,
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen .font-semibold.text-gray-800,
+html.theme-dark [class*="bg-[#E3F2FD]"] .font-semibold.text-gray-800 {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen .text-gray-600,
+html.theme-dark [class*="bg-[#E3F2FD]"] .text-gray-600 {
+  color: #94a3b8 !important;
+}
+
+/* Badges de actividades (Respiración, etc.) */
+html.theme-dark .bg-cyan-100.text-cyan-800,
+html.theme-dark [class*="bg-cyan-100"] {
+  background-color: #065f46 !important;
+  color: #6ee7b7 !important;
+}
+
+/* Selects de actividades */
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen select,
+html.theme-dark [class*="bg-[#E3F2FD]"] select,
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen select option,
+html.theme-dark [class*="bg-[#E3F2FD]"] select option {
+  background-color: #0a1628 !important;
+  color: #f8fafc !important;
+  border: 2px solid #3b82f6 !important;
+}
+
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen .bg-blue-50.text-blue-800,
+html.theme-dark [class*="bg-[#E3F2FD]"] .bg-blue-50.text-blue-800,
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen .ring-blue-300,
+html.theme-dark [class*="bg-[#E3F2FD]"] .ring-blue-300 {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  --tw-ring-color: #60a5fa !important;
+}
+
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen .bg-green-50.text-green-800,
+html.theme-dark [class*="bg-[#E3F2FD]"] .bg-green-50.text-green-800,
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen .ring-green-300,
+html.theme-dark [class*="bg-[#E3F2FD]"] .ring-green-300 {
+  background-color: #065f46 !important;
+  color: #6ee7b7 !important;
+  --tw-ring-color: #34d399 !important;
+}
+
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen .bg-white.text-amber-800,
+html.theme-dark [class*="bg-[#E3F2FD]"] .bg-white.text-amber-800 {
+  background-color: #78350f !important;
+  color: #fcd34d !important;
+}
+
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen .bg-white.text-green-800,
+html.theme-dark [class*="bg-[#E3F2FD]"] .bg-white.text-green-800 {
+  background-color: #065f46 !important;
+  color: #6ee7b7 !important;
+}
+
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen .bg-white.text-red-800,
+html.theme-dark [class*="bg-[#E3F2FD]"] .bg-white.text-red-800 {
+  background-color: #7f1d1d !important;
+  color: #fca5a5 !important;
+}
+
+/* Botones de acción (editar, ver, eliminar) en actividades */
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen .bg-blue-50.text-blue-700,
+html.theme-dark [class*="bg-[#E3F2FD]"] .bg-blue-50.text-blue-700 {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+}
+
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen .bg-emerald-50.text-emerald-700,
+html.theme-dark [class*="bg-[#E3F2FD]"] .bg-emerald-50.text-emerald-700 {
+  background-color: #059669 !important;
+  color: #ffffff !important;
+}
+
+html.theme-dark .bg-\[\#E3F2FD\].min-h-screen .bg-red-50.text-red-700,
+html.theme-dark [class*="bg-[#E3F2FD]"] .bg-red-50.text-red-700 {
+  background-color: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+/* Botones Importar y Ver actividades */
+html.theme-dark .bg-\[\#D1E7FF\].border.border-gray-400.p-6.rounded-xl,
+html.theme-dark [class*="bg-[#D1E7FF]"].border.border-gray-400 {
+  background-color: #13233b !important;
+  border: 2px solid #3b82f6 !important;
+}
+
+html.theme-dark .bg-\[\#D1E7FF\].border.border-gray-400.p-6.rounded-xl .text-gray-800,
+html.theme-dark [class*="bg-[#D1E7FF]"].border.border-gray-400 .text-gray-800,
+html.theme-dark .bg-\[\#D1E7FF\].border.border-gray-400.p-6.rounded-xl .text-gray-700,
+html.theme-dark [class*="bg-[#D1E7FF]"].border.border-gray-400 .text-gray-700 {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .bg-\[\#D1E7FF\].border.border-gray-400.p-6.rounded-xl:hover,
+html.theme-dark [class*="bg-[#D1E7FF]"].border.border-gray-400:hover {
+  background-color: #1e3a5f !important;
+}
+
+/* =========================================
+   5. REPORTES
+========================================= */
+/* Header de Reportes (bg-[#D1E7FF]) */
+html.theme-dark .bg-\[\#D1E7FF\].p-5.rounded-xl,
+html.theme-dark [class*="bg-[#D1E7FF]"].p-5.rounded-xl {
+  background-color: #13233b !important;
+  border: 2px solid #3b82f6 !important;
+  box-shadow: none !important;
+}
+
+html.theme-dark .bg-\[\#D1E7FF\].p-5.rounded-xl .text-gray-900,
+html.theme-dark [class*="bg-[#D1E7FF]"].p-5.rounded-xl .text-gray-900,
+html.theme-dark .bg-\[\#D1E7FF\].p-5.rounded-xl .font-black.text-gray-900 {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .bg-\[\#D1E7FF\].p-5.rounded-xl .text-gray-700,
+html.theme-dark [class*="bg-[#D1E7FF]"].p-5.rounded-xl .text-gray-700,
+html.theme-dark .bg-\[\#D1E7FF\].p-5.rounded-xl .font-bold.text-gray-700 {
+  color: #94a3b8 !important;
+}
+
+/* Tarjetas de reportes (bg-[#FFF0EA]) */
+html.theme-dark .admin-report-card,
+html.theme-dark [class*="admin-report-card"],
+html.theme-dark .bg-\[\#FFF0EA\].p-5.rounded-xl,
+html.theme-dark [class*="bg-[#FFF0EA]"] {
+  background-color: #13233b !important;
+  border: 2px solid #3b82f6 !important;
+  box-shadow: none !important;
+}
+
+html.theme-dark .admin-report-card .text-gray-900,
+html.theme-dark [class*="admin-report-card"] .text-gray-900,
+html.theme-dark .bg-\[\#FFF0EA\].p-5.rounded-xl .text-gray-900,
+html.theme-dark [class*="bg-[#FFF0EA]"] .text-gray-900 {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .admin-report-card .text-gray-600,
+html.theme-dark [class*="admin-report-card"] .text-gray-600,
+html.theme-dark .bg-\[\#FFF0EA\].p-5.rounded-xl .text-gray-600,
+html.theme-dark [class*="bg-[#FFF0EA]"] .text-gray-600 {
+  color: #94a3b8 !important;
+}
+
+/* Botón Generar PDF en reportes */
+html.theme-dark .admin-report-card button,
+html.theme-dark [class*="admin-report-card"] button,
+html.theme-dark .bg-\[\#FFF0EA\].p-5.rounded-xl button,
+html.theme-dark [class*="bg-[#FFF0EA]"] button {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  border: 2px solid #60a5fa !important;
+}
+
+html.theme-dark .admin-report-card button:hover,
+html.theme-dark [class*="admin-report-card"] button:hover,
+html.theme-dark .bg-\[\#FFF0EA\].p-5.rounded-xl button:hover,
+html.theme-dark [class*="bg-[#FFF0EA]"] button:hover {
+  background-color: #2563eb !important;
+}
+
+html.theme-dark .admin-report-card button .text-gray-900,
+html.theme-dark [class*="admin-report-card"] button .text-gray-900 {
+  color: #ffffff !important;
+}
+
+/* =========================================
+   6. TABLAS EN PSICÓLOGOS Y PACIENTES
+========================================= */
+html.theme-dark .admin-dashboard-page .overflow-hidden.rounded-xl,
+html.theme-dark .admin-dashboard-page .border.border-blue-200,
+html.theme-dark .admin-dashboard-page .bg-white.rounded-xl {
+  background-color: #13233b !important;
+  border: 2px solid #3b82f6 !important;
+}
+
+html.theme-dark .admin-dashboard-page table,
+html.theme-dark .admin-dashboard-page .bg-white {
+  background-color: #13233b !important;
+}
+
+html.theme-dark .admin-dashboard-page thead,
+html.theme-dark .admin-dashboard-page .bg-gray-50,
+html.theme-dark .admin-dashboard-page .bg-\[\#F8FAFC\] {
+  background-color: #0a1a30 !important;
+}
+
+html.theme-dark .admin-dashboard-page th,
+html.theme-dark .admin-dashboard-page .text-gray-900.font-bold,
+html.theme-dark .admin-dashboard-page .font-bold.text-gray-900 {
+  color: #93c5fd !important;
+}
+
+html.theme-dark .admin-dashboard-page td,
+html.theme-dark .admin-dashboard-page .text-gray-800,
+html.theme-dark .admin-dashboard-page .text-gray-700 {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .admin-dashboard-page .border-b,
+html.theme-dark .admin-dashboard-page .border-gray-200 {
+  border-color: #334155 !important;
+}
+
+html.theme-dark .admin-dashboard-page tr:hover,
+html.theme-dark .admin-dashboard-page .hover\:bg-gray-50:hover {
+  background-color: #1e3a5f !important;
+}
+
+/* =========================================
+   7. FILTROS DE TABLAS (Todos, Activos, Inactivos, Pendiente)
+========================================= */
+html.theme-dark .flex.gap-2 button.bg-gray-800,
+html.theme-dark [class*="flex.gap-2"] button.bg-gray-800 {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  border: 2px solid #60a5fa !important;
+}
+
+html.theme-dark .flex.gap-2 button.bg-white,
+html.theme-dark [class*="flex.gap-2"] button.bg-white {
+  background-color: #0a1628 !important;
+  color: #dbeafe !important;
+  border: 2px solid #3b82f6 !important;
+}
+
+html.theme-dark .flex.gap-2 button.bg-white:hover,
+html.theme-dark [class*="flex.gap-2"] button.bg-white:hover {
+  background-color: #1e293b !important;
+  color: #ffffff !important;
+}
+
+/* =========================================
+   8. BADGES DE ESTADO (Activo, Inactivo, Pendiente)
+========================================= */
+html.theme-dark .bg-green-100.text-green-800,
+html.theme-dark [class*="bg-green-100"] {
+  background-color: #065f46 !important;
+  color: #6ee7b7 !important;
+}
+
+html.theme-dark .bg-red-100.text-red-800,
+html.theme-dark [class*="bg-red-100"] {
+  background-color: #7f1d1d !important;
+  color: #fca5a5 !important;
+}
+
+html.theme-dark .bg-yellow-100.text-yellow-800,
+html.theme-dark [class*="bg-yellow-100"] {
+  background-color: #78350f !important;
+  color: #fcd34d !important;
+}
+
+html.theme-dark .bg-gray-100.text-gray-800,
+html.theme-dark [class*="bg-gray-100"] {
+  background-color: #1e293b !important;
+  color: #94a3b8 !important;
+}
+
+/* =========================================
+   9. BOTÓN DESACTIVAR (rojo → azul en oscuro)
+========================================= */
+html.theme-dark .bg-red-500,
+html.theme-dark .bg-red-600,
+html.theme-dark button.bg-red-500,
+html.theme-dark button.bg-red-600,
+html.theme-dark [class*="bg-red-"]:not([class*="bg-red-50"]):not([class*="bg-red-100"]) {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  border: 2px solid #60a5fa !important;
+}
+
+html.theme-dark .bg-red-500:hover,
+html.theme-dark button.bg-red-500:hover,
+html.theme-dark [class*="bg-red-"]:not([class*="bg-red-50"]):not([class*="bg-red-100"]):hover {
+  background-color: #2563eb !important;
+}
+
+html.theme-dark .bg-red-500 *,
+html.theme-dark button.bg-red-500 * {
+  color: #ffffff !important;
+}
+
+/* =========================================
+   10. INPUTS DE BÚSQUEDA
+========================================= */
+html.theme-dark .admin-dashboard-page input[type="text"],
+html.theme-dark .admin-dashboard-page input[type="search"],
+html.theme-dark .admin-dashboard-page .border-gray-300.rounded-full,
+html.theme-dark .admin-dashboard-page .border-gray-300.rounded-xl {
+  background-color: #0a1628 !important;
+  color: #f8fafc !important;
+  border: 2px solid #3b82f6 !important;
+}
+
+html.theme-dark .admin-dashboard-page input::placeholder,
+html.theme-dark .admin-dashboard-page .text-gray-500,
+html.theme-dark .admin-dashboard-page .text-gray-400 {
+  color: #94a3b8 !important;
+}
+
+/* =========================================
+   11. FOOTER
+========================================= */
+html.theme-dark .admin-dashboard-page footer,
+html.theme-dark .admin-dashboard-shell footer,
+html.theme-dark .admin-dashboard-page .border-t,
+html.theme-dark .admin-dashboard-shell .border-t {
+  background-color: #0f172a !important;
+  border-top: 1px solid #334155 !important;
+  color: #94a3b8 !important;
+}
+
+html.theme-dark .admin-dashboard-page footer *,
+html.theme-dark .admin-dashboard-shell footer * {
+  color: #94a3b8 !important;
+}
+
+html.theme-dark .admin-dashboard-page footer .text-\[\#1E4D8C\],
+html.theme-dark .admin-dashboard-shell footer .text-\[\#1E4D8C\] {
+  color: #94a3b8 !important;
+}
+
+/* =========================================
+   ARREGLO - TABLA PSICÓLOGOS Y PACIENTES (CLASES EXACTAS)
+========================================= */
+
+/* --- 1. CONTENEDOR DE LA TABLA --- */
+html.theme-dark .admin-psychologists-table,
+html.theme-dark .admin-patients-table,
+html.theme-dark .admin-psychologists-table.bg-white,
+html.theme-dark .admin-patients-table.bg-white {
+  background-color: #13233b !important;
+  border-color: #3b82f6 !important;
+}
+
+/* --- 2. ENCABEZADO DE TABLA (THEAD) --- */
+html.theme-dark .admin-psychologists-table thead,
+html.theme-dark .admin-patients-table thead,
+html.theme-dark .admin-psychologists-table .bg-\[\#BDBDBD\],
+html.theme-dark .admin-patients-table .bg-\[\#BDBDBD\] {
+  background-color: #0a1a30 !important;
+  border-color: #3b82f6 !important;
+}
+
+html.theme-dark .admin-psychologists-table thead th,
+html.theme-dark .admin-patients-table thead th,
+html.theme-dark .admin-psychologists-table th.border-r-2,
+html.theme-dark .admin-patients-table th.border-r-2,
+html.theme-dark .admin-psychologists-table th.border-gray-800,
+html.theme-dark .admin-patients-table th.border-gray-800,
+html.theme-dark .admin-psychologists-table th.uppercase,
+html.theme-dark .admin-patients-table th.uppercase {
+  background-color: #0a1a30 !important;
+  color: #93c5fd !important;
+  border-color: #3b82f6 !important;
+}
+
+html.theme-dark .admin-psychologists-table thead .text-gray-900,
+html.theme-dark .admin-patients-table thead .text-gray-900,
+html.theme-dark .admin-psychologists-table thead .font-black,
+html.theme-dark .admin-patients-table thead .font-black {
+  color: #93c5fd !important;
+}
+
+/* --- 3. CUERPO DE TABLA (TBODY) --- */
+html.theme-dark .admin-psychologists-table tbody,
+html.theme-dark .admin-patients-table tbody,
+html.theme-dark .admin-psychologists-table .divide-y-2.divide-gray-200,
+html.theme-dark .admin-patients-table .divide-y-2.divide-gray-200 {
+  background-color: #13233b !important;
+  border-color: #3b82f6 !important;
+}
+
+html.theme-dark .admin-psychologists-table td,
+html.theme-dark .admin-patients-table td,
+html.theme-dark .admin-psychologists-table td.border-r-2,
+html.theme-dark .admin-patients-table td.border-r-2,
+html.theme-dark .admin-psychologists-table td.border-gray-200,
+html.theme-dark .admin-patients-table td.border-gray-200 {
+  background-color: #13233b !important;
+  color: #dbeafe !important;
+  border-color: #3b82f6 !important;
+}
+
+html.theme-dark .admin-psychologists-table td .text-gray-900,
+html.theme-dark .admin-patients-table td .text-gray-900,
+html.theme-dark .admin-psychologists-table td .font-medium,
+html.theme-dark .admin-patients-table td .font-medium {
+  color: #dbeafe !important;
+}
+
+/* --- 4. FILAS ALTERNAS --- */
+html.theme-dark .admin-psychologists-table tbody tr:nth-child(even),
+html.theme-dark .admin-patients-table tbody tr:nth-child(even) {
+  background-color: #0a1a30 !important;
+}
+
+html.theme-dark .admin-psychologists-table tbody tr:nth-child(even) td,
+html.theme-dark .admin-patients-table tbody tr:nth-child(even) td {
+  background-color: #0a1a30 !important;
+}
+
+/* --- 5. HOVER EN FILAS --- */
+html.theme-dark .admin-psychologists-table tbody tr:hover,
+html.theme-dark .admin-patients-table tbody tr:hover,
+html.theme-dark .admin-psychologists-table .hover\:bg-gray-100:hover,
+html.theme-dark .admin-patients-table .hover\:bg-gray-100:hover {
+  background-color: #1e3a5f !important;
+}
+
+html.theme-dark .admin-psychologists-table tbody tr:hover td,
+html.theme-dark .admin-patients-table tbody tr:hover td {
+  background-color: #1e3a5f !important;
+}
+
+/* --- 6. BADGE "ACTIVO" --- */
+html.theme-dark .admin-psychologists-table .bg-green-100.text-green-700,
+html.theme-dark .admin-patients-table .bg-green-100.text-green-700,
+html.theme-dark .admin-psychologists-table .bg-green-100,
+html.theme-dark .admin-patients-table .bg-green-100,
+html.theme-dark .admin-psychologists-table .text-green-700,
+html.theme-dark .admin-patients-table .text-green-700 {
+  background-color: #065f46 !important;
+  color: #6ee7b7 !important;
+}
+
+/* --- 7. BOTÓN "DESACTIVAR" --- */
+html.theme-dark .admin-psychologists-table .bg-red-200,
+html.theme-dark .admin-patients-table .bg-red-200,
+html.theme-dark .admin-psychologists-table button.bg-red-200,
+html.theme-dark .admin-patients-table button.bg-red-200 {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  border-color: #60a5fa !important;
+}
+
+html.theme-dark .admin-psychologists-table .bg-red-200:hover,
+html.theme-dark .admin-patients-table .bg-red-200:hover,
+html.theme-dark .admin-psychologists-table button.bg-red-200:hover,
+html.theme-dark .admin-patients-table button.bg-red-200:hover {
+  background-color: #2563eb !important;
+}
+
+/* --- 8. ICONOS DE EDICIÓN Y ELIMINAR --- */
+html.theme-dark .admin-psychologists-table .text-gray-800.hover\:text-blue-600,
+html.theme-dark .admin-patients-table .text-gray-800.hover\:text-blue-600,
+html.theme-dark .admin-psychologists-table .text-gray-800.hover\:text-red-600,
+html.theme-dark .admin-patients-table .text-gray-800.hover\:text-red-600 {
+  color: #93c5fd !important;
+}
+
+html.theme-dark .admin-psychologists-table .text-gray-800.hover\:text-blue-600:hover,
+html.theme-dark .admin-patients-table .text-gray-800.hover\:text-blue-600:hover {
+  color: #60a5fa !important;
+}
+
+html.theme-dark .admin-psychologists-table .text-gray-800.hover\:text-red-600:hover,
+html.theme-dark .admin-patients-table .text-gray-800.hover\:text-red-600:hover {
+  color: #fca5a5 !important;
+}
+
+/* --- 9. FILTROS (Todos, Activos, Inactivos, Pendiente) --- */
+html.theme-dark .admin-psychologists-search .flex.gap-2 button.bg-gray-800,
+html.theme-dark .admin-patients-search .flex.gap-2 button.bg-gray-800 {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  border: 2px solid #60a5fa !important;
+}
+
+html.theme-dark .admin-psychologists-search .flex.gap-2 button.bg-white,
+html.theme-dark .admin-patients-search .flex.gap-2 button.bg-white {
+  background-color: #0a1628 !important;
+  color: #dbeafe !important;
+  border: 2px solid #3b82f6 !important;
+}
+
+html.theme-dark .admin-psychologists-search .flex.gap-2 button.bg-white:hover,
+html.theme-dark .admin-patients-search .flex.gap-2 button.bg-white:hover {
+  background-color: #1e293b !important;
+  color: #ffffff !important;
+}
+
+html.theme-dark .admin-psychologists-search .flex.gap-2 button,
+html.theme-dark .admin-patients-search .flex.gap-2 button {
+  border-color: #3b82f6 !important;
+}
+
+/* --- 10. INPUT DE BÚSQUEDA --- */
+html.theme-dark .admin-psychologists-search input,
+html.theme-dark .admin-patients-search input,
+html.theme-dark .admin-psychologists-search .border-gray-400,
+html.theme-dark .admin-patients-search .border-gray-400 {
+  background-color: #0a1628 !important;
+  color: #f8fafc !important;
+  border: 2px solid #3b82f6 !important;
+}
+
+html.theme-dark .admin-psychologists-search input::placeholder,
+html.theme-dark .admin-patients-search input::placeholder {
+  color: #94a3b8 !important;
+}
+
+html.theme-dark .admin-psychologists-search input.text-gray-900,
+html.theme-dark .admin-patients-search input.text-gray-900 {
+  color: #f8fafc !important;
+}
+
+/* --- 11. BOTÓN "BUSCAR" --- */
+html.theme-dark .admin-psychologists-search .bg-gray-200,
+html.theme-dark .admin-patients-search .bg-gray-200,
+html.theme-dark .admin-psychologists-search button.bg-gray-200,
+html.theme-dark .admin-patients-search button.bg-gray-200 {
+  background-color: #1e293b !important;
+  color: #dbeafe !important;
+  border-color: #3b82f6 !important;
+}
+
+html.theme-dark .admin-psychologists-search .bg-gray-200:hover,
+html.theme-dark .admin-patients-search .bg-gray-200:hover,
+html.theme-dark .admin-psychologists-search button.bg-gray-200:hover,
+html.theme-dark .admin-patients-search button.bg-gray-200:hover {
+  background-color: #334155 !important;
+}
+
+html.theme-dark .admin-psychologists-search button.text-gray-800,
+html.theme-dark .admin-patients-search button.text-gray-800 {
+  color: #dbeafe !important;
+}
+
+/* --- 12. FONDO DEL CONTENEDOR DE BÚSQUEDA (bg-[#D1E7FF]/50) --- */
+html.theme-dark .admin-psychologists-search,
+html.theme-dark .admin-patients-search,
+html.theme-dark .bg-\[\#D1E7FF\]\/50 {
+  background-color: #13233b !important;
+  border-color: #3b82f6 !important;
+}
+
+/* --- 13. BORDES Y SOMBRAS DE LA TABLA --- */
+html.theme-dark .admin-psychologists-table .shadow-lg,
+html.theme-dark .admin-patients-table .shadow-lg {
+  box-shadow: none !important;
+}
+
+html.theme-dark .admin-psychologists-table .border-gray-800,
+html.theme-dark .admin-patients-table .border-gray-800 {
+  border-color: #3b82f6 !important;
+}
+
+/* =========================================
+   TEMA OSCURO - FORMULARIO CREAR PSICÓLOGO / PACIENTE
+========================================= */
+
+/* --- 1. FONDO DEL MODAL (overlay) --- */
+html.theme-dark .fixed.inset-0.bg-black\/50,
+html.theme-dark .fixed.inset-0.bg-black\/60,
+html.theme-dark [class*="bg-black/50"],
+html.theme-dark [class*="bg-black/60"] {
+  background-color: rgba(0, 0, 0, 0.88) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* --- 2. TARJETA PRINCIPAL DEL FORMULARIO --- */
+html.theme-dark .admin-create-psychologist-card,
+html.theme-dark .admin-create-patient-card,
+html.theme-dark .bg-\[\#F7F7F7\].w-full.max-w-md.rounded-3xl {
+  background-color: #13233b !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* --- 3. HEADER DEL FORMULARIO --- */
+html.theme-dark .admin-create-psychologist-header,
+html.theme-dark .admin-create-patient-header,
+html.theme-dark .bg-\[\#AFC8E8\].p-6.border-b-4 {
+  background-color: #0a1a30 !important;
+  border-color: #3b82f6 !important;
+}
+
+html.theme-dark .admin-create-psychologist-header h2,
+html.theme-dark .admin-create-patient-header h2,
+html.theme-dark .admin-create-psychologist-header .text-gray-900,
+html.theme-dark .admin-create-patient-header .text-gray-900 {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .admin-create-psychologist-header .text-gray-900,
+html.theme-dark .admin-create-patient-header .text-gray-900 {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .admin-create-psychologist-header svg,
+html.theme-dark .admin-create-patient-header svg {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .admin-create-psychologist-header button:hover svg,
+html.theme-dark .admin-create-patient-header button:hover svg {
+  color: #93c5fd !important;
+}
+
+/* --- 4. CUERPO DEL FORMULARIO --- */
+html.theme-dark .admin-create-psychologist-card form,
+html.theme-dark .admin-create-patient-card form,
+html.theme-dark .bg-\[\#F7F7F7\].w-full.max-w-md.rounded-3xl form {
+  background-color: #13233b !important;
+}
+
+/* --- 5. LABELS --- */
+html.theme-dark .admin-create-psychologist-card label,
+html.theme-dark .admin-create-patient-card label,
+html.theme-dark .bg-\[\#F7F7F7\].w-full.max-w-md.rounded-3xl label,
+html.theme-dark .admin-create-psychologist-card .text-gray-700,
+html.theme-dark .admin-create-patient-card .text-gray-700 {
+  color: #94a3b8 !important;
+}
+
+/* --- 6. INPUTS --- */
+html.theme-dark .admin-create-psychologist-card input,
+html.theme-dark .admin-create-patient-card input,
+html.theme-dark .bg-\[\#F7F7F7\].w-full.max-w-md.rounded-3xl input,
+html.theme-dark .admin-create-psychologist-card .bg-\[\#EAF2FB\],
+html.theme-dark .admin-create-patient-card .bg-\[\#EAF2FB\] {
+  background-color: #0a1628 !important;
+  color: #f8fafc !important;
+  border-color: #3b82f6 !important;
+}
+
+html.theme-dark .admin-create-psychologist-card input::placeholder,
+html.theme-dark .admin-create-patient-card input::placeholder {
+  color: #94a3b8 !important;
+}
+
+html.theme-dark .admin-create-psychologist-card input:focus,
+html.theme-dark .admin-create-patient-card input:focus {
+  background-color: #0f1a30 !important;
+  outline: 2px solid #60a5fa !important;
+  outline-offset: 2px !important;
+}
+
+html.theme-dark .admin-create-psychologist-card input.text-gray-900,
+html.theme-dark .admin-create-patient-card input.text-gray-900 {
+  color: #f8fafc !important;
+}
+
+html.theme-dark .admin-create-psychologist-card .placeholder-gray-500::placeholder,
+html.theme-dark .admin-create-patient-card .placeholder-gray-500::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* --- 7. BOTÓN MOSTRAR CONTRASEÑA --- */
+html.theme-dark .admin-create-psychologist-card .text-gray-500.hover\:text-gray-800,
+html.theme-dark .admin-create-patient-card .text-gray-500.hover\:text-gray-800 {
+  color: #94a3b8 !important;
+}
+
+html.theme-dark .admin-create-psychologist-card .text-gray-500.hover\:text-gray-800:hover,
+html.theme-dark .admin-create-patient-card .text-gray-500.hover\:text-gray-800:hover {
+  color: #dbeafe !important;
+}
+
+/* --- 8. BOTÓN "GUARDAR PSICÓLOGO" --- */
+html.theme-dark .admin-create-psychologist-card button[type="submit"],
+html.theme-dark .admin-create-patient-card button[type="submit"],
+html.theme-dark .bg-\[\#AFC8E8\].hover\:bg-\[\#94B6DF\].border-4.border-gray-800 {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  border-color: #60a5fa !important;
+}
+
+html.theme-dark .admin-create-psychologist-card button[type="submit"]:hover,
+html.theme-dark .admin-create-patient-card button[type="submit"]:hover {
+  background-color: #2563eb !important;
+}
+
+html.theme-dark .admin-create-psychologist-card button[type="submit"] .text-gray-900,
+html.theme-dark .admin-create-patient-card button[type="submit"] .text-gray-900 {
+  color: #ffffff !important;
+}
+
+html.theme-dark .admin-create-psychologist-card button[type="submit"] .shadow-\[4px_4px_0px_0px_rgba\(0\2c 0\2c 0\2c 1\)\],
+html.theme-dark .admin-create-patient-card button[type="submit"] .shadow-\[4px_4px_0px_0px_rgba\(0\2c 0\2c 0\2c 1\)\] {
+  box-shadow: none !important;
+}
+
+/* --- 9. BORDES DEL FORMULARIO --- */
+html.theme-dark .admin-create-psychologist-card .border-gray-800,
+html.theme-dark .admin-create-patient-card .border-gray-800 {
+  border-color: #3b82f6 !important;
+}
+
+html.theme-dark .admin-create-psychologist-card .border-gray-700,
+html.theme-dark .admin-create-patient-card .border-gray-700 {
+  border-color: #3b82f6 !important;
+}
+
+/* --- 10. SOMBRAS --- */
+html.theme-dark .admin-create-psychologist-card .shadow-\[10px_10px_0px_0px_rgba\(0\2c 0\2c 0\2c 1\)\],
+html.theme-dark .admin-create-patient-card .shadow-\[10px_10px_0px_0px_rgba\(0\2c 0\2c 0\2c 1\)\] {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8) !important;
+}
+
+html.theme-dark .admin-create-psychologist-card .shadow-\[4px_4px_0px_0px_rgba\(0\2c 0\2c 0\2c 1\)\],
+html.theme-dark .admin-create-patient-card .shadow-\[4px_4px_0px_0px_rgba\(0\2c 0\2c 0\2c 1\)\] {
+  box-shadow: none !important;
+}
+
+/* --- 11. FONDO DEL HEADER (bg-[#AFC8E8]) --- */
+html.theme-dark .bg-\[\#AFC8E8\],
+html.theme-dark [class*="bg-[#AFC8E8]"] {
+  background-color: #0a1a30 !important;
+}
+
+/* --- 12. FONDO DE INPUTS (bg-[#EAF2FB]) --- */
+html.theme-dark .bg-\[\#EAF2FB\],
+html.theme-dark [class*="bg-[#EAF2FB]"] {
+  background-color: #0a1628 !important;
+}
+
+/* =========================================
+   TEMA OSCURO - MODAL IMPORTAR ACTIVIDADES
+========================================= */
+
+/* --- 1. FONDO DEL MODAL (overlay) --- */
+html.theme-dark .fixed.inset-0.bg-black.bg-opacity-40,
+html.theme-dark .fixed.inset-0.bg-black\/40,
+html.theme-dark [class*="bg-black"][class*="bg-opacity"] {
+  background-color: rgba(0, 0, 0, 0.88) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* --- 2. CONTENEDOR PRINCIPAL DEL MODAL --- */
+html.theme-dark .bg-white.rounded-lg.shadow-xl,
+html.theme-dark .bg-white.rounded-lg.shadow-xl.w-full {
+  background-color: #13233b !important;
+  border: 2px solid #3b82f6 !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* --- 3. HEADER DEL MODAL (bg-[#D1E7FF]) --- */
+html.theme-dark .bg-\[\#D1E7FF\].px-6.py-4,
+html.theme-dark .bg-\[\#D1E7FF\].text-gray-800 {
+  background-color: #0a1a30 !important;
+  border-bottom: 2px solid #3b82f6 !important;
+}
+
+html.theme-dark .bg-\[\#D1E7FF\].px-6.py-4 .text-black,
+html.theme-dark .bg-\[\#D1E7FF\].px-6.py-4 .text-gray-800,
+html.theme-dark .bg-\[\#D1E7FF\].px-6.py-4 h3,
+html.theme-dark .bg-\[\#D1E7FF\].px-6.py-4 p {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .bg-\[\#D1E7FF\].px-6.py-4 button {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .bg-\[\#D1E7FF\].px-6.py-4 button:hover {
+  color: #93c5fd !important;
+}
+
+/* --- 4. CUERPO DEL MODAL (p-6) --- */
+html.theme-dark .bg-white.rounded-lg.shadow-xl .p-6,
+html.theme-dark .bg-white.rounded-lg.shadow-xl > .p-6 {
+  background-color: #13233b !important;
+}
+
+html.theme-dark .bg-white.rounded-lg.shadow-xl .p-6 .text-black,
+html.theme-dark .bg-white.rounded-lg.shadow-xl .p-6 .text-gray-800,
+html.theme-dark .bg-white.rounded-lg.shadow-xl .p-6 .text-gray-900 {
+  color: #dbeafe !important;
+}
+
+/* --- 5. TARJETAS INTERNAS (bg-slate-50, border-slate-100) --- */
+html.theme-dark .bg-slate-50.rounded-lg.border.border-slate-100,
+html.theme-dark .bg-slate-50.rounded-lg {
+  background-color: #0a1628 !important;
+  border-color: #3b82f6 !important;
+}
+
+html.theme-dark .bg-slate-50.rounded-lg .text-slate-400,
+html.theme-dark .bg-slate-50.rounded-lg .text-sm.text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+html.theme-dark .bg-slate-50.rounded-lg strong,
+html.theme-dark .bg-slate-50.rounded-lg .font-bold {
+  color: #dbeafe !important;
+}
+
+/* --- 6. INPUT DEL MODAL --- */
+html.theme-dark .bg-white.rounded-lg.shadow-xl input,
+html.theme-dark .bg-white.rounded-lg.shadow-xl .border.rounded {
+  background-color: #0a1628 !important;
+  color: #f8fafc !important;
+  border: 2px solid #3b82f6 !important;
+}
+
+html.theme-dark .bg-white.rounded-lg.shadow-xl input::placeholder {
+  color: #94a3b8 !important;
+}
+
+html.theme-dark .bg-white.rounded-lg.shadow-xl input.text-black,
+html.theme-dark .bg-white.rounded-lg.shadow-xl input.font-bold {
+  color: #f8fafc !important;
+}
+
+html.theme-dark .bg-white.rounded-lg.shadow-xl input:focus {
+  outline: 2px solid #60a5fa !important;
+  outline-offset: 2px !important;
+}
+
+/* --- 7. BOTONES DE IMPORTAR --- */
+html.theme-dark .bg-white.rounded-lg.shadow-xl .bg-blue-600,
+html.theme-dark .bg-white.rounded-lg.shadow-xl button.bg-blue-600 {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  border: 2px solid #60a5fa !important;
+}
+
+html.theme-dark .bg-white.rounded-lg.shadow-xl .bg-blue-600:hover,
+html.theme-dark .bg-white.rounded-lg.shadow-xl button.bg-blue-600:hover {
+  background-color: #2563eb !important;
+}
+
+/* --- 8. ÁREA DE DROP ZONE (border-dashed, bg-white) --- */
+html.theme-dark .bg-white.rounded-lg.shadow-xl .border-2.border-dashed,
+html.theme-dark .bg-white.rounded-lg.shadow-xl .border-dashed.rounded.bg-white {
+  background-color: #0a1628 !important;
+  border-color: #3b82f6 !important;
+}
+
+html.theme-dark .bg-white.rounded-lg.shadow-xl .border-2.border-dashed .text-sm.text-slate-400,
+html.theme-dark .bg-white.rounded-lg.shadow-xl .border-dashed.rounded .text-sm.text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+/* --- 9. TEXTO DE LOS ÍCONOS (🔗, 📦) --- */
+html.theme-dark .bg-white.rounded-lg.shadow-xl .text-2xl {
+  color: #dbeafe !important;
+}
+
+/* --- 10. BOTÓN "CERRAR" (X) --- */
+html.theme-dark .bg-white.rounded-lg.shadow-xl .text-black.font-bold.opacity-90,
+html.theme-dark .bg-white.rounded-lg.shadow-xl button.text-black {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .bg-white.rounded-lg.shadow-xl .text-black.font-bold.opacity-90:hover,
+html.theme-dark .bg-white.rounded-lg.shadow-xl button.text-black:hover {
+  color: #93c5fd !important;
+}
+
+/* --- 11. SOMBRAS --- */
+html.theme-dark .bg-white.rounded-lg.shadow-xl {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* =========================================
+   TEMA OSCURO - MODAL VER ACTIVIDADES (DURACIÓN Y BADGES)
+========================================= */
+
+/* --- Badges de duración (bg-green-50) --- */
+html.theme-dark .bg-green-50.rounded-full,
+html.theme-dark .bg-green-50 {
+  background-color: #065f46 !important;
+  color: #6ee7b7 !important;
+}
+
+/* --- Badges de categoría (bg-blue-50) --- */
+html.theme-dark .bg-blue-50.rounded-full,
+html.theme-dark .bg-blue-50 {
+  background-color: #1e3a5f !important;
+  color: #93c5fd !important;
+}
+
+/* --- Badges de usos (bg-gray-50) --- */
+html.theme-dark .bg-gray-50.rounded-full,
+html.theme-dark .bg-gray-50 {
+  background-color: #1e293b !important;
+  color: #94a3b8 !important;
+}
+
+/* --- Texto del título de la actividad --- */
+html.theme-dark .font-semibold.text-gray-900 {
+  color: #dbeafe !important;
+}
+
+/* --- Texto de descripción "Sin descripción disponible" --- */
+html.theme-dark .text-xs.text-gray-600 {
+  color: #94a3b8 !important;
+}
+
+/* --- Texto de los badges (span contenedor) --- */
+html.theme-dark .text-xs.text-gray-700 {
+  color: #cbd5e1 !important;
+}
+
+/* --- Asegurar colores en el contenedor flex de badges --- */
+html.theme-dark .mt-2.flex.items-center.gap-3.text-xs.text-gray-700 span {
+  color: inherit !important;
+}
+
+/* --- Fondo del modal "Ver Actividades" (si es necesario) --- */
+html.theme-dark .bg-white.rounded-xl.overflow-hidden,
+html.theme-dark .bg-white.rounded-lg.overflow-hidden,
+html.theme-dark .bg-white.shadow-xl.overflow-hidden {
+  background-color: #13233b !important;
+  border: 2px solid #3b82f6 !important;
+}
+
+/* --- Header del modal "Ver Actividades" --- */
+html.theme-dark .bg-\[\#D1E7FF\].px-6.py-4,
+html.theme-dark .bg-\[\#D1E7FF\].p-4,
+html.theme-dark .bg-\[\#D1E7FF\] {
+  background-color: #0a1a30 !important;
+  border-bottom: 2px solid #3b82f6 !important;
+}
+
+html.theme-dark .bg-\[\#D1E7FF\].px-6.py-4 .text-gray-900,
+html.theme-dark .bg-\[\#D1E7FF\].px-6.py-4 .text-black,
+html.theme-dark .bg-\[\#D1E7FF\].px-6.py-4 h3,
+html.theme-dark .bg-\[\#D1E7FF\].px-6.py-4 .font-semibold {
+  color: #dbeafe !important;
+}
+
+/* --- Botón "Cerrar" (X) en el modal --- */
+html.theme-dark .bg-\[\#D1E7FF\].px-6.py-4 button,
+html.theme-dark .bg-\[\#D1E7FF\].p-4 button {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .bg-\[\#D1E7FF\].px-6.py-4 button:hover,
+html.theme-dark .bg-\[\#D1E7FF\].p-4 button:hover {
+  color: #93c5fd !important;
+}
+
+
+/* =========================================
+   TEMA OSCURO - GUÍA DE AUTOAYUDA (PACIENTE)
+========================================= */
+
+/* --- ELIMINAR EL DEGRADADO AZUL DEL CONTENEDOR PADRE --- */
+html.theme-dark .min-h-screen.bg-gradient-to-b.from-blue-50.to-blue-100,
+html.theme-dark .min-h-screen.bg-gradient-to-b,
+html.theme-dark div.min-h-screen.bg-gradient-to-b {
+  background: #0b1220 !important;
+  background-image: none !important;
+}
+
+/* --- Fondo completo de la sección de biblioteca --- */
+html.theme-dark .biblioteca-page-shell,
+html.theme-dark .biblioteca-page-shell .py-8,
+html.theme-dark .biblioteca-page-shell .max-w-7xl,
+html.theme-dark .biblioteca-page-shell .max-w-7xl.mx-auto,
+html.theme-dark .biblioteca-page-shell .max-w-7xl.mx-auto.px-6,
+html.theme-dark .biblioteca-page-shell > div,
+html.theme-dark .biblioteca-page-shell > div > div,
+html.theme-dark .py-8 > .max-w-7xl,
+html.theme-dark .py-8 > .max-w-7xl > .biblioteca-page-shell {
+  background-color: #0b1220 !important;
+}
+
+/* --- Forzar fondo en todos los contenedores de la sección --- */
+html.theme-dark .biblioteca-page-shell .text-center.mb-12,
+html.theme-dark .biblioteca-page-shell section,
+html.theme-dark .biblioteca-page-shell .mb-16,
+html.theme-dark .biblioteca-page-shell .biblioteca-card-grid {
+  background-color: #0b1220 !important;
+}
+
+/* --- Títulos principales --- */
+html.theme-dark .biblioteca-guide-title,
+html.theme-dark .biblioteca-guide-title.text-\[\#1E4D8C\],
+html.theme-dark .biblioteca-page-shell .text-5xl.font-black.text-\[\#1E4D8C\] {
+  color: #dbeafe !important;
+}
+
+/* --- Títulos de sección --- */
+html.theme-dark .biblioteca-guide-section-title,
+html.theme-dark .biblioteca-guide-section-title.text-\[\#1E4D8C\],
+html.theme-dark .biblioteca-page-shell .text-3xl.font-black.text-\[\#1E4D8C\] {
+  color: #dbeafe !important;
+}
+
+/* --- Descripción --- */
+html.theme-dark .biblioteca-page-shell .text-slate-700,
+html.theme-dark .biblioteca-page-shell .text-xl.text-slate-700 {
+  color: #94a3b8 !important;
+}
+
+/* --- Tarjetas de guías --- */
+html.theme-dark .biblioteca-guide-card,
+html.theme-dark .biblioteca-guide-card.group.bg-white,
+html.theme-dark .biblioteca-guide-card.group.bg-white.rounded-lg {
+  background-color: #13233b !important;
+  border: 2px solid #3b82f6 !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* --- Badges "Guía", "Libro", "Artículo" --- */
+html.theme-dark .biblioteca-guide-badge,
+html.theme-dark .biblioteca-guide-badge.bg-white\/90,
+html.theme-dark .biblioteca-guide-badge.absolute.top-4.right-4 {
+  background-color: #0a1628 !important;
+  color: #93c5fd !important;
+  border-color: #3b82f6 !important;
+  border-width: 2px !important;
+}
+
+/* --- OVERLAY: color sólido oscuro, mismo que el fondo --- */
+html.theme-dark .biblioteca-guide-overlay,
+html.theme-dark .biblioteca-guide-overlay.bg-\[\#71A5D9\],
+html.theme-dark .biblioteca-guide-overlay.absolute.inset-0.z-20,
+html.theme-dark .biblioteca-guide-overlay.bg-opacity-70 {
+  background-color: #0b1220 !important;
+  background-image: none !important;
+  opacity: 0 !important;
+}
+
+/* --- OVERLAY al hacer hover: visible con el mismo fondo oscuro --- */
+html.theme-dark .biblioteca-guide-card:hover .biblioteca-guide-overlay,
+html.theme-dark .biblioteca-guide-card:hover .biblioteca-guide-overlay.bg-\[\#71A5D9\],
+html.theme-dark .biblioteca-guide-card:hover .biblioteca-guide-overlay.absolute.inset-0.z-20 {
+  opacity: 1 !important;
+  background-color: #0b1220 !important;
+}
+
+/* --- TEXTO del overlay (título) --- */
+html.theme-dark .biblioteca-guide-overlay h4,
+html.theme-dark .biblioteca-guide-overlay .text-white,
+html.theme-dark .biblioteca-guide-overlay .text-white.text-lg.font-semibold,
+html.theme-dark .biblioteca-guide-card:hover .biblioteca-guide-overlay h4 {
+  color: #ffffff !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* --- Imágenes dentro de las tarjetas --- */
+html.theme-dark .biblioteca-guide-card img,
+html.theme-dark .biblioteca-guide-card .w-full.h-96.object-cover {
+  background-color: #0a1628 !important;
+  filter: brightness(0.85) !important;
+}
+
+/* --- Hover: escala y borde --- */
+html.theme-dark .biblioteca-guide-card:hover {
+  border-color: #60a5fa !important;
+  box-shadow: 0 15px 40px rgba(59, 130, 246, 0.3) !important;
+}
+
+/* =========================================
+   ALTO CONTRASTE - GUÍA DE AUTOAYUDA
+========================================= */
+
+html.theme-high-contrast .min-h-screen.bg-gradient-to-b.from-blue-50.to-blue-100,
+html.theme-high-contrast .min-h-screen.bg-gradient-to-b {
+  background: #000000 !important;
+  background-image: none !important;
+}
+
+html.theme-high-contrast .biblioteca-page-shell,
+html.theme-high-contrast .biblioteca-page-shell .py-8,
+html.theme-high-contrast .biblioteca-page-shell .max-w-7xl,
+html.theme-high-contrast .biblioteca-page-shell .max-w-7xl.mx-auto,
+html.theme-high-contrast .biblioteca-page-shell .max-w-7xl.mx-auto.px-6,
+html.theme-high-contrast .biblioteca-page-shell > div,
+html.theme-high-contrast .biblioteca-page-shell > div > div,
+html.theme-high-contrast .py-8 > .max-w-7xl,
+html.theme-high-contrast .py-8 > .max-w-7xl > .biblioteca-page-shell {
+  background-color: #000000 !important;
+}
+
+html.theme-high-contrast .biblioteca-guide-title,
+html.theme-high-contrast .biblioteca-guide-section-title,
+html.theme-high-contrast .biblioteca-guide-title.text-\[\#1E4D8C\],
+html.theme-high-contrast .biblioteca-guide-section-title.text-\[\#1E4D8C\] {
+  color: #ffeb3b !important;
+}
+
+html.theme-high-contrast .biblioteca-page-shell .text-slate-700,
+html.theme-high-contrast .biblioteca-page-shell .text-xl.text-slate-700 {
+  color: #ffeb3b !important;
+}
+
+html.theme-high-contrast .biblioteca-guide-card,
+html.theme-high-contrast .biblioteca-guide-card.group.bg-white,
+html.theme-high-contrast .biblioteca-guide-card.group.bg-white.rounded-lg {
+  background-color: #000000 !important;
+  border: 3px solid #ffeb3b !important;
+}
+
+html.theme-high-contrast .biblioteca-guide-badge,
+html.theme-high-contrast .biblioteca-guide-badge.bg-white\/90 {
+  background-color: #000000 !important;
+  color: #ffeb3b !important;
+  border: 2px solid #ffeb3b !important;
+}
+
+html.theme-high-contrast .biblioteca-guide-overlay,
+html.theme-high-contrast .biblioteca-guide-overlay.bg-\[\#71A5D9\],
+html.theme-high-contrast .biblioteca-guide-overlay.absolute.inset-0.z-20 {
+  background-color: rgba(0, 0, 0, 0.95) !important;
+}
+
+html.theme-high-contrast .biblioteca-guide-overlay h4,
+html.theme-high-contrast .biblioteca-guide-overlay .text-white {
+  color: #ffeb3b !important;
+  text-shadow: none !important;
+}
+
+html.theme-high-contrast .biblioteca-guide-card:hover {
+  border-color: #ffffff !important;
+  box-shadow: 0 0 30px rgba(255, 235, 59, 0.4) !important;
+}
+
+/* =========================================
+   TEMA OSCURO - TAREAS DEL PACIENTE (PACIENTE/TAREAS)
+========================================= */
+
+/* --- Badge de estado "asignada" (amarillo → azul en oscuro) --- */
+html.theme-dark .tareas-status-pill,
+html.theme-dark .tareas-status-pill.rounded-full.bg-yellow-100,
+html.theme-dark .tareas-status-pill.text-yellow-800,
+html.theme-dark .bg-yellow-100.text-yellow-800 {
+  background-color: #1e3a5f !important;
+  color: #93c5fd !important;
+  border: 1px solid #3b82f6 !important;
+}
+
+/* --- Tarjetas de tareas (fondo oscuro) --- */
+html.theme-dark .tareas-assigned-card,
+html.theme-dark .tareas-completed-section,
+html.theme-dark .bg-white.rounded-xl.shadow-sm,
+html.theme-dark .bg-white.rounded-xl.shadow-md,
+html.theme-dark .bg-white.p-6.rounded-xl {
+  background-color: #13233b !important;
+  border: 2px solid #3b82f6 !important;
+}
+
+/* --- Títulos de las tareas --- */
+html.theme-dark .tareas-assigned-card-title,
+html.theme-dark .text-xl.font-bold.text-gray-900,
+html.theme-dark .font-bold.text-gray-900 {
+  color: #dbeafe !important;
+}
+
+/* --- Descripción de las tareas --- */
+html.theme-dark .tareas-assigned-card-description,
+html.theme-dark .text-gray-600,
+html.theme-dark .text-slate-600 {
+  color: #94a3b8 !important;
+}
+
+/* --- Botón "Abrir" de las tareas --- */
+html.theme-dark .tareas-open-btn,
+html.theme-dark .bg-blue-600.text-white.rounded-lg,
+html.theme-dark button.bg-blue-600 {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  border: 2px solid #60a5fa !important;
+}
+
+html.theme-dark .tareas-open-btn:hover,
+html.theme-dark .bg-blue-600.text-white.rounded-lg:hover,
+html.theme-dark button.bg-blue-600:hover {
+  background-color: #2563eb !important;
+}
+
+/* --- Texto "Tareas asignadas" y contador --- */
+html.theme-dark .tareas-assigned-title,
+html.theme-dark .text-2xl.font-bold.text-gray-800,
+html.theme-dark .text-2xl.font-bold.text-gray-700 {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .tareas-assigned-count,
+html.theme-dark .text-sm.text-gray-500 {
+  color: #94a3b8 !important;
+}
+
+/* =========================================
+   ALTO CONTRASTE - TAREAS DEL PACIENTE
+========================================= */
+
+html.theme-high-contrast .tareas-status-pill,
+html.theme-high-contrast .tareas-status-pill.rounded-full.bg-yellow-100,
+html.theme-high-contrast .bg-yellow-100.text-yellow-800 {
+  background-color: #000000 !important;
+  color: #ffeb3b !important;
+  border: 2px solid #ffeb3b !important;
+}
+
+html.theme-high-contrast .tareas-assigned-card,
+html.theme-high-contrast .bg-white.rounded-xl.shadow-sm {
+  background-color: #000000 !important;
+  border: 3px solid #ffeb3b !important;
+}
+
+html.theme-high-contrast .tareas-assigned-card-title,
+html.theme-high-contrast .text-xl.font-bold.text-gray-900 {
+  color: #ffeb3b !important;
+}
+
+html.theme-high-contrast .tareas-assigned-card-description,
+html.theme-high-contrast .text-gray-600 {
+  color: #ffeb3b !important;
+}
+
+html.theme-high-contrast .tareas-open-btn,
+html.theme-high-contrast .bg-blue-600.text-white.rounded-lg {
+  background-color: #000000 !important;
+  color: #ffeb3b !important;
+  border: 2px solid #ffeb3b !important;
+}
+
+html.theme-high-contrast .tareas-open-btn:hover {
+  outline: 3px solid #ffffff !important;
+  outline-offset: 2px !important;
+}

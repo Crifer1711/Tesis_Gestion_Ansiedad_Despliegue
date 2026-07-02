@@ -127,9 +127,9 @@ export default function HomePage() {
       )}
 
       {/* ============ FOOTER ============ */}
-      <footer className="home-footer bg-[#71A5D9] py-4 text-sm text-center">
+      <footer className="home-footer bg-[#1A2026] py-4 text-sm text-center">
         <div className="mx-auto max-w-7xl px-5">
-          <p className="font-semibold text-[#1E4D8C]">© 2026 MindPeace • Todos los derechos reservados</p>
+          <p className="font-semibold text-[#EAEAEA]">© 2026 MindPeace • Todos los derechos reservados</p>
         </div>
       </footer>
     </div>
