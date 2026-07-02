@@ -18,48 +18,55 @@ export function AccessibilityPanel() {
 
   if (!mounted) return null;
 
+  const panelButtonClass = (isActive: boolean, activeClass: string) =>
+    `accessibility-panel-btn py-2 px-2 text-xs font-bold rounded-md border transition-all duration-200 ${
+      isActive
+        ? `${activeClass} border-transparent shadow-md`
+        : 'accessibility-panel-btn--idle'
+    }`;
+
   return (
-    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-5 mt-4 shadow-sm">
-      {/* ENCABEZADO IDÉNTICO AL NAVIGATION SIDEBAR */}
+    <div className="accessibility-panel mt-2 rounded-xl border p-4 shadow-sm">
       <div className="flex items-center gap-2 mb-3">
-        <Settings size={22} className="text-[#1E4D8C]" />
-        <h4 className="text-lg font-black text-[#1E4D8C]">
+        <Settings size={22} className="accessibility-panel-title-icon" />
+        <h4 className="accessibility-panel-title text-lg font-black">
           Accesibilidad
         </h4>
       </div>
-      <div className="h-0.5 w-12 bg-[#1E4D8C] rounded-full mb-5"></div>
+      <div className="accessibility-panel-divider mb-5 h-0.5 w-16 rounded-full"></div>
 
       <div className="space-y-6">
-        {/* COLORES */}
         <div>
-          <label className="text-sm font-bold text-white flex items-center gap-2 mb-2">
+          <label className="accessibility-panel-label mb-2 flex items-center gap-2 text-sm font-bold">
             <Palette size={16} className="opacity-90" /> Color de Pantalla
           </label>
           <div className="grid grid-cols-3 gap-2">
             <button 
               onClick={() => updateSetting('theme', 'light')}
-              className={`py-2 px-1 text-xs font-bold rounded-md transition-all duration-200 ${settings.theme === 'light' ? 'bg-[#1E4D8C] text-white shadow-md' : 'bg-white/20 text-white hover:bg-white/30'}`}
+              aria-pressed={settings.theme === 'light'}
+              className={panelButtonClass(settings.theme === 'light', 'accessibility-panel-btn--active-light')}
             >Claro</button>
             <button 
               onClick={() => updateSetting('theme', 'dark')}
-              className={`py-2 px-1 text-xs font-bold rounded-md transition-all duration-200 ${settings.theme === 'dark' ? 'bg-[#1E4D8C] text-white shadow-md' : 'bg-white/20 text-white hover:bg-white/30'}`}
+              aria-pressed={settings.theme === 'dark'}
+              className={panelButtonClass(settings.theme === 'dark', 'accessibility-panel-btn--active-dark')}
             >Oscuro</button>
             <button 
               onClick={() => updateSetting('theme', 'high-contrast')}
-              className={`py-2 px-1 text-xs font-bold rounded-md transition-all duration-200 ${settings.theme === 'high-contrast' ? 'bg-black text-yellow-400 shadow-md border border-yellow-400' : 'bg-white/20 text-white hover:bg-white/30'}`}
+              aria-pressed={settings.theme === 'high-contrast'}
+              className={panelButtonClass(settings.theme === 'high-contrast', 'accessibility-panel-btn--active-contrast')}
             >Contraste</button>
           </div>
         </div>
 
-        {/* FUENTE */}
         <div>
-          <label className="text-sm font-bold text-white flex items-center gap-2 mb-2">
+          <label className="accessibility-panel-label mb-2 flex items-center gap-2 text-sm font-bold">
             <Type size={16} className="opacity-90" /> Tipo de Letra
           </label>
           <select 
             value={settings.fontFamily}
             onChange={(e) => updateSetting('fontFamily', e.target.value)}
-            className="w-full bg-white/20 text-white text-sm p-2.5 rounded-md outline-none focus:ring-2 focus:ring-[#1E4D8C] transition-all cursor-pointer [&>option]:text-slate-900"
+            className="accessibility-font-select w-full cursor-pointer rounded-md border border-slate-500 bg-slate-700 p-2.5 text-sm text-slate-100 outline-none transition-all focus:ring-2 focus:ring-yellow-300"
           >
             <option value="sans">Predeterminada</option>
             <option value="serif">Lectura (Serif)</option>
@@ -67,23 +74,25 @@ export function AccessibilityPanel() {
           </select>
         </div>
 
-        {/* TAMAÑO */}
         <div>
-          <label className="text-sm font-bold text-white flex items-center gap-2 mb-2">
+          <label className="accessibility-panel-label mb-2 flex items-center gap-2 text-sm font-bold">
             <Scaling size={16} className="opacity-90" /> Tamaño de Letra
           </label>
           <div className="grid grid-cols-3 gap-2">
             <button 
               onClick={() => updateSetting('fontSize', 'small')}
-              className={`py-2 px-1 text-xs font-bold rounded-md transition-all duration-200 ${settings.fontSize === 'small' ? 'bg-[#1E4D8C] text-white shadow-md' : 'bg-white/20 text-white hover:bg-white/30'}`}
+              aria-pressed={settings.fontSize === 'small'}
+              className={panelButtonClass(settings.fontSize === 'small', 'accessibility-panel-btn--active-light')}
             >A-</button>
             <button 
               onClick={() => updateSetting('fontSize', 'medium')}
-              className={`py-2 px-1 text-sm font-bold rounded-md transition-all duration-200 ${settings.fontSize === 'medium' ? 'bg-[#1E4D8C] text-white shadow-md' : 'bg-white/20 text-white hover:bg-white/30'}`}
+              aria-pressed={settings.fontSize === 'medium'}
+              className={panelButtonClass(settings.fontSize === 'medium', 'accessibility-panel-btn--active-light')}
             >A</button>
             <button 
               onClick={() => updateSetting('fontSize', 'large')}
-              className={`py-2 px-1 text-base font-bold rounded-md transition-all duration-200 ${settings.fontSize === 'large' ? 'bg-[#1E4D8C] text-white shadow-md' : 'bg-white/20 text-white hover:bg-white/30'}`}
+              aria-pressed={settings.fontSize === 'large'}
+              className={panelButtonClass(settings.fontSize === 'large', 'accessibility-panel-btn--active-light')}
             >A+</button>
           </div>
         </div>

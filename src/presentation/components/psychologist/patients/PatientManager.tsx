@@ -91,15 +91,15 @@ export function PatientManager({ patients }: Props) {
 
 
   return (
-    <div className="space-y-6">
+    <div className="psychologist-patient-manager space-y-6">
       {/* Buscador */}
-      <div className="bg-[#EEF2FF] p-4 rounded-xl border border-blue-100 flex gap-3 shadow-sm">
+      <div className="psychologist-patient-search bg-[#EEF2FF] p-4 rounded-xl border border-blue-100 flex gap-3 shadow-sm">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-3 text-blue-500" size={20} />
           <input 
             type="text"
             placeholder="Buscar paciente por nombre..."
-            className="w-full bg-transparent pl-11 pr-4 py-2 text-base text-slate-800 placeholder:text-slate-400 outline-none border-none font-medium"
+            className="psychologist-patient-search-input w-full bg-transparent pl-11 pr-4 py-2 text-base text-slate-800 placeholder:text-slate-400 outline-none border-none font-medium"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -109,12 +109,12 @@ export function PatientManager({ patients }: Props) {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* LISTA DE PACIENTES */}
         <div className="lg:col-span-4 space-y-4">
-          <div className="bg-blue-600 p-4 rounded-t-xl shadow-md">
+          <div className="psychologist-patient-list-header bg-blue-600 p-4 rounded-t-xl shadow-md">
             <h3 className="text-white text-xs font-black uppercase tracking-widest text-center">
               Lista de Pacientes
             </h3>
           </div>
-          <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-blue-200">
+          <div className="psychologist-patient-list space-y-3 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-blue-200">
             {filteredPatients.map((patient) => (
               <button
                 key={patient.id}
@@ -148,11 +148,11 @@ export function PatientManager({ patients }: Props) {
 
         {/* FICHA DETALLADA */}
         <div className="lg:col-span-8">
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden min-h-[550px]">
+          <div className="psychologist-patient-detail bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden min-h-[550px]">
             {selectedPatient ? (
               <div className="p-6 sm:p-8">
                 {/* Header de la Ficha */}
-                <div className="flex flex-col md:flex-row gap-6 md:gap-8 pb-8 border-b border-gray-100 items-center md:items-start">
+                <div className="psychologist-patient-detail-header flex flex-col md:flex-row gap-6 md:gap-8 pb-8 border-b border-gray-100 items-center md:items-start">
                   <div className="w-24 h-24 md:w-32 md:h-32 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 flex-shrink-0">
                     <User size={48} className="md:w-16 md:h-16" />
                   </div>
@@ -160,7 +160,7 @@ export function PatientManager({ patients }: Props) {
                     <h2 className="text-2xl md:text-3xl font-black text-gray-800 uppercase tracking-tight">
                       {selectedPatient.nombre}
                     </h2>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <div className="psychologist-patient-detail-stats grid grid-cols-2 md:grid-cols-3 gap-3">
                       <DetailStat label="Citas" value={details?.appointments?.length || 0} icon={Calendar} color="text-orange-500" />
                       <DetailStat label="Fichas" value={details?.medicalRecords?.length || 0} icon={FileText} color="text-blue-500" />
                       <DetailStat label="Test" value={details?.testResults?.length || 0} icon={ClipboardList} color="text-purple-500" />
@@ -174,7 +174,7 @@ export function PatientManager({ patients }: Props) {
                     <h3 className="text-sm font-black text-gray-800 uppercase tracking-tight mb-4 flex items-center gap-2">
                       Progreso de Ansiedad (Historial)
                     </h3>
-                    <div className="h-[250px] w-full bg-slate-50 p-4 rounded-2xl border border-slate-200 shadow-inner">
+                    <div className="psychologist-patient-chart h-[250px] w-full bg-slate-50 p-4 rounded-2xl border border-slate-200 shadow-inner">
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart 
                           data={[...details.testResults]
@@ -225,7 +225,7 @@ export function PatientManager({ patients }: Props) {
 
                 {/* Navegación de Pestañas */}
                 <div className="mt-8">
-                  <div className="flex border border-gray-300 rounded-xl overflow-hidden bg-gray-50 shadow-inner">
+                  <div className="psychologist-patient-tabs flex border border-gray-300 rounded-xl overflow-hidden bg-gray-50 shadow-inner">
                     {['Citas', 'Ficha Médica', 'Resultados Test'].map((tab) => (
                       <button 
                         key={tab} 
@@ -250,7 +250,7 @@ export function PatientManager({ patients }: Props) {
                         
                         {/* PESTAÑA: CITAS */}
                         {activeTab === 'Citas' && details?.appointments.map((app, i) => (
-                          <div key={i} className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-5 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+                          <div key={i} className="psychologist-patient-appointment flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-5 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
                             <div>
                               <p className="font-bold text-base uppercase text-gray-800 mb-1">{app.motivo}</p>
                               <p className="text-sm text-gray-500 font-medium">
@@ -277,7 +277,7 @@ export function PatientManager({ patients }: Props) {
                           <div className="space-y-4">
                             {details?.testResults && details.testResults.length > 0 ? (
                               details.testResults.map((test, index) => (
-                                <div key={index} className="bg-white border border-gray-200 p-5 rounded-xl shadow-sm hover:border-blue-400 transition-colors flex justify-between items-center">
+                                <div key={index} className="psychologist-test-card bg-white border border-gray-200 p-5 rounded-xl shadow-sm hover:border-blue-400 transition-colors flex justify-between items-center">
                                   <div className="space-y-3">
                                     <div className="flex items-center gap-3">
                                       <h4 className="font-black text-[#1E4D8C] uppercase text-sm">{test.test}</h4>

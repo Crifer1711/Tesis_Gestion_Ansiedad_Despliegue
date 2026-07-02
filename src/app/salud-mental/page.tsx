@@ -17,7 +17,7 @@ function SaludMentalLoading() {
 
 function SaludMentalContent() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 py-16">
+    <div className="salud-mental-page-shell min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 py-16">
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">

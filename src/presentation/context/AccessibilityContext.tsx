@@ -1,5 +1,6 @@
 'use client';
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import { usePathname } from 'next/navigation';
 import { AccessibilitySettings } from '@/domain/entities/AccessibilitySettings';
 import { LocalStorageAccessibilityRepository } from '@/infrastructure/repositories/LocalStorageAccessibilityRepository';
 import { ManageSettingsUseCase } from '@/application/use-cases/accessibility/ManageSettings';
@@ -20,6 +21,15 @@ const AccessibilityContext = createContext<AccessibilityContextType>(null as unk
 export function AccessibilityProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettings] = useState<AccessibilitySettings>(defaultSettings);
   const [isHydrated, setIsHydrated] = useState(false);
+  const pathname = usePathname();
+
+  const forceLightTheme = useMemo(() => {
+    return pathname.startsWith('/dashboard/admin') || pathname.startsWith('/dashboard/psicologo');
+  }, [pathname]);
+
+  const effectiveSettings = useMemo(() => {
+    return forceLightTheme ? { ...settings, theme: 'light' as const } : settings;
+  }, [forceLightTheme, settings]);
 
   useEffect(() => {
     const repository = new LocalStorageAccessibilityRepository();
@@ -45,11 +55,11 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
     root.className = root.className.replace(/\b(theme|font-size|font-family)-\S+/g, '').trim(); 
     
     // Inyectamos las clases nuevas al HTML
-    if (settings.theme !== 'light') root.classList.add(`theme-${settings.theme}`);
-    if (settings.fontSize !== 'medium') root.classList.add(`font-size-${settings.fontSize}`);
-    if (settings.fontFamily !== 'sans') root.classList.add(`font-family-${settings.fontFamily}`);
+    if (effectiveSettings.theme !== 'light') root.classList.add(`theme-${effectiveSettings.theme}`);
+    root.classList.add(`font-size-${effectiveSettings.fontSize}`);
+    root.classList.add(`font-family-${effectiveSettings.fontFamily}`);
     
-  }, [settings, isHydrated]);
+  }, [effectiveSettings, settings, isHydrated]);
 
   return (
     <AccessibilityContext.Provider value={{ settings, setSettings }}>

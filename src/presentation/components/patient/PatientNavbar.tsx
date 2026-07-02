@@ -57,19 +57,19 @@ export function PatientNavbar() {
   // Función para obtener el badge de tipo
   const getNotificationBadge = (notif: any) => {
     if (notif.type === 'appointment' || notif.id?.startsWith('apt-') || notif.id?.startsWith('link-')) {
-      return { text: '📅 Cita', color: 'text-blue-600 bg-blue-50' };
+      return { text: 'Cita', color: 'text-blue-600 bg-blue-50', icon: Calendar };
     }
     if (notif.type === 'task' || notif.id?.startsWith('task-')) {
-      return { text: '📋 Tarea', color: 'text-purple-600 bg-purple-50' };
+      return { text: 'Tarea', color: 'text-purple-600 bg-purple-50', icon: CheckSquare };
     }
-    return { text: '📌 General', color: 'text-gray-600 bg-gray-50' };
+    return { text: 'General', color: 'text-gray-600 bg-gray-50', icon: Bell };
   };
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-blue-100 px-8 py-3 flex items-center justify-between font-sans">
       <div className="flex items-center gap-10">
         <div className="flex flex-col items-center">
-          <Image src="/images/Logo.png" alt="Mindpeace Logo" width={50} height={50} className="rounded-full" />
+          <Image src="/images/Logo2.png" alt="Mindpeace Logo" width={50} height={50} className="rounded-full" />
           <span className="text-[10px] font-bold text-blue-800 uppercase tracking-tighter">Mindpeace</span>
         </div>
 
@@ -111,9 +111,9 @@ export function PatientNavbar() {
 
           {/* PANEL DE NOTIFICACIONES */}
           {showNotifications && (
-            <div className="absolute right-0 mt-2 w-[360px] bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden">
+            <div className="patient-navbar-notifications absolute right-0 mt-2 w-[360px] bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden">
               {/* HEADER */}
-              <div className="p-3 border-b border-gray-200 flex justify-between items-center bg-blue-50">
+              <div className="patient-navbar-notifications__header p-3 border-b border-gray-200 flex justify-between items-center bg-blue-50">
                 <h3 className="font-bold text-gray-700 text-sm">Notificaciones</h3>
                 <button 
                   onClick={() => setShowNotifications(false)}
@@ -124,8 +124,8 @@ export function PatientNavbar() {
               </div>
 
               {/* 🔥 ACCESOS RÁPIDOS */}
-              <div className="p-3 border-b border-gray-200 bg-gradient-to-r from-blue-50/80 to-purple-50/80">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1">
+              <div className="patient-navbar-notifications__quicklinks p-3 border-b border-gray-200 bg-gradient-to-r from-blue-50/80 to-purple-50/80">
+                <p className="patient-navbar-notifications__quicklinks-label text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1">
                   <span className="inline-block w-1 h-1 rounded-full bg-blue-400"></span>
                   Accesos rápidos
                 </p>
@@ -133,7 +133,7 @@ export function PatientNavbar() {
                   <Link
                     href="/paciente/citas"
                     onClick={() => setShowNotifications(false)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg border border-blue-200 hover:bg-blue-50 hover:border-blue-300 transition text-xs font-bold text-blue-700 shadow-sm flex-1 justify-center"
+                    className="patient-navbar-notifications__quicklink patient-navbar-notifications__quicklink--citas flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg border border-blue-200 hover:bg-blue-50 hover:border-blue-300 transition text-xs font-bold text-blue-700 shadow-sm flex-1 justify-center"
                   >
                     <Calendar size={14} />
                     Citas
@@ -141,7 +141,7 @@ export function PatientNavbar() {
                   <Link
                     href="/paciente/tareas"
                     onClick={() => setShowNotifications(false)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg border border-purple-200 hover:bg-purple-50 hover:border-purple-300 transition text-xs font-bold text-purple-700 shadow-sm flex-1 justify-center"
+                    className="patient-navbar-notifications__quicklink patient-navbar-notifications__quicklink--tasks flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg border border-purple-200 hover:bg-purple-50 hover:border-purple-300 transition text-xs font-bold text-purple-700 shadow-sm flex-1 justify-center"
                   >
                     <CheckSquare size={14} />
                     Tareas
@@ -149,7 +149,7 @@ export function PatientNavbar() {
                   <Link
                     href="/dashboard/paciente"
                     onClick={() => setShowNotifications(false)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition text-xs font-bold text-slate-600 shadow-sm flex-1 justify-center"
+                    className="patient-navbar-notifications__quicklink patient-navbar-notifications__quicklink--home flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition text-xs font-bold text-slate-600 shadow-sm flex-1 justify-center"
                   >
                     <Home size={14} />
                     Inicio
@@ -158,9 +158,9 @@ export function PatientNavbar() {
               </div>
 
               {/* LISTA DE NOTIFICACIONES */}
-              <div className="max-h-64 overflow-y-auto">
+              <div className="patient-navbar-notifications__list max-h-64 overflow-y-auto">
                 {notifications.length === 0 ? (
-                  <div className="p-6 text-center">
+                  <div className="patient-navbar-notifications__empty p-6 text-center">
                     <div className="text-4xl mb-2">🔔</div>
                     <p className="text-gray-500 text-sm font-medium">Sin notificaciones nuevas</p>
                     <p className="text-gray-400 text-xs mt-1">Las notificaciones aparecerán aquí</p>
@@ -174,13 +174,17 @@ export function PatientNavbar() {
                         key={notif.id}
                         href={link}
                         onClick={() => setShowNotifications(false)}
-                        className="block p-3 border-b border-gray-100 hover:bg-gray-50 transition cursor-pointer group"
+                        className="patient-navbar-notifications__item block p-3 border-b border-gray-100 hover:bg-gray-50 transition cursor-pointer group"
                       >
                         <div className="flex items-start gap-2">
                           <div className="flex-1 min-w-0">
                             <p className="text-sm text-gray-700 leading-relaxed">{notif.message}</p>
                             <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${badge.color}`}>
+                              <span className={`notification-bell-badge inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded ${badge.color}`}>
+                                {(() => {
+                                  const BadgeIcon = badge.icon;
+                                  return <BadgeIcon size={10} className="shrink-0" />;
+                                })()}
                                 {badge.text}
                               </span>
                               <span className="text-[10px] text-gray-400">
@@ -203,7 +207,7 @@ export function PatientNavbar() {
               </div>
 
               {/* FOOTER */}
-              <div className="p-2 border-t border-gray-100 bg-gray-50 text-center">
+              <div className="patient-navbar-notifications__footer p-2 border-t border-gray-100 bg-gray-50 text-center">
                 <Link
                   href="/paciente/citas"
                   onClick={() => setShowNotifications(false)}

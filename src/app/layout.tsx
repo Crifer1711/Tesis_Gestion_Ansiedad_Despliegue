@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from "@/presentation/providers/AuthProvider";
 import { ConfirmProvider } from '@/presentation/components/common/ConfirmProvider';
 import { AccessibilityProvider } from "@/presentation/context/AccessibilityContext";
+import { AccessibilityLauncher } from '@/presentation/components/accessibility/AccessibilityLauncher';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ConfirmProvider>
             <AuthProvider>
               {children}
+              <AccessibilityLauncher />
               <Toaster position="top-right" containerStyle={{ top: 84, right: 16 }} />
             </AuthProvider>
           </ConfirmProvider>

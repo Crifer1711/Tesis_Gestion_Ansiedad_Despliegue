@@ -233,7 +233,7 @@ export default function TareasPage() {
   const completedTasks = asignaciones.filter((task) => String(task.estado || '').toLowerCase() === 'completada');
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100">
+    <div className="tareas-page-shell min-h-screen bg-gradient-to-b from-blue-50 to-blue-100">
       <PatientHeader
         activeSection={activeSection}
         onNavClick={setActiveSection}
@@ -247,7 +247,7 @@ export default function TareasPage() {
           <div className="mb-6">
             <Link 
               href="/dashboard/paciente" 
-              className="inline-flex w-fit items-center gap-2 rounded-xl bg-[#1d42fb] px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-[#D95536] hover:shadow-lg"
+              className="tareas-back-btn inline-flex w-fit items-center gap-2 rounded-xl bg-[#1d42fb] px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-[#163bd1] hover:shadow-lg"
             >
               <Home size={18} />
               Volver al Inicio
@@ -265,32 +265,32 @@ export default function TareasPage() {
               <div className="text-sm text-gray-600 mt-3">No tienes tareas asignadas.</div>
             ) : (
               <div className="space-y-6 mt-4">
-                <section className="rounded-2xl border border-[#71A5D9] bg-white/80 p-4 shadow-sm">
+                <section className="tareas-assigned-section rounded-2xl border border-[#71A5D9] bg-white/80 p-4 shadow-sm">
                   <div className="flex items-center justify-between gap-3 mb-4">
-                    <h2 className="text-xl font-black text-[#1E4D8C]">Tareas asignadas</h2>
-                    <span className="text-xs font-bold uppercase text-slate-500">{assignedTasks.length} visibles</span>
+                    <h2 className="tareas-assigned-title text-xl font-black text-[#1E4D8C]">Tareas asignadas</h2>
+                    <span className="tareas-assigned-count text-xs font-bold uppercase text-slate-500">{assignedTasks.length} visibles</span>
                   </div>
                   {assignedTasks.length === 0 ? (
-                    <div className="rounded-xl border border-dashed border-blue-200 bg-blue-50 p-5 text-sm text-slate-600">
+                    <div className="tareas-assigned-empty rounded-xl border border-dashed border-blue-200 bg-blue-50 p-5 text-sm text-slate-600">
                       No tienes tareas asignadas pendientes.
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 gap-4">
                       {assignedTasks.map(a => (
-                        <div key={a.id} className="rounded-2xl border border-blue-200 bg-gradient-to-br from-white to-blue-50 p-4 shadow-sm transition hover:shadow-md">
+                        <div key={a.id} className="tareas-assigned-card rounded-2xl border border-blue-200 bg-gradient-to-br from-white to-blue-50 p-4 shadow-sm transition hover:shadow-md">
                           <div className="flex items-start justify-between gap-4">
                             <div className="min-w-0 flex-1">
-                              <div className="font-black text-[#1E4D8C] text-lg">{a.titulo || 'Actividad'}</div>
-                              <div className="text-sm text-slate-600 mt-1">{a.descripcion || ''}</div>
+                              <div className="tareas-assigned-card-title font-black text-[#1E4D8C] text-lg">{a.titulo || 'Actividad'}</div>
+                              <div className="tareas-assigned-card-description text-sm text-slate-600 mt-1">{a.descripcion || ''}</div>
                               <div className="flex flex-wrap gap-2 mt-3 text-[11px] font-bold uppercase">
-                                <span className="rounded-full bg-yellow-100 px-3 py-1 text-yellow-800">Estado: {a.estado}</span>
-                                {a.fecha_limite && <span className="rounded-full bg-red-50 px-3 py-1 text-red-700">Límite: {new Date(a.fecha_limite).toLocaleString()}</span>}
+                                <span className="tareas-status-pill rounded-full bg-yellow-100 px-3 py-1 text-yellow-800">Estado: {a.estado}</span>
+                                {a.fecha_limite && <span className="tareas-limit-pill rounded-full bg-red-50 px-3 py-1 text-red-700">Límite: {new Date(a.fecha_limite).toLocaleString()}</span>}
                               </div>
-                              {a.instrucciones_psicologo && <div className="mt-3 rounded-xl border border-blue-100 bg-white p-3 text-sm text-slate-700">{a.instrucciones_psicologo}</div>}
+                              {a.instrucciones_psicologo && <div className="tareas-instructions mt-3 rounded-xl border border-blue-100 bg-white p-3 text-sm text-slate-700">{a.instrucciones_psicologo}</div>}
                             </div>
                             <div className="flex flex-col gap-2 shrink-0">
                               {a.embed_url ? (
-                                <button onClick={() => handleOpenAsignacion(a)} className="rounded-xl bg-[#1E4D8C] px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-[#173d6f]">
+                                <button onClick={() => handleOpenAsignacion(a)} className="tareas-open-btn rounded-xl bg-[#1E4D8C] px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-[#173d6f]">
                                   Abrir
                                 </button>
                               ) : null}
@@ -302,11 +302,11 @@ export default function TareasPage() {
                   )}
                 </section>
 
-                <section className="rounded-2xl border border-slate-300 bg-slate-100/80 p-4 shadow-sm">
+                <section className="tareas-completed-section rounded-2xl border border-slate-300 bg-slate-100/80 p-4 shadow-sm">
                   <button
                     type="button"
                     onClick={() => setShowCompleted((value) => !value)}
-                    className="flex w-full items-center justify-between rounded-xl border border-slate-300 bg-slate-200 px-4 py-3 text-left"
+                    className="tareas-completed-toggle flex w-full items-center justify-between rounded-xl border border-slate-300 bg-slate-200 px-4 py-3 text-left"
                   >
                     <div>
                       <h2 className="text-lg font-black text-slate-700">Tareas realizadas</h2>

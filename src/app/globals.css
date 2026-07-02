@@ -3,22 +3,8 @@
 
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
     --background: #0a0a0a;
     --foreground: #ededed;
-  }
 }
 
 body {
@@ -62,116 +48,1683 @@ body {
 ========================================= */
 
 /* 1. TIPOGRAFÍAS */
-.font-family-dyslexic * {
+html.font-family-dyslexic,
+html.font-family-dyslexic body,
+html.font-family-dyslexic button,
+html.font-family-dyslexic input,
+html.font-family-dyslexic select,
+html.font-family-dyslexic textarea {
   font-family: 'OpenDyslexic', sans-serif !important;
 }
 
-.font-family-serif * {
+html.font-family-dyslexic * {
+  font-family: 'OpenDyslexic', sans-serif !important;
+}
+
+html.font-family-serif,
+html.font-family-serif body,
+html.font-family-serif button,
+html.font-family-serif input,
+html.font-family-serif select,
+html.font-family-serif textarea {
   font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif !important;
 }
 
-/* 2. TAMAÑOS DE LETRA */
-/* Usamos zoom en lugar de font-size con '*' para que todo crezca o se encoja 
-   proporcionalmente, sin arruinar los tamaños de los títulos */
-
-.font-size-small {
-  zoom: 0.99 !important;
+html.font-family-serif * {
 }
 
-.font-size-large {
-  zoom: 1.09 !important; /* Crece un 5% manteniendo las proporciones intactas */
+html.theme-dark .psychologist-dashboard-page .bg-white\/80,
+html.theme-dark .psychologist-dashboard-page .bg-white\/95,
+html.theme-dark .psychologist-dashboard-page .bg-white\/90 {
+  background-color: rgba(19, 35, 59, 0.96) !important;
 }
 
-/* 3. TEMAS DE COLOR */
-/* =========================================
-   SISTEMA DE ACCESIBILIDAD DEFINITIVO
-========================================= */
-
-/* --- MODO OSCURO --- */
-
-/* 1. Forzar TODOS los fondos de Tailwind a oscuros */
-.theme-dark body,
-.theme-dark main,
-.theme-dark section,
-.theme-dark [class*="bg-"] {
-  background-color: #0f172a !important;
-  border-color: #cccccc !important;
+html.theme-dark .psychologist-dashboard-page .hover\:bg-gray-50:hover,
+html.theme-dark .psychologist-dashboard-page .hover\:bg-blue-50:hover,
+html.theme-dark .psychologist-dashboard-page .hover\:border-blue-300:hover {
+  background-color: #1e3a5f !important;
 }
 
-/* Opcional: Dejar las tarjetas (blancas o muy claritas) en un tono azul-gris para que destaquen del fondo */
-.theme-dark .bg-white,
-.theme-dark [class*="bg-gray-50"],
-.theme-dark [class*="bg-slate-50"] {
+html.theme-dark .psychologist-activities-shell,
+html.theme-dark .psychologist-activities-page,
+html.theme-dark .psychologist-activities-header,
+html.theme-dark .psychologist-activities-empty {
+  background-color: #13233b !important;
+  border-color: #334155 !important;
+  color: #dbeafe !important;
+}
+
+html.theme-dark .psychologist-activities-page .psychologist-activities-header {
+  background: linear-gradient(180deg, rgba(19, 35, 59, 0.98), rgba(15, 23, 42, 0.98)) !important;
+}
+
+html.theme-dark .psychologist-activities-page .psychologist-activities-header h1,
+html.theme-dark .psychologist-activities-page .psychologist-activities-header p,
+html.theme-dark .psychologist-activities-page .psychologist-activities-empty p {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .psychologist-activities-client,
+html.theme-dark .psychologist-activities-card,
+html.theme-dark .psychologist-activities-modal-card,
+html.theme-dark .psychologist-activities-modal-body {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .psychologist-activities-card {
+  background-color: #13233b !important;
+  border-color: #3b82f6 !important;
+}
+
+html.theme-dark .psychologist-activities-card .bg-white,
+html.theme-dark .psychologist-activities-card .bg-blue-50,
+html.theme-dark .psychologist-activities-card .bg-slate-50 {
   background-color: #1e293b !important;
 }
 
-/* 2. Forzar TODAS las etiquetas de texto a ser claras (Gris muy claro) */
-.theme-dark h1, .theme-dark h2, .theme-dark h3, 
-.theme-dark h4, .theme-dark h5, .theme-dark h6, 
-.theme-dark p, .theme-dark span, .theme-dark li, 
-.theme-dark label, .theme-dark a, .theme-dark strong,
-.theme-dark [class*="text-"] {
-  color: #0080ff !important;
+html.theme-dark .psychologist-activities-card .text-slate-800,
+html.theme-dark .psychologist-activities-card .text-slate-600,
+html.theme-dark .psychologist-activities-card [class*="text-[#1E4D8C]"] {
+  color: #dbeafe !important;
 }
 
-/* 3. Excepción: Mantener los azules principales legibles pero vibrantes */
-.theme-dark .text-\[\#1E4D8C\],
-.theme-dark [class*="text-blue-"] {
-  color: #60a5fa !important;
+html.theme-dark .psychologist-activities-card .border-blue-200,
+html.theme-dark .psychologist-activities-card .border-slate-100 {
+  border-color: #3b82f6 !important;
 }
 
+html.theme-dark .psychologist-activities-modal {
+  background-color: rgba(2, 6, 23, 0.72) !important;
+}
 
-/* --- ALTO CONTRASTE --- */
+html.theme-dark .psychologist-activities-modal-card {
+  background-color: #13233b !important;
+  border-color: #334155 !important;
+}
 
-/* 1. Forzar TODO el fondo a negro puro */
-.theme-high-contrast body,
-.theme-high-contrast main,
-.theme-high-contrast section,
-.theme-high-contrast [class*="bg-"] {
+html.theme-dark .psychologist-activities-modal-header {
+  background: linear-gradient(90deg, #13233b, #1e293b) !important;
+  color: #dbeafe !important;
+}
+
+html.theme-dark .psychologist-activities-modal-body label,
+html.theme-dark .psychologist-activities-modal-body p,
+html.theme-dark .psychologist-activities-modal-body span {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .psychologist-activities-modal-body select,
+html.theme-dark .psychologist-activities-modal-body input {
+  background-color: #0f172a !important;
+  color: #e5e7eb !important;
+  border-color: #475569 !important;
+}
+
+html.theme-dark .psychologist-activities-modal-body option {
+  background-color: #0f172a !important;
+  color: #e5e7eb !important;
+}
+
+html.theme-dark .psychologist-activities-modal-body .bg-white {
+  background-color: #0f172a !important;
+}
+
+html.theme-dark .psychologist-patient-manager,
+html.theme-dark .psychologist-patient-search,
+html.theme-dark .psychologist-patient-list-header,
+html.theme-dark .psychologist-patient-detail,
+html.theme-dark .psychologist-patient-detail-header,
+html.theme-dark .psychologist-patient-detail-stats,
+html.theme-dark .psychologist-patient-chart,
+html.theme-dark .psychologist-patient-tabs,
+html.theme-dark .psychologist-patient-appointment,
+html.theme-dark .psychologist-test-card {
+  background-color: #13233b !important;
+  border-color: #334155 !important;
+  color: #dbeafe !important;
+}
+
+html.theme-dark .psychologist-patient-search {
+  background-color: #13233b !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.25) !important;
+}
+
+html.theme-dark .psychologist-patient-search-input {
+  background-color: #0f172a !important;
+  color: #e5e7eb !important;
+}
+
+html.theme-dark .psychologist-patient-search-input::placeholder {
+  color: #94a3b8 !important;
+}
+
+html.theme-dark .psychologist-patient-list button {
+  background-color: #13233b !important;
+  border-color: #334155 !important;
+}
+
+html.theme-dark .psychologist-patient-list button:hover,
+html.theme-dark .psychologist-patient-list button:focus-visible {
+  background-color: #1e3a5f !important;
+  border-color: #60a5fa !important;
+}
+
+html.theme-dark .psychologist-patient-list .bg-white,
+html.theme-dark .psychologist-patient-detail .bg-white,
+html.theme-dark .psychologist-patient-detail .bg-gray-50,
+html.theme-dark .psychologist-patient-detail .bg-slate-50 {
+  background-color: #13233b !important;
+}
+
+html.theme-dark .psychologist-patient-list .text-gray-800,
+html.theme-dark .psychologist-patient-list .text-slate-500,
+html.theme-dark .psychologist-patient-list .text-blue-600,
+html.theme-dark .psychologist-patient-detail .text-gray-800,
+html.theme-dark .psychologist-patient-detail .text-slate-500,
+html.theme-dark .psychologist-patient-detail .text-blue-600 {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .psychologist-patient-detail .bg-slate-50,
+html.theme-dark .psychologist-patient-detail .bg-gray-50,
+html.theme-dark .psychologist-patient-chart {
+  background-color: #0f172a !important;
+}
+
+html.theme-dark .psychologist-patient-search-input::placeholder {
+  color: #94a3b8 !important;
+}
+
+html.theme-dark .psychologist-patient-manager .bg-white,
+html.theme-dark .psychologist-patient-manager .bg-gray-50,
+html.theme-dark .psychologist-patient-manager [class*="bg-[#EEF2FF]"] {
+  background-color: #13233b !important;
+}
+
+html.theme-dark .psychologist-patient-manager .text-gray-800,
+html.theme-dark .psychologist-patient-manager .text-slate-800,
+html.theme-dark .psychologist-patient-manager .text-slate-500,
+html.theme-dark .psychologist-patient-manager .text-gray-500,
+html.theme-dark .psychologist-patient-manager .text-blue-600 {
+  color: #dbeafe !important;
+}
+
+html.font-family-sans,
+html.font-family-sans body,
+html.font-family-sans * {
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif !important;
+}
+
+/* 2. TAMAÑOS DE LETRA */
+html.font-size-small {
+  font-size: 15px;
+}
+
+html.font-size-large {
+  font-size: 18px;
+}
+
+.accessibility-font-select,
+.accessibility-font-select option {
+  color: #f8fafc !important;
+  background-color: #0f172a !important;
+}
+
+.accessibility-font-select:focus {
+  border-color: #60a5fa !important;
+}
+
+.accessibility-panel {
+  background-color: #1e293b;
+  border-color: #475569;
+}
+
+.accessibility-panel-title-icon,
+.accessibility-panel-title {
+  color: #93c5fd;
+}
+
+.accessibility-panel-divider {
+  background-color: #60a5fa;
+}
+
+.accessibility-panel-label {
+  color: #e2e8f0;
+}
+
+.accessibility-panel-btn--idle {
+  background-color: #334155;
+  color: #f1f5f9;
+  border-color: #64748b;
+}
+
+.accessibility-panel-btn--idle:hover {
+  background-color: #475569;
+}
+
+.accessibility-panel-btn--active-light {
+  background-color: #0ea5e9;
+  color: #ffffff;
+}
+
+.accessibility-panel-btn--active-dark {
+  background-color: #0f172a;
+  color: #e2e8f0;
+  border-color: #64748b;
+}
+
+.accessibility-panel-btn--active-contrast {
+  background-color: #0b1220;
+  color: #bfdbfe;
+  border-color: #93c5fd;
+}
+
+html.theme-dark .accessibility-panel {
+  background-color: #0f172a;
+  border-color: #334155;
+}
+
+html.theme-dark .accessibility-panel-title-icon,
+html.theme-dark .accessibility-panel-title {
+  color: #7dd3fc;
+}
+
+html.theme-dark .accessibility-panel-divider {
+  background-color: #38bdf8;
+}
+
+html.theme-dark .accessibility-panel-btn--idle {
+  background-color: #1e293b;
+  color: #e2e8f0;
+  border-color: #475569;
+}
+
+html.theme-dark .accessibility-panel-btn--idle:hover {
+  background-color: #334155;
+}
+
+html.theme-dark .accessibility-font-select,
+html.theme-dark .accessibility-font-select option {
+  background-color: #111827 !important;
+  color: #e5e7eb !important;
+  border-color: #475569 !important;
+}
+
+/* 3. FOCO Y ACCIONES INTERACTIVAS */
+*:focus-visible {
+  outline: 3px solid #1e40af;
+  outline-offset: 2px;
+}
+
+a,
+button,
+[role="button"],
+summary,
+select,
+input[type="checkbox"],
+input[type="radio"] {
+  transition: box-shadow 0.2s ease, outline-color 0.2s ease, transform 0.2s ease;
+}
+
+.accessibility-fab:hover {
+  box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.45);
+}
+
+.accessibility-launcher {
+  top: 7rem;
+}
+
+.accessibility-launcher .accessibility-fab {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* 4. MODO OSCURO */
+html.theme-dark body,
+html.theme-dark main,
+html.theme-dark section {
+  background-color: #0b1220 !important;
+  color: #e5e7eb !important;
+}
+
+html.theme-dark [class*="bg-gradient-to-"] {
+  background-image: none !important;
+  background-color: #0f172a !important;
+}
+
+html.theme-dark .bg-white,
+html.theme-dark [class*="bg-slate-"],
+html.theme-dark [class*="bg-gray-"],
+html.theme-dark [class*="bg-blue-"] {
+  background-color: #162235 !important;
+}
+
+html.theme-dark [class*="text-slate-"],
+html.theme-dark [class*="text-gray-"],
+html.theme-dark p,
+html.theme-dark span,
+html.theme-dark label,
+html.theme-dark li,
+html.theme-dark h1,
+html.theme-dark h2,
+html.theme-dark h3,
+html.theme-dark h4,
+html.theme-dark h5,
+html.theme-dark h6 {
+  color: #e5e7eb !important;
+}
+
+html.theme-dark .text-\[\#1E4D8C\],
+html.theme-dark [class*="text-blue-"] {
+  color: #93c5fd !important;
+}
+
+html.theme-dark input,
+html.theme-dark select,
+html.theme-dark textarea {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  border-color: #94a3b8 !important;
+}
+
+html.theme-dark ::placeholder {
+  color: #cbd5e1 !important;
+}
+
+html.theme-dark button:hover,
+html.theme-dark a:hover,
+html.theme-dark [role="button"]:hover {
+  box-shadow: 0 0 0 2px rgba(147, 197, 253, 0.45);
+}
+
+/* 5. ALTO CONTRASTE */
+html.theme-high-contrast body,
+html.theme-high-contrast main,
+html.theme-high-contrast section,
+html.theme-high-contrast [class*="bg-"] {
   background-color: #000000 !important;
-  border-color: #facc15 !important;
+  color: #ffeb3b !important;
 }
 
-/* 2. Forzar TODAS las etiquetas de texto a amarillo puro */
-.theme-high-contrast h1, .theme-high-contrast h2, .theme-high-contrast h3, 
-.theme-high-contrast h4, .theme-high-contrast h5, .theme-high-contrast h6, 
-.theme-high-contrast p, .theme-high-contrast span, .theme-high-contrast li, 
-.theme-high-contrast label, .theme-high-contrast a, .theme-high-contrast strong,
-.theme-high-contrast [class*="text-"] {
-  color: #facc15 !important;
-}
-
-/* --- ALTO CONTRASTE --- */
-.theme-high-contrast body {
+html.theme-high-contrast [class*="bg-gradient-to-"] {
+  background-image: none !important;
   background-color: #000000 !important;
-  color: #facc15 !important; 
 }
 
-.theme-high-contrast * {
-  border-color: #facc15 !important;
+html.theme-high-contrast .hero-home-bg {
+  background-image: url('/images/psico1.png') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-color: transparent !important;
+  filter: grayscale(100%) contrast(125%);
 }
 
-/* Forzar todos los fondos de Tailwind a negro */
-.theme-high-contrast .bg-white,
-.theme-high-contrast .bg-blue-600,
-.theme-high-contrast [class*="bg-"] {
+html.theme-high-contrast .hero-home-overlay {
+  background-image: none !important;
+  background-color: rgba(0, 0, 0, 0.35) !important;
+}
+
+html.theme-high-contrast .citas-page-shell {
+  background: #000000 !important;
+}
+
+html.theme-high-contrast .citas-route-shell {
+  background: #000000 !important;
+}
+
+html.theme-high-contrast .citas-field {
   background-color: #000000 !important;
-  color: #facc15 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffeb3b !important;
 }
 
-/* SOLUCIÓN: 
-  En lugar de listar clase por clase (text-white, text-gray-800, etc.), 
-  forzamos a que CUALQUIER elemento que tenga una clase de texto de Tailwind, 
-  así como los elementos de texto estándar, se vuelvan amarillos.
-*/
-.theme-high-contrast [class*="text-"],
-.theme-high-contrast h1,
-.theme-high-contrast h2,
-.theme-high-contrast h3,
-.theme-high-contrast h4,
-.theme-high-contrast p,
-.theme-high-contrast span {
-  color: #facc15 !important;
+html.theme-high-contrast .citas-field:focus,
+html.theme-high-contrast .citas-field:focus-visible {
+  outline: 3px solid #ffffff !important;
+  outline-offset: 1px;
+  border-color: #ffffff !important;
+}
+
+html.theme-high-contrast .citas-field option {
+  background-color: #000000 !important;
+  color: #ffeb3b !important;
+}
+
+html.theme-high-contrast .citas-field option:checked,
+html.theme-high-contrast .citas-field option:hover,
+html.theme-high-contrast .citas-field option:focus {
+  background: #ffeb3b !important;
+  color: #000000 !important;
+}
+
+.citas-date-field::-webkit-calendar-picker-indicator {
+  opacity: 0 !important;
+}
+
+.citas-date-icon {
+  color: #1e4d8c;
+}
+
+html.theme-high-contrast input.citas-field[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0 !important;
+}
+
+html.theme-high-contrast .citas-date-icon {
+  color: #ffeb3b !important;
+}
+
+html.theme-high-contrast .citas-hour-slot {
+  background-color: #000000 !important;
+  color: #ffeb3b !important;
+  border-color: #ffeb3b !important;
+}
+
+html.theme-high-contrast .citas-hour-slot:hover,
+html.theme-high-contrast .citas-hour-slot:focus-visible {
+  outline: 3px solid #ffffff !important;
+  outline-offset: 1px;
+  border-color: #ffffff !important;
+}
+
+html.theme-high-contrast .citas-hour-slot--selected {
+  background-color: #ffeb3b !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+}
+html.theme-high-contrast button.citas-hour-slot--selected,
+html.theme-high-contrast .citas-hour-slot.citas-hour-slot--selected {
+  color: #000000 !important;
+}
+
+html.theme-high-contrast .citas-hour-slot--busy,
+html.theme-high-contrast .citas-hour-slot--past {
+  opacity: 0.55 !important;
+}
+
+html.theme-high-contrast .citas-tab-btn {
+  background-color: #000000 !important;
+  color: #ffeb3b !important;
+  border: 1px solid #ffeb3b !important;
+}
+
+html.theme-high-contrast .citas-tab-btn--active {
+  background-color: #ffeb3b !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+}
+
+html.theme-high-contrast button.citas-tab-btn--active,
+html.theme-high-contrast .citas-tab-btn.citas-tab-btn--active {
+  color: #000000 !important;
+}
+
+html.theme-high-contrast .citas-submit-btn {
+  background-image: none !important;
+  background-color: #000000 !important;
+  color: #ffeb3b !important;
+  border: 2px solid #ffeb3b !important;
+}
+
+html.theme-high-contrast .citas-submit-btn,
+html.theme-high-contrast .citas-submit-btn span,
+html.theme-high-contrast .citas-submit-btn svg {
+  color: #ffeb3b !important;
+  stroke: #ffeb3b !important;
+}
+
+html.theme-high-contrast .citas-submit-btn:hover,
+html.theme-high-contrast .citas-submit-btn:focus-visible {
+  background-color: #ffeb3b !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+}
+
+html.theme-high-contrast .citas-submit-btn:hover svg,
+html.theme-high-contrast .citas-submit-btn:focus-visible svg {
+  color: #000000 !important;
+  stroke: #000000 !important;
+}
+
+html.theme-high-contrast .citas-select-trigger,
+html.theme-high-contrast .citas-select-menu {
+  background-color: #000000 !important;
+  border-color: #ffeb3b !important;
+  color: #ffeb3b !important;
+}
+
+html.theme-high-contrast .citas-select-option {
+  background-color: #000000 !important;
+  color: #ffeb3b !important;
+}
+
+html.theme-high-contrast .citas-select-option:hover,
+html.theme-high-contrast .citas-select-option:focus-visible,
+html.theme-high-contrast .citas-select-option--selected {
+  background-color: #ffeb3b !important;
+  color: #000000 !important;
+  border: 1px solid #ffffff !important;
+}
+
+html.theme-dark .citas-route-shell {
+  background-color: #0b1220 !important;
+  background-image: none !important;
+}
+
+html.theme-dark .citas-page-shell {
+  background: #0b1220 !important;
+  color: #e5e7eb !important;
+}
+
+html.theme-dark .saber-mas-main {
+  background-color: #0b1220 !important;
+  background-image: none !important;
+}
+
+html.theme-dark .saber-mas-overlay {
+  background-color: rgba(10, 18, 32, 0.9) !important;
+}
+
+html.theme-dark .ansiedad-page-shell,
+html.theme-dark .salud-mental-page-shell {
+  background: #0b1220 !important;
+  color: #e5e7eb !important;
+}
+
+html.theme-dark .ansiedad-page-shell [class*="bg-white"],
+html.theme-dark .salud-mental-page-shell [class*="bg-white"],
+html.theme-dark .ansiedad-page-shell [class*="bg-blue-50"],
+html.theme-dark .salud-mental-page-shell [class*="bg-blue-50"] {
+  background-color: #111b2e !important;
+}
+
+html.theme-dark .ansiedad-page-shell [class*="border-[#71A5D9]"],
+html.theme-dark .salud-mental-page-shell [class*="border-[#71A5D9]"],
+html.theme-dark .ansiedad-page-shell [class*="border-blue"],
+html.theme-dark .salud-mental-page-shell [class*="border-blue"] {
+  border-color: #3b82f6 !important;
+}
+
+html.theme-dark .ansiedad-page-shell [class*="text-black"],
+html.theme-dark .salud-mental-page-shell [class*="text-black"],
+html.theme-dark .ansiedad-page-shell [class*="text-slate-700"],
+html.theme-dark .salud-mental-page-shell [class*="text-slate-700"] {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .ansiedad-page-shell [class*="text-[#1E4D8C]"],
+html.theme-dark .salud-mental-page-shell [class*="text-[#1E4D8C]"] {
+  color: #93c5fd !important;
+}
+
+html.theme-dark .ansiedad-page-shell [class*="bg-gradient-to-b"],
+html.theme-dark .salud-mental-page-shell [class*="bg-gradient-to-b"] {
+  background-image: none !important;
+  background-color: #0b1220 !important;
+}
+
+html.theme-dark .citas-page-shell .rounded-3xl,
+html.theme-dark .citas-page-shell .rounded-2xl,
+html.theme-dark .citas-page-shell .rounded-xl {
+  border-color: #334155 !important;
+}
+
+html.theme-dark .citas-page-shell [class*="bg-white"],
+html.theme-dark .citas-page-shell [class*="bg-blue-50"],
+html.theme-dark .citas-page-shell [class*="bg-slate-50"],
+html.theme-dark .citas-page-shell [class*="bg-emerald-50"],
+html.theme-dark .citas-page-shell [class*="bg-amber-50"] {
+  background-color: #162235 !important;
+}
+
+html.theme-dark .citas-page-shell [class*="text-slate-"],
+html.theme-dark .citas-page-shell [class*="text-gray-"] {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .citas-page-shell [class*="text-emerald-700"] {
+  color: #6ee7b7 !important;
+}
+
+html.theme-dark .citas-page-shell [class*="text-amber-700"] {
+  color: #fcd34d !important;
+}
+
+html.theme-dark .citas-page-shell [class*="text-rose-700"],
+html.theme-dark .citas-page-shell [class*="text-red-700"] {
+  color: #fda4af !important;
+}
+
+html.theme-dark .citas-field {
+  background-color: #0f172a !important;
+  border-color: #93c5fd !important;
+  color: #e5e7eb !important;
+}
+
+html.theme-dark .citas-date-icon {
+  color: #93c5fd !important;
+}
+
+html.theme-dark .citas-select-trigger,
+html.theme-dark .citas-select-menu {
+  background-color: #0f172a !important;
+  border-color: #93c5fd !important;
+  color: #e5e7eb !important;
+}
+
+html.theme-dark .citas-select-option {
+  background-color: #0f172a !important;
+  color: #e5e7eb !important;
+}
+
+html.theme-dark .citas-select-option:hover,
+html.theme-dark .citas-select-option--selected {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+}
+
+html.theme-dark .citas-hour-slot--selected,
+html.theme-dark .citas-tab-btn--active {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  border-color: #bfdbfe !important;
+}
+
+html.theme-dark .citas-submit-btn {
+  background-image: none !important;
+  background-color: #1d4ed8 !important;
+  border: 2px solid #93c5fd !important;
+  color: #ffffff !important;
+}
+
+html.theme-dark .citas-submit-btn:hover,
+html.theme-dark .citas-submit-btn:focus-visible {
+  background-color: #2563eb !important;
+  border-color: #dbeafe !important;
+}
+
+html.theme-dark .citas-page-shell [class*="bg-sky-50"] {
+  background-color: #10243a !important;
+}
+
+html.theme-dark .citas-page-shell [class*="border-sky-200"],
+html.theme-dark .citas-page-shell [class*="border-blue-200"],
+html.theme-dark .citas-page-shell [class*="border-blue-100"] {
+  border-color: #3b82f6 !important;
+}
+
+html.theme-dark .citas-page-shell [class*="bg-red-50"],
+html.theme-dark .citas-page-shell [class*="bg-rose-50"] {
+  background-color: #2a1220 !important;
+}
+
+html.theme-dark .citas-page-shell [class*="border-red-200"],
+html.theme-dark .citas-page-shell [class*="border-rose-200"] {
+  border-color: #be123c !important;
+}
+
+html.theme-dark .citas-page-shell [class*="bg-gradient-to-r"] {
+  background-image: none !important;
+  background-color: #1e3a5f !important;
+}
+
+html.theme-dark .citas-page-shell [class*="bg-[#f5f9ff]"] {
+  background-color: #162235 !important;
+}
+
+html.theme-dark .citas-page-shell [class*="bg-[#f4f9ff]"] {
+  background-color: #162235 !important;
+}
+
+html.theme-dark .citas-page-shell [class*="bg-[#f7fbff]"] {
+  background-color: #162235 !important;
+}
+
+html.theme-dark .citas-page-shell [class*="bg-[#1d42fb]"] {
+  background-color: #1d4ed8 !important;
+}
+
+html.theme-dark .citas-page-shell [class*="text-[#1E4D8C]"] {
+  color: #bfdbfe !important;
+}
+
+html.theme-dark .citas-page-shell [class*="text-[#4c82bf]"] {
+  color: #93c5fd !important;
+}
+
+html.theme-dark .citas-page-shell [class*="bg-white/85"] {
+  background-color: #111b2e !important;
+}
+
+html.theme-dark .citas-page-shell [class*="bg-white"] {
+  color: #e5e7eb !important;
+}
+
+html.theme-dark .citas-page-shell [class*="bg-black/50"] [class*="bg-white"],
+html.theme-dark .citas-page-shell [class*="bg-black/50"] [class*="bg-slate-200"] {
+  background-color: #111b2e !important;
+}
+
+html.theme-dark .citas-page-shell textarea,
+html.theme-dark .citas-page-shell input,
+html.theme-dark .citas-page-shell select {
+  caret-color: #ffffff;
+}
+
+html.theme-high-contrast * {
+  border-color: #ffeb3b !important;
+}
+
+html.theme-high-contrast [class*="text-"],
+html.theme-high-contrast p,
+html.theme-high-contrast span,
+html.theme-high-contrast label,
+html.theme-high-contrast li,
+html.theme-high-contrast h1,
+html.theme-high-contrast h2,
+html.theme-high-contrast h3,
+html.theme-high-contrast h4,
+html.theme-high-contrast h5,
+html.theme-high-contrast h6 {
+  color: #ffeb3b !important;
+}
+
+html.theme-high-contrast button,
+html.theme-high-contrast a,
+html.theme-high-contrast [role="button"],
+html.theme-high-contrast summary,
+html.theme-high-contrast label[for] {
+  cursor: pointer !important;
+}
+
+html.theme-high-contrast button,
+html.theme-high-contrast [role="button"] {
+  background-color: #000000 !important;
+  color: #ffeb3b !important;
+  border: 2px solid #ffeb3b !important;
+}
+
+html.theme-high-contrast button:hover,
+html.theme-high-contrast a:hover,
+html.theme-high-contrast [role="button"]:hover {
+  outline: 3px solid #ffffff !important;
+  outline-offset: 1px;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35) !important;
+}
+
+html.theme-high-contrast .patient-dashboard-nav {
+  background-image: none !important;
+  background-color: #000000 !important;
+  border: 2px solid #ffeb3b !important;
+}
+
+html.theme-high-contrast .patient-dashboard-nav__item {
+  background-color: #000000 !important;
+  color: #ffeb3b !important;
+  border: 1px solid #ffeb3b !important;
+}
+
+html.theme-high-contrast .patient-dashboard-nav__item:hover,
+html.theme-high-contrast .patient-dashboard-nav__item:focus-visible {
+  background-color: #ffeb3b !important;
+  color: #000000 !important;
+}
+
+html.theme-high-contrast .patient-dashboard-nav__item--active {
+  background-color: #ffeb3b !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+}
+
+html.theme-high-contrast .gad7-option {
+  cursor: pointer !important;
+  border-width: 2px !important;
+}
+
+html.theme-high-contrast .gad7-option:hover,
+html.theme-high-contrast .gad7-option:focus-visible {
+  background-color: #ffeb3b !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+}
+
+html.theme-high-contrast .gad7-option--selected {
+  background-color: #ffeb3b !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+}
+
+html.theme-high-contrast .gad7-primary-action {
+  background-color: #ffeb3b !important;
+  color: #000000 !important;
+  border: 2px solid #ffffff !important;
+}
+
+html.theme-high-contrast .gad7-score {
+  background-color: #000000 !important;
+  color: #ffeb3b !important;
+  border: 2px solid #ffeb3b !important;
+}
+
+html.theme-high-contrast .gad7-semaphore {
+  background-color: #000000 !important;
+  border: 2px solid #ffeb3b !important;
+}
+
+html.theme-high-contrast .gad7-scale-item {
+  background-color: #000000 !important;
+  color: #ffeb3b !important;
+  border-color: #ffeb3b !important;
+}
+
+html.theme-high-contrast .citas-modalidad-option {
+  background-color: #000000 !important;
+  color: #ffeb3b !important;
+  border: 2px solid #ffeb3b !important;
+}
+
+html.theme-high-contrast .citas-modalidad-option:hover,
+html.theme-high-contrast .citas-modalidad-option:focus-within {
+  outline: 2px solid #ffffff !important;
+  outline-offset: 1px;
+}
+
+html.theme-high-contrast .citas-modalidad-option--selected {
+  background-color: #ffeb3b !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+}
+
+html.theme-high-contrast .citas-modalidad-option input[type="radio"] {
+  accent-color: #000000;
+}
+
+html.theme-high-contrast [class*="hover:bg-"],
+html.theme-high-contrast [class*="hover:text-"] {
+  transition-duration: 0s !important;
+}
+
+html.theme-dark .patient-dashboard-nav {
+  background-image: none !important;
+  background: linear-gradient(90deg, #090f1c 0%, #17386b 50%, #090f1c 100%) !important;
+  border-color: #6ea8ff !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 8px 18px rgba(0, 0, 0, 0.28) !important;
+}
+
+html.theme-dark .patient-dashboard-tabs-wrap {
+  background-color: #0b1220 !important;
+}
+
+html.theme-dark .patient-dashboard-nav__item {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .patient-dashboard-nav__item:hover,
+html.theme-dark .patient-dashboard-nav__item:focus-visible,
+html.theme-dark .patient-dashboard-nav__item--active {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+}
+
+html.theme-dark .patient-dashboard-shell {
+  background-color: #121f35 !important;
+}
+
+html.theme-dark .patient-dashboard-shell [class*="border-slate-"],
+html.theme-dark .patient-dashboard-shell [class*="border-blue"],
+html.theme-dark .patient-dashboard-shell [class*="border-emerald"],
+html.theme-dark .patient-dashboard-shell [class*="border-amber"],
+html.theme-dark .patient-dashboard-shell [class*="border-purple"] {
+  border-color: #3b82f6 !important;
+}
+
+html.theme-dark .patient-dashboard-shell [class*="text-slate-"],
+html.theme-dark .patient-dashboard-shell [class*="text-gray-"] {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .patient-dashboard-shell [class*="text-[#1E4D8C]"] {
+  color: #93c5fd !important;
+}
+
+html.theme-dark .patient-dashboard-modal {
+  background-color: #0b1220 !important;
+}
+
+html.theme-dark .patient-dashboard-modal-header {
+  background-color: rgba(15, 23, 42, 0.95) !important;
+  border-color: #334155 !important;
+}
+
+html.theme-dark .notification-bell-root > button {
+  background-color: #13233b !important;
+  border-color: #3b82f6 !important;
+  color: #dbeafe !important;
+}
+
+html.theme-dark .notification-bell-root > button:hover {
+  background-color: #1e3a5f !important;
+}
+
+html.theme-dark .notification-bell-panel,
+html.theme-dark .patient-navbar-notifications {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+}
+
+html.theme-dark .notification-bell-panel__header,
+html.theme-dark .patient-navbar-notifications__header {
+  background-color: #1d4ed8 !important;
+  border-color: #93c5fd !important;
+}
+
+html.theme-dark .notification-bell-panel__header p:first-child,
+html.theme-dark .patient-navbar-notifications__header p:first-child {
+  color: #ffffff !important;
+}
+
+html.theme-dark .notification-bell-panel__header p:last-child,
+html.theme-dark .patient-navbar-notifications__header p:last-child {
+  color: rgba(255, 255, 255, 0.82) !important;
+}
+
+html.theme-dark .notification-bell-panel__quicklinks,
+html.theme-dark .patient-navbar-notifications__quicklinks {
+  background: linear-gradient(90deg, #1d4ed8, #2563eb) !important;
+  border-color: #93c5fd !important;
+}
+
+html.theme-dark .notification-bell-panel__quicklinks-label,
+html.theme-dark .patient-navbar-notifications__quicklinks-label {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+html.theme-dark .notification-bell-panel__quicklink,
+html.theme-dark .patient-navbar-notifications__quicklink {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+html.theme-dark .notification-bell-panel__quicklink--tasks,
+html.theme-dark .patient-navbar-notifications__quicklink--tasks {
+  border-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+html.theme-dark .notification-bell-panel__quicklink--home,
+html.theme-dark .patient-navbar-notifications__quicklink--home {
+  border-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+html.theme-dark .notification-bell-panel__quicklink svg,
+html.theme-dark .patient-navbar-notifications__quicklink svg {
+  color: #ffffff !important;
+}
+
+html.theme-dark .notification-bell-panel__empty,
+html.theme-dark .patient-navbar-notifications__empty {
+  color: #94a3b8 !important;
+  background-color: #0f172a !important;
+}
+
+html.theme-dark .notification-bell-panel__item,
+html.theme-dark .patient-navbar-notifications__item {
+  background-color: #13233b !important;
+  border-color: #334155 !important;
+}
+
+html.theme-dark .notification-bell-panel__item:hover,
+html.theme-dark .patient-navbar-notifications__item:hover {
+  background-color: #1e3a5f !important;
+}
+
+html.theme-dark .notification-bell-panel__item p,
+html.theme-dark .patient-navbar-notifications__item p {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .notification-bell-panel__item span,
+html.theme-dark .patient-navbar-notifications__item span {
+  color: #cbd5e1 !important;
+}
+
+html.theme-dark .notification-bell-panel__item .text-gray-300,
+html.theme-dark .patient-navbar-notifications__item .text-gray-300 {
+  color: #93c5fd !important;
+}
+
+html.theme-dark .notification-bell-panel__item .notification-bell-badge,
+html.theme-dark .patient-navbar-notifications__item .notification-bell-badge {
+  background-color: #1e293b !important;
+  color: #ffffff !important;
+  border: 1px solid #93c5fd !important;
+}
+
+html.theme-dark .notification-bell-panel__item .notification-bell-badge svg,
+html.theme-dark .patient-navbar-notifications__item .notification-bell-badge svg {
+  color: #ffffff !important;
+}
+
+html.theme-dark .notification-bell-panel__footer,
+html.theme-dark .patient-navbar-notifications__footer {
+  background-color: #13233b !important;
+  border-color: #334155 !important;
+}
+
+html.theme-dark .biblioteca-page-shell {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .biblioteca-page-shell h1,
+html.theme-dark .biblioteca-page-shell h2,
+html.theme-dark .biblioteca-page-shell h3,
+html.theme-dark .biblioteca-page-shell p {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .biblioteca-card-grid > div {
+  background-color: #13233b !important;
+  border-color: #3b82f6 !important;
+  box-shadow: none !important;
+}
+
+html.theme-dark .biblioteca-card-grid > div .absolute.inset-0 {
+  background-color: rgba(30, 64, 175, 0.35) !important;
+}
+
+html.theme-dark .biblioteca-card-grid > div .bg-white\/90 {
+  background-color: rgba(15, 23, 42, 0.88) !important;
+  color: #dbeafe !important;
+  border-color: #3b82f6 !important;
+}
+
+html.theme-dark .biblioteca-guide-title,
+html.theme-dark .biblioteca-guide-section-title {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .biblioteca-guide-badge {
+  background-color: rgba(15, 23, 42, 0.88) !important;
+  color: #dbeafe !important;
+  border-color: #3b82f6 !important;
+}
+
+html.theme-dark .biblioteca-guide-overlay {
+  background-color: #1d4ed8 !important;
+}
+
+html.theme-dark .biblioteca-card-grid > div .bg-opacity-70 {
+  opacity: 0.5 !important;
+}
+
+html.theme-dark .saber-mas-main {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .saber-mas-sections [class*="text-slate-"],
+html.theme-dark .saber-mas-sections [class*="text-gray-"] {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .saber-mas-sections [class*="bg-white"],
+html.theme-dark .saber-mas-sections [class*="bg-blue-50"],
+html.theme-dark .saber-mas-sections [class*="bg-slate-50"] {
+  background-color: #121f35 !important;
+}
+
+html.theme-dark .saber-mas-sections [class*="border-[#71A5D9]"],
+html.theme-dark .saber-mas-sections [class*="border-blue"] {
+  border-color: #60a5fa !important;
+}
+
+html.theme-dark .saber-mas-modal {
+  background-color: rgba(11, 18, 32, 0.96) !important;
+}
+
+html.theme-dark .saber-mas-modal-header {
+  background-color: rgba(15, 23, 42, 0.95) !important;
+  border-color: #334155 !important;
+}
+
+html.theme-dark .citas-modalidad-option {
+  background-color: #111827 !important;
+  border-color: #93c5fd !important;
+  color: #e5e7eb !important;
+}
+
+html.theme-dark .citas-modalidad-option--selected {
+  background-color: #1d4ed8 !important;
+  border-color: #bfdbfe !important;
+  color: #ffffff !important;
+}
+
+html.theme-high-contrast input,
+html.theme-high-contrast select,
+html.theme-high-contrast textarea {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffeb3b !important;
+  caret-color: #ffffff !important;
+}
+
+html.theme-high-contrast ::placeholder {
+  color: #fef08a !important;
+}
+
+html.theme-high-contrast *:focus-visible {
+  outline: 3px solid #ffffff !important;
+  outline-offset: 2px;
+}
+
+html.theme-high-contrast ::selection {
+  background-color: #ffeb3b;
+  color: #000000;
+}
+
+/* Ajustes finos oscuros: Saber Más y Dashboard Paciente */
+html.theme-dark .saber-mas-nav {
+  background-color: rgba(8, 15, 28, 0.92) !important;
+  border-color: #1e293b !important;
+}
+
+html.theme-dark .saber-mas-nav-btn {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .saber-mas-nav-btn-login:hover {
+  background-color: rgba(30, 58, 95, 0.55) !important;
+}
+
+html.theme-dark .saber-mas-nav-btn-register {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+}
+
+html.theme-dark .saber-mas-nav-btn-register:hover {
+  background-color: #2563eb !important;
+}
+
+html.theme-dark .saber-mas-footer {
+  background-color: #0b1220 !important;
+  border-top: 1px solid #1e293b;
+}
+
+html.theme-dark .saber-mas-footer-text {
+  color: #93c5fd !important;
+}
+
+html.theme-dark .patient-header-logout {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  border: 1px solid #93c5fd;
+}
+
+html.theme-dark .patient-header-logout:hover {
+  background-color: #2563eb !important;
+}
+
+html.theme-dark .patient-activity-card {
+  border-color: #3b82f6 !important;
+  background-color: #13233b !important;
+}
+
+html.theme-dark .patient-activity-icon-box {
+  background-color: #1e3a5f !important;
+}
+
+html.theme-dark .patient-activity-icon {
+  color: #93c5fd !important;
+}
+
+html.theme-dark .patient-activity-kicker,
+html.theme-dark .patient-activity-title,
+html.theme-dark .patient-activity-description {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .patient-activity-btn {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  border: 1px solid #93c5fd;
+}
+
+html.theme-dark .patient-activity-btn:hover,
+html.theme-dark .patient-activity-btn:focus-visible {
+  background-color: #2563eb !important;
+  border-color: #dbeafe;
+}
+
+html.theme-dark .app-logo-badge,
+html.theme-high-contrast .app-logo-badge {
+  background-color: #e2e8f0 !important;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+html.theme-dark .hero-home-bg {
+  background-image: url('/images/psico1.png') !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+
+/* Evita que el overlay oscuro tape por completo la imagen en tema dark. */
+html.theme-dark .hero-home-overlay {
+  background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.28), rgba(2, 6, 23, 0.52)) !important;
+  background-color: transparent !important;
+}
+
+html.theme-dark .patient-citas-card {
+  border-color: #3b82f6 !important;
+  background-color: #13233b !important;
+}
+
+html.theme-dark .patient-citas-icon-box {
+  background-color: #1e3a5f !important;
+}
+
+html.theme-dark .patient-citas-icon,
+html.theme-dark .patient-citas-kicker,
+html.theme-dark .patient-citas-value,
+html.theme-dark .patient-citas-desc {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .patient-citas-pill {
+  background-color: #1e3a5f !important;
+  color: #dbeafe !important;
+  border: 1px solid #93c5fd !important;
+}
+
+html.theme-dark .patient-citas-pill--updated {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  border-color: #bfdbfe !important;
+}
+
+html.theme-dark .patient-citas-action {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  border: 1px solid #93c5fd;
+}
+
+html.theme-dark .patient-citas-action:hover,
+html.theme-dark .patient-citas-action:focus-visible {
+  background-color: #2563eb !important;
+}
+
+html.theme-dark .patient-citas-card [class*="text-emerald"],
+html.theme-dark .patient-citas-card [class*="text-amber"],
+html.theme-dark .patient-citas-card [class*="text-green"] {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .patient-citas-card [class*="bg-emerald"],
+html.theme-dark .patient-citas-card [class*="bg-amber"],
+html.theme-dark .patient-citas-card [class*="bg-green"] {
+  background-color: #1e3a5f !important;
+}
+
+html.theme-dark .tareas-page-shell {
+  background-image: none !important;
+  background-color: #0b1220 !important;
+  color: #dbeafe !important;
+}
+
+html.theme-dark .tareas-page-shell [class*="text-slate-"],
+html.theme-dark .tareas-page-shell [class*="text-gray-"] {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .tareas-assigned-card,
+html.theme-dark .tareas-completed-section,
+html.theme-dark .tareas-instructions,
+html.theme-dark .tareas-completed-toggle {
+  background-image: none !important;
+  background-color: #13233b !important;
+  border-color: #3b82f6 !important;
+}
+
+html.theme-dark .tareas-status-pill,
+html.theme-dark .tareas-limit-pill {
+  background-color: #1e3a5f !important;
+  color: #eaf2ff !important;
+  border: 1px solid #93c5fd !important;
+}
+
+html.theme-dark .tareas-status-pill {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  border-color: #bfdbfe !important;
+}
+
+html.theme-dark .tareas-open-btn,
+html.theme-dark .tareas-back-btn {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+}
+
+html.theme-dark .tareas-open-btn:hover,
+html.theme-dark .tareas-open-btn:focus-visible,
+html.theme-dark .tareas-back-btn:hover,
+html.theme-dark .tareas-back-btn:focus-visible {
+  background-color: #2563eb !important;
+}
+
+html.theme-dark .tecnicas-page-shell {
+  background-image: none !important;
+  background-color: #0b1220 !important;
+  color: #dbeafe !important;
+}
+
+html.theme-dark .tecnicas-page-shell [class*="bg-white"],
+html.theme-dark .tecnicas-page-shell [class*="bg-slate-"],
+html.theme-dark .tecnicas-page-shell [class*="bg-blue-"] {
+  background-image: none !important;
+  background-color: #13233b !important;
+}
+
+html.theme-dark .tecnicas-page-shell [class*="border-blue"],
+html.theme-dark .tecnicas-page-shell [class*="border-slate"] {
+  border-color: #3b82f6 !important;
+}
+
+html.theme-dark .tecnicas-page-shell [class*="text-slate-"],
+html.theme-dark .tecnicas-page-shell [class*="text-gray-"] {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .tecnicas-back-btn {
+  background-color: #1d4ed8 !important;
+}
+
+html.theme-dark .tecnicas-back-btn:hover,
+html.theme-dark .tecnicas-back-btn:focus-visible {
+  background-color: #2563eb !important;
+}
+
+html.theme-high-contrast .tareas-back-btn,
+html.theme-high-contrast .tecnicas-back-btn,
+html.theme-high-contrast .tareas-back-btn:hover,
+html.theme-high-contrast .tecnicas-back-btn:hover,
+html.theme-high-contrast .tareas-back-btn:focus-visible,
+html.theme-high-contrast .tecnicas-back-btn:focus-visible {
+  background-color: #111111 !important;
+  color: #ffeb3b !important;
+  border-color: #ffeb3b !important;
+}
+
+html.theme-high-contrast .tareas-back-btn svg,
+html.theme-high-contrast .tecnicas-back-btn svg {
+  color: #ffeb3b !important;
+}
+
+html.theme-high-contrast .tareas-assigned-section {
+  background-color: #111111 !important;
+  border-color: #ffeb3b !important;
+}
+
+html.theme-high-contrast .tareas-assigned-title,
+html.theme-high-contrast .tareas-assigned-section .tareas-assigned-count,
+html.theme-high-contrast .tareas-assigned-card-title,
+html.theme-high-contrast .tareas-assigned-card-description,
+html.theme-high-contrast .tareas-assigned-section .text-slate-600,
+html.theme-high-contrast .tareas-assigned-section .text-slate-500 {
+  color: #ffeb3b !important;
+}
+
+html.theme-high-contrast .tareas-assigned-section .tareas-assigned-empty,
+html.theme-high-contrast .tareas-assigned-section .tareas-assigned-card,
+html.theme-high-contrast .tareas-assigned-section .tareas-instructions {
+  background-color: #111111 !important;
+  border-color: #ffeb3b !important;
+  color: #ffeb3b !important;
+}
+
+html.theme-high-contrast .tareas-assigned-section .tareas-status-pill {
+  background-color: #ffeb3b !important;
+  color: #111111 !important;
+  border-color: #ffeb3b !important;
+}
+
+html.theme-high-contrast .tareas-assigned-section .tareas-limit-pill {
+  background-color: #111111 !important;
+  color: #ffeb3b !important;
+  border-color: #ffeb3b !important;
+}
+
+html.theme-high-contrast .tareas-assigned-section .tareas-open-btn {
+  background-color: #111111 !important;
+  color: #ffeb3b !important;
+  border: 1px solid #ffeb3b !important;
+}
+
+html.theme-high-contrast .tareas-assigned-section .tareas-open-btn:hover,
+html.theme-high-contrast .tareas-assigned-section .tareas-open-btn:focus-visible {
+  background-color: #ffeb3b !important;
+  color: #111111 !important;
+}
+
+html.theme-high-contrast .patient-citas-pill,
+html.theme-high-contrast .patient-citas-pill--updated {
+  color: #ffffff !important;
+}
+
+html.theme-high-contrast .patient-citas-pill--updated {
+  background-color: #ffeb3b !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+}
+
+html.theme-high-contrast .tareas-status-pill {
+  background-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  border-color: #bfdbfe !important;
+}
+
+html.theme-high-contrast .tareas-limit-pill {
+  background-color: #7f1d1d !important;
+  color: #ffffff !important;
+  border-color: #fca5a5 !important;
+}
+
+.patient-header-logo.app-logo-badge {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.hero-section-logo-badge {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+html.theme-dark .home-page-shell {
+  background-color: #020617 !important;
+}
+
+html.theme-dark .home-nav {
+  background-color: rgba(2, 6, 23, 0.82) !important;
+  border-color: rgba(148, 163, 184, 0.25) !important;
+}
+
+html.theme-dark .home-logo-word {
+  color: #e2e8f0 !important;
+}
+
+html.theme-dark .home-footer {
+  background-color: #0f172a !important;
+}
+
+html.theme-dark .home-footer p {
+  color: #93c5fd !important;
+}
+
+html.theme-dark .home-page-shell .hero-home-overlay {
+  background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.52), rgba(2, 6, 23, 0.74)) !important;
+  background-color: transparent !important;
+}
+
+html.theme-dark .app-logo-badge {
+  background-color: #0f172a !important;
+  border: 1px solid #334155 !important;
+}
+
+html.theme-dark .hero-section-logo-badge {
+  background-color: #0f172a !important;
+}
+
+html.theme-high-contrast .app-logo-badge {
+  background-color: #000000 !important;
+  border: 2px solid #ffeb3b !important;
+}
+
+html.theme-high-contrast .hero-section-logo-badge {
+  background-color: #000000 !important;
+  border: none !important;
+}
+
+.app-logo-image {
+  transition: filter 0.2s ease;
+}
+
+html.theme-dark .app-logo-image {
+  filter: saturate(1.1) brightness(1.06);
+}
+
+html.theme-high-contrast .app-logo-image {
+  filter: grayscale(1) contrast(1.7) brightness(1.28);
+}
+
+.saber-mas-home-back {
+  border: 1px solid rgba(147, 197, 253, 0.45);
+}
+
+html.theme-high-contrast .gad7-semaphore .gad7-semaphore-light {
+  background-color: #111827 !important;
+  border-color: #4b5563 !important;
+  box-shadow: none !important;
+}
+
+/* En contraste, conservar colores del semáforo GAD-7. */
+html.theme-high-contrast .gad7-semaphore .gad7-semaphore-light--red.gad7-semaphore-light--active {
+  background-color: #ef4444 !important;
+  border-color: #fecaca !important;
+}
+
+html.theme-high-contrast .gad7-semaphore .gad7-semaphore-light--yellow.gad7-semaphore-light--active {
+  background-color: #facc15 !important;
+  border-color: #fef9c3 !important;
+}
+
+html.theme-high-contrast .gad7-semaphore .gad7-semaphore-light--green.gad7-semaphore-light--active {
+  background-color: #22c55e !important;
+  border-color: #bbf7d0 !important;
+}
+
+/* Dashboard Psicologo: modo oscuro */
+html.theme-dark .psychologist-dashboard-shell {
+  background-image: none !important;
+  background-color: #0b1220 !important;
+  color: #e5e7eb !important;
+}
+
+html.theme-dark .psychologist-dashboard-shell [class*="bg-gradient-to-b"] {
+  background-image: none !important;
+  background-color: #0b1220 !important;
+}
+
+html.theme-dark .psychologist-dashboard-page [class*="bg-white"],
+html.theme-dark .psychologist-dashboard-page [class*="bg-gray-"],
+html.theme-dark .psychologist-dashboard-page [class*="bg-blue-"],
+html.theme-dark .psychologist-dashboard-page [class*="bg-purple-"],
+html.theme-dark .psychologist-dashboard-page [class*="bg-yellow-"],
+html.theme-dark .psychologist-dashboard-page [class*="bg-green-"] {
+  background-image: none !important;
+  background-color: #13233b !important;
+}
+
+html.theme-dark .psychologist-dashboard-page [class*="text-gray-"],
+html.theme-dark .psychologist-dashboard-page [class*="text-slate-"] {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .psychologist-dashboard-page [class*="text-yellow-"],
+html.theme-dark .psychologist-dashboard-page [class*="text-green-"],
+html.theme-dark .psychologist-dashboard-page [class*="text-purple-"] {
+  color: #93c5fd !important;
+}
+
+html.theme-dark .psychologist-dashboard-page [class*="border-gray"],
+html.theme-dark .psychologist-dashboard-page [class*="border-white"],
+html.theme-dark .psychologist-dashboard-page [class*="border-blue"],
+html.theme-dark .psychologist-dashboard-page [class*="border-purple"] {
+  border-color: #3b82f6 !important;
+}
+
+html.theme-dark .psychologist-dashboard-page tr:hover,
+html.theme-dark .psychologist-dashboard-page [class*="hover:bg-"]:hover {
+  background-color: #1e3a5f !important;
+}
+
+html.theme-dark .psychologist-citas-overview,
+html.theme-dark .psychologist-citas-stat-card,
+html.theme-dark .psychologist-citas-calendar,
+html.theme-dark .psychologist-citas-calendar-grid,
+html.theme-dark .psychologist-citas-list,
+html.theme-dark .psychologist-citas-list-header,
+html.theme-dark .psychologist-citas-appointment {
+  background-color: #13233b !important;
+  border-color: #334155 !important;
+  color: #dbeafe !important;
+}
+
+html.theme-dark .psychologist-citas-overview h1,
+html.theme-dark .psychologist-citas-overview h2,
+html.theme-dark .psychologist-citas-overview p,
+html.theme-dark .psychologist-citas-stat-card p,
+html.theme-dark .psychologist-citas-calendar h3,
+html.theme-dark .psychologist-citas-list h3,
+html.theme-dark .psychologist-citas-appointment p,
+html.theme-dark .psychologist-citas-appointment span {
+  color: #dbeafe !important;
+}
+
+html.theme-dark .psychologist-citas-search {
+  background-color: #0f172a !important;
+  color: #e5e7eb !important;
+  border-color: #475569 !important;
+}
+
+html.theme-dark .psychologist-citas-search::placeholder {
+  color: #94a3b8 !important;
+}
+
+html.theme-dark .psychologist-citas-list-header {
+  background-color: rgba(15, 23, 42, 0.98) !important;
+}
+
+html.theme-dark .psychologist-citas-calendar .bg-white,
+html.theme-dark .psychologist-citas-list .bg-white,
+html.theme-dark .psychologist-citas-overview .bg-white {
+  background-color: #13233b !important;
+}
+
+html.theme-dark .psychologist-citas-calendar .bg-gray-50,
+html.theme-dark .psychologist-citas-list .bg-gray-50,
+html.theme-dark .psychologist-citas-appointment .bg-gray-50 {
+  background-color: #1e293b !important;
+}
+
+html.theme-dark .psychologist-citas-appointment:hover,
+html.theme-dark .psychologist-citas-appointment:hover .hover\:bg-gray-50:hover {
+  background-color: #1e3a5f !important;
+}
+
+html.theme-dark .psychologist-citas-calendar button,
+html.theme-dark .psychologist-citas-list button {
+  color: #dbeafe !important;
+}
+
+/* Ajuste visual del launcher en dashboards densos */
+html.theme-dark .accessibility-launcher {
+  filter: none;
 }
 
 /* Evita doble icono de ver contraseña (icono nativo + icono custom). */

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { Calendar, Clock, User, Send, Lock, Video, Link2, XCircle, Home } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Calendar, Clock, User, Send, Lock, Video, Link2, XCircle, Home, ChevronDown, CalendarDays } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
@@ -94,9 +94,26 @@ export function CitasComponent() {
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [cancelDialogId, setCancelDialogId] = useState<string | null>(null);
   const [cancelReason, setCancelReason] = useState('');
+  const [isPsychologistMenuOpen, setIsPsychologistMenuOpen] = useState(false);
+  const psychologistSelectRef = useRef<HTMLDivElement | null>(null);
+  const dateInputRef = useRef<HTMLInputElement | null>(null);
 
   const today = now ? getLocalDateString(now) : '';
   const motivoWords = countWords(formData.motivo);
+  const selectedPsychologistName = psicologos.find((p) => p.id === formData.psicologo)?.name || '';
+
+  const openDatePicker = () => {
+    const input = dateInputRef.current;
+    if (!input) return;
+
+    if (typeof input.showPicker === 'function') {
+      input.showPicker();
+      return;
+    }
+
+    input.focus();
+    input.click();
+  };
 
   const isHoraPasada = (fecha: string, hora: string) => {
     if (!fecha || !hora || !now) {
@@ -240,6 +257,28 @@ export function CitasComponent() {
     fetchHorasOcupadas();
   }, [formData.psicologo, formData.fecha]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!psychologistSelectRef.current) return;
+      if (!psychologistSelectRef.current.contains(event.target as Node)) {
+        setIsPsychologistMenuOpen(false);
+      }
+    };
+
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsPsychologistMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('mousedown', handleClickOutside);
+    window.addEventListener('keydown', handleEsc);
+    return () => {
+      window.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('keydown', handleEsc);
+    };
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -374,14 +413,14 @@ export function CitasComponent() {
 
   return (
     <>
-    <div className="min-h-screen bg-[radial-gradient(circle_at_15%_20%,#dff1ff_0%,#eef6ff_35%,#f8fbff_70%)] px-4 py-6 md:px-8 md:py-10">
+    <div className="citas-page-shell min-h-screen bg-[radial-gradient(circle_at_15%_20%,#dff1ff_0%,#eef6ff_35%,#f8fbff_70%)] px-4 py-6 md:px-8 md:py-10">
       <div className="mx-auto max-w-[1450px] space-y-7">
         <section className="rounded-3xl border border-[#c7ddf8] bg-white/85 p-6 shadow-[0_20px_45px_rgba(29,78,140,0.12)] backdrop-blur md:p-8">
           {/* NUEVO BOTÓN: Volver al inicio */}
           <div className="mb-6">
             <Link 
               href="/dashboard/paciente" 
-              className="inline-flex w-fit items-center gap-2 rounded-xl bg-[#1d42fb] px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-[#D95536] hover:shadow-lg"
+              className="inline-flex w-fit items-center gap-2 rounded-xl bg-[#1d42fb] px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-[#163bd1] hover:shadow-lg"
             >
               <Home size={18} />
               Volver al Inicio
@@ -432,16 +471,47 @@ export function CitasComponent() {
                       <User size={16} className="mr-1 inline" />
                       Psicólogo
                     </label>
-                    <select
-                      value={formData.psicologo}
-                      onChange={(e) => setFormData({ ...formData, psicologo: e.target.value })}
-                      className="w-full rounded-xl border border-blue-100 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 outline-none transition focus:border-[#71A5D9] focus:bg-white"
-                    >
-                      <option value="">{loading ? 'Cargando psicólogos...' : psicologos.length === 0 ? 'No hay psicólogos disponibles' : 'Selecciona un psicólogo'}</option>
-                      {psicologos.map((p) => (
-                        <option key={p.id} value={p.id}>{p.name}</option>
-                      ))}
-                    </select>
+                    <div ref={psychologistSelectRef} className="relative">
+                      <button
+                        type="button"
+                        onClick={() => setIsPsychologistMenuOpen((prev) => !prev)}
+                        className="citas-field citas-select-trigger flex w-full items-center justify-between rounded-xl border border-blue-100 bg-slate-50 px-4 py-3 text-left text-sm font-medium text-slate-700 outline-none transition focus:border-[#71A5D9] focus:bg-white"
+                        aria-haspopup="listbox"
+                        aria-expanded={isPsychologistMenuOpen}
+                        aria-label="Seleccionar psicólogo"
+                      >
+                        <span>{selectedPsychologistName || (loading ? 'Cargando psicólogos...' : psicologos.length === 0 ? 'No hay psicólogos disponibles' : 'Selecciona un psicólogo')}</span>
+                        <ChevronDown size={16} className={`transition-transform ${isPsychologistMenuOpen ? 'rotate-180' : ''}`} />
+                      </button>
+
+                      {isPsychologistMenuOpen && (
+                        <ul
+                          role="listbox"
+                          className="citas-select-menu absolute z-30 mt-2 max-h-56 w-full overflow-auto rounded-xl border border-blue-100 bg-white p-1 shadow-xl"
+                        >
+                          {psicologos.length === 0 ? (
+                            <li className="citas-select-option px-3 py-2 text-sm">No hay psicólogos disponibles</li>
+                          ) : (
+                            psicologos.map((p) => (
+                              <li key={p.id}>
+                                <button
+                                  type="button"
+                                  role="option"
+                                  aria-selected={formData.psicologo === p.id}
+                                  onClick={() => {
+                                    setFormData({ ...formData, psicologo: p.id });
+                                    setIsPsychologistMenuOpen(false);
+                                  }}
+                                  className={`citas-select-option w-full rounded-lg px-3 py-2 text-left text-sm font-semibold transition ${formData.psicologo === p.id ? 'citas-select-option--selected bg-blue-50 text-[#1E4D8C]' : 'text-slate-700 hover:bg-slate-100'}`}
+                                >
+                                  {p.name}
+                                </button>
+                              </li>
+                            ))
+                          )}
+                        </ul>
+                      )}
+                    </div>
                   </div>
 
                   <div>
@@ -449,19 +519,30 @@ export function CitasComponent() {
                       <Calendar size={16} className="mr-1 inline" />
                       Fecha
                     </label>
-                    <input
-                      type="date"
-                      value={formData.fecha}
-                      onChange={(e) => setFormData({ ...formData, fecha: e.target.value })}
-                      min={today}
-                      className="w-full rounded-xl border border-blue-100 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 outline-none transition focus:border-[#71A5D9] focus:bg-white"
-                    />
+                    <div className="citas-date-wrapper relative">
+                      <input
+                        ref={dateInputRef}
+                        type="date"
+                        value={formData.fecha}
+                        onChange={(e) => setFormData({ ...formData, fecha: e.target.value })}
+                        min={today}
+                        className="citas-field citas-date-field w-full rounded-xl border border-blue-100 bg-slate-50 px-4 py-3 pr-11 text-sm font-medium text-slate-700 outline-none transition focus:border-[#71A5D9] focus:bg-white"
+                      />
+                      <button
+                        type="button"
+                        onClick={openDatePicker}
+                        aria-label="Abrir calendario"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1.5 transition hover:bg-black/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#71A5D9]"
+                      >
+                        <CalendarDays size={16} className="citas-date-icon text-[#1E4D8C]" />
+                      </button>
+                    </div>
                   </div>
 
                   <div>
                     <label className="mb-2 block text-sm font-bold text-[#1E4D8C]">Modalidad</label>
                     <div className="grid grid-cols-2 gap-3">
-                      <label className={`flex cursor-pointer items-center justify-center rounded-xl border-2 p-3 text-sm font-semibold transition ${
+                      <label className={`citas-modalidad-option ${formData.modalidad === 'Presencial' ? 'citas-modalidad-option--selected' : ''} flex cursor-pointer items-center justify-center rounded-xl border-2 p-3 text-sm font-semibold transition ${
                         formData.modalidad === 'Presencial' ? 'text-[#0f3f74]' : 'text-slate-700'
                       }`}
                         style={{ borderColor: formData.modalidad === 'Presencial' ? '#71A5D9' : '#d8e8f9', background: formData.modalidad === 'Presencial' ? '#ebf4ff' : '#f8fbff' }}>
@@ -474,7 +555,7 @@ export function CitasComponent() {
                         />
                         Presencial
                       </label>
-                      <label className={`flex cursor-pointer items-center justify-center rounded-xl border-2 p-3 text-sm font-semibold transition ${
+                      <label className={`citas-modalidad-option ${formData.modalidad === 'Virtual' ? 'citas-modalidad-option--selected' : ''} flex cursor-pointer items-center justify-center rounded-xl border-2 p-3 text-sm font-semibold transition ${
                         formData.modalidad === 'Virtual' ? 'text-[#0f3f74]' : 'text-slate-700'
                       }`}
                         style={{ borderColor: formData.modalidad === 'Virtual' ? '#71A5D9' : '#d8e8f9', background: formData.modalidad === 'Virtual' ? '#ebf4ff' : '#f8fbff' }}>
@@ -510,7 +591,7 @@ export function CitasComponent() {
                           type="button"
                           onClick={() => !estaInhabilitada && setFormData({ ...formData, hora: h })}
                           disabled={estaInhabilitada}
-                          className={`rounded-lg border-2 px-2 py-2 text-sm font-bold transition ${
+                          className={`citas-hour-slot ${formData.hora === h ? 'citas-hour-slot--selected' : ''} ${estaPasada ? 'citas-hour-slot--past' : ''} ${estaOcupada ? 'citas-hour-slot--busy' : ''} rounded-lg border-2 px-2 py-2 text-sm font-bold transition ${
                             estaPasada
                               ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400'
                               : estaOcupada
@@ -546,7 +627,7 @@ export function CitasComponent() {
                     }}
                     placeholder="Describe brevemente lo que deseas tratar en la sesión..."
                     rows={4}
-                    className="w-full resize-none rounded-xl border border-blue-100 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 outline-none transition focus:border-[#71A5D9] focus:bg-white"
+                    className="citas-field w-full resize-none rounded-xl border border-blue-100 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 outline-none transition focus:border-[#71A5D9] focus:bg-white"
                   />
                   <div className="mt-2 flex items-center justify-between text-xs">
                     <span className="text-slate-500">Opcional, pero útil para orientar la sesión.</span>
@@ -557,7 +638,7 @@ export function CitasComponent() {
                 <button
                   type="submit"
                   disabled={enviando || !formData.psicologo || !formData.fecha || !formData.hora || horaSeleccionadaInvalida || motivoWords > MAX_MOTIVO_WORDS}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#2f6ca9] to-[#1E4D8C] px-6 py-3.5 text-sm font-black text-white shadow-lg transition hover:from-[#25588a] hover:to-[#163b68] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="citas-submit-btn inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#2f6ca9] to-[#1E4D8C] px-6 py-3.5 text-sm font-black text-white shadow-lg transition hover:from-[#25588a] hover:to-[#163b68] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <Send size={18} />
                   {enviando ? 'Agendando...' : 'Confirmar solicitud de cita'}
@@ -574,14 +655,14 @@ export function CitasComponent() {
                 <button
                   type="button"
                   onClick={() => setActiveTab('proximas')}
-                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${activeTab === 'proximas' ? 'bg-[#71A5D9] text-white' : 'text-slate-600 hover:text-[#1E4D8C]'}`}
+                  className={`citas-tab-btn ${activeTab === 'proximas' ? 'citas-tab-btn--active' : ''} px-4 py-2 rounded-lg text-sm font-semibold transition ${activeTab === 'proximas' ? 'bg-[#71A5D9] text-white' : 'text-slate-600 hover:text-[#1E4D8C]'}`}
                 >
                   Próximas
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveTab('historial')}
-                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${activeTab === 'historial' ? 'bg-[#71A5D9] text-white' : 'text-slate-600 hover:text-[#1E4D8C]'}`}
+                  className={`citas-tab-btn ${activeTab === 'historial' ? 'citas-tab-btn--active' : ''} px-4 py-2 rounded-lg text-sm font-semibold transition ${activeTab === 'historial' ? 'bg-[#71A5D9] text-white' : 'text-slate-600 hover:text-[#1E4D8C]'}`}
                 >
                   Historial
                 </button>

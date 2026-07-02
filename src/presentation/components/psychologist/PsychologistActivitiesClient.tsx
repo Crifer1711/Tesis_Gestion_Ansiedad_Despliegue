@@ -24,10 +24,10 @@ export default function PsychologistActivitiesClient({ activities, patients }: {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="psychologist-activities-client space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
         {activities.map(act => (
-          <div key={act.id} className="group overflow-hidden rounded-[26px] border border-blue-200 bg-white shadow-[0_10px_28px_rgba(30,77,140,0.08)] transition hover:-translate-y-1 hover:shadow-[0_18px_38px_rgba(30,77,140,0.14)]">
+          <div key={act.id} className="psychologist-activities-card group overflow-hidden rounded-[26px] border border-blue-200 bg-white shadow-[0_10px_28px_rgba(30,77,140,0.08)] transition hover:-translate-y-1 hover:shadow-[0_18px_38px_rgba(30,77,140,0.14)]">
             <div className="h-2 bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-500" />
             <div className="p-5">
             <div className="flex items-start gap-3">
@@ -51,13 +51,13 @@ export default function PsychologistActivitiesClient({ activities, patients }: {
       </div>
 
       {assigning && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md overflow-hidden rounded-[28px] border border-blue-200 bg-white shadow-[0_24px_80px_rgba(30,77,140,0.20)]">
-            <div className="flex items-center justify-between bg-gradient-to-r from-[#EAF2FF] to-[#DDF0FF] px-6 py-4 text-[#1E4D8C]">
+        <div className="psychologist-activities-modal fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-sm p-4">
+          <div className="psychologist-activities-modal-card w-full max-w-md overflow-hidden rounded-[28px] border border-blue-200 bg-white shadow-[0_24px_80px_rgba(30,77,140,0.20)]">
+            <div className="psychologist-activities-modal-header flex items-center justify-between bg-gradient-to-r from-[#EAF2FF] to-[#DDF0FF] px-6 py-4 text-[#1E4D8C]">
               <h3 className="font-black text-lg">Asignar: {assigning.nombre}</h3>
               <button onClick={() => setAssigning(null)} className="rounded-full bg-white px-3 py-1 text-sm font-black text-[#1E4D8C] shadow-sm transition hover:bg-blue-50">Cerrar ✕</button>
             </div>
-            <div className="space-y-4 p-6 text-slate-700">
+            <div className="psychologist-activities-modal-body space-y-4 p-6 text-slate-700">
               {message && <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900">{message}</div>}
               <div>
                 <label className="mb-2 block text-sm font-black text-[#1E4D8C]">Selecciona paciente</label>

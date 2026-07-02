@@ -85,11 +85,11 @@ export function CreatePsychologistModal({ isOpen, onClose, onCreated }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-[#F7F7F7] w-full max-w-md rounded-3xl border-4 border-gray-800 shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+    <div className="admin-create-psychologist-modal fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="admin-create-psychologist-card bg-[#F7F7F7] w-full max-w-md rounded-3xl border-4 border-gray-800 shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
         
         {/* Header */}
-        <div className="bg-[#AFC8E8] p-6 border-b-4 border-gray-800 flex justify-between items-center">
+        <div className="admin-create-psychologist-header bg-[#AFC8E8] p-6 border-b-4 border-gray-800 flex justify-between items-center">
           <h2 className="text-xl font-black text-gray-900 uppercase">Nuevo Psicólogo</h2>
           <button onClick={onClose} className="hover:rotate-90 transition-transform">
             <X size={24} className="text-gray-900" />

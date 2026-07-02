@@ -16,7 +16,7 @@ export function PsychologistDashboard({ initialData }: DashboardProps) {
   const { stats, nextAppointments, recentActivities } = initialData;
 
   return (
-    <div className="space-y-8">
+    <div className="psychologist-dashboard-page space-y-8">
       {/* Encabezado */}
       <div>
         <h1 className="text-4xl font-black text-[#1E4D8C]">Panel de Control</h1>

@@ -19,7 +19,7 @@ export default function PacienteAnsiedadPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100">
+    <div className="ansiedad-page-shell min-h-screen bg-gradient-to-b from-blue-50 to-blue-100">
       {/* ❌ ELIMINADO PatientHeader porque ya está en el modal */}
       <div className="py-8">
         <div className="max-w-7xl mx-auto px-6">

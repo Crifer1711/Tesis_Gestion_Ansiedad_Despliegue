@@ -18,20 +18,20 @@ function GuideCard({ title, image, url, resourceType, onClick }: GuideCardProps)
   return (
     <div 
       onClick={handleClick}
-      className="group bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer transform hover:scale-105 transition duration-300 hover:shadow-xl relative"
+      className="biblioteca-guide-card group bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer transform hover:scale-105 transition duration-300 hover:shadow-xl relative"
     >
       <img src={image} alt={title} className="w-full h-96 object-cover" />
       {/* Resource type badge - visible on hover and on small screens */}
       {resourceType && (
         <div
           aria-hidden
-          className="absolute top-4 right-4 z-30 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 text-sm font-semibold text-[#1E4D8C] px-3 py-1 rounded-full border border-[#dceffb] shadow"
+          className="biblioteca-guide-badge absolute top-4 right-4 z-30 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 text-sm font-semibold px-3 py-1 rounded-full border border-[#dceffb] shadow"
         >
           {resourceType}
         </div>
       )}
 
-      <div className="absolute inset-0 z-20 bg-[#71A5D9] bg-opacity-70 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+      <div className="biblioteca-guide-overlay absolute inset-0 z-20 bg-[#71A5D9] bg-opacity-70 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
         <h4 className="text-white text-lg font-semibold text-center px-4">{title}</h4>
       </div>
     </div>
@@ -117,15 +117,15 @@ export function Biblioteca({ onHomeClick }: { onHomeClick: () => void }) {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-6 pt-6">
+    <div className="biblioteca-page-shell max-w-7xl mx-auto px-6 pt-6">
       <div className="text-center mb-12">
-        <h1 className="text-5xl font-black text-[#1E4D8C] mb-4">Guía de Autoayuda</h1>
+        <h1 className="biblioteca-guide-title text-5xl font-black text-[#1E4D8C] mb-4">Guía de Autoayuda</h1>
         <p className="text-xl text-slate-700">Recursos prácticos y verificados para manejar ansiedad, depresión y mejorar tu salud mental.</p>
       </div>
 
       <section className="mb-16">
-        <h2 className="text-3xl font-black text-[#1E4D8C] mb-8">Área académica</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <h2 className="biblioteca-guide-section-title text-3xl font-black text-[#1E4D8C] mb-8">Área académica</h2>
+        <div className="biblioteca-card-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {ACADEMIC_GUIDES.map((guide, index) => (
             <GuideCard key={index} {...guide} onClick={handleOpenPdf} />
           ))}
@@ -133,8 +133,8 @@ export function Biblioteca({ onHomeClick }: { onHomeClick: () => void }) {
       </section>
 
       <section className="mb-16">
-        <h2 className="text-3xl font-black text-[#1E4D8C] mb-8">Área social</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <h2 className="biblioteca-guide-section-title text-3xl font-black text-[#1E4D8C] mb-8">Área social</h2>
+        <div className="biblioteca-card-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {SOCIAL_GUIDES.map((guide, index) => (
             <GuideCard key={index} {...guide} onClick={handleOpenPdf} />
           ))}
@@ -142,8 +142,8 @@ export function Biblioteca({ onHomeClick }: { onHomeClick: () => void }) {
       </section>
 
       <section className="mb-16">
-        <h2 className="text-3xl font-black text-[#1E4D8C] mb-8">Área personal</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <h2 className="biblioteca-guide-section-title text-3xl font-black text-[#1E4D8C] mb-8">Área personal</h2>
+        <div className="biblioteca-card-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {PERSONAL_GUIDES.map((guide, index) => (
             <GuideCard key={index} {...guide} onClick={handleOpenPdf} />
           ))}

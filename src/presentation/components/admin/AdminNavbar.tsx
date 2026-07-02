@@ -43,7 +43,7 @@ export function AdminNavbar() {
         <Link href="/dashboard/admin" className="flex items-center gap-3 hover:opacity-80 transition">
           <div className="relative h-10 w-10 overflow-hidden rounded-2xl bg-white/90 p-1 shadow-inner">
             <Image
-              src="/images/Logo-.png"
+              src="/images/Logo2.png"
               alt="MindPeace"
               fill
               className="object-contain"
@@ -51,7 +51,7 @@ export function AdminNavbar() {
               priority
             />
           </div>
-          <span className="text-3xl font-semibold tracking-tight text-white [font-family:Georgia,serif]">
+          <span className="text-3xl font-semibold tracking-tight text-white">
             MindPeace
           </span>
         </Link>
@@ -91,3 +91,4 @@ export function AdminNavbar() {
     </header>
   );
 }
+

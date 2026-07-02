@@ -16,7 +16,7 @@ export function Header({ activeSection, onNavClick }: HeaderProps) {
         <div className="flex items-center gap-3">
           <div className="relative h-12 w-12">
             <Image 
-              src="/images/Logo.png" 
+              src="/images/Logo2.png" 
               alt="MindPeace" 
               fill 
               className="object-contain"
@@ -42,3 +42,4 @@ export function Header({ activeSection, onNavClick }: HeaderProps) {
     </header>
   );
 }
+

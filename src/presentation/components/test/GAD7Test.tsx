@@ -85,9 +85,9 @@ export function GAD7Test({ onHomeClick }: { onHomeClick?: () => void }) {
                       <button
                         key={opt.value}
                         onClick={() => handleResponseChange(i, opt.value)}
-                        className={`p-3 rounded-xl border-2 transition-all font-medium ${
+                        className={`gad7-option cursor-pointer p-3 rounded-xl border-2 transition-all font-medium focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-300 ${
                           responses[i] === opt.value 
-                            ? 'border-[#1E4D8C] bg-[#1E4D8C] text-white shadow-md' 
+                            ? 'gad7-option--selected border-[#1E4D8C] bg-[#1E4D8C] text-white shadow-md' 
                             : 'border-slate-200 bg-white text-slate-700 hover:border-[#71A5D9] hover:bg-blue-50'
                         }`}
                       >
@@ -102,7 +102,7 @@ export function GAD7Test({ onHomeClick }: { onHomeClick?: () => void }) {
               <button 
                 onClick={calculateResult} 
                 disabled={isCalculating}
-                className="py-4 px-10 bg-[#1E4D8C] text-white font-black text-xl rounded-full hover:scale-105 transition shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                className="gad7-primary-action cursor-pointer py-4 px-10 bg-[#1E4D8C] text-white font-black text-xl rounded-full hover:scale-105 transition shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isCalculating ? 'Calculando...' : 'VER MI NIVEL ACTUAL'}
               </button>
@@ -112,10 +112,10 @@ export function GAD7Test({ onHomeClick }: { onHomeClick?: () => void }) {
           <div className="text-center py-8">
             <h2 className="text-3xl font-black text-[#1E4D8C] mb-8 uppercase">Tu Estado Actual</h2>
             
-            <div className="flex flex-col items-center gap-6 mb-8 bg-slate-900 p-8 rounded-3xl w-fit mx-auto shadow-inner">
-              <div className={`w-16 h-16 rounded-full border-4 ${result.color === 'red' ? 'bg-red-500 shadow-[0_0_20px_rgba(239,68,68,0.8)] border-red-200' : 'bg-red-900/30 border-transparent'}`} />
-              <div className={`w-16 h-16 rounded-full border-4 ${result.color === 'orange' || result.color === 'yellow' ? 'bg-yellow-400 shadow-[0_0_20px_rgba(250,204,21,0.8)] border-yellow-100' : 'bg-yellow-900/30 border-transparent'}`} />
-              <div className={`w-16 h-16 rounded-full border-4 ${result.color === 'green' ? 'bg-green-500 shadow-[0_0_20px_rgba(34,197,94,0.8)] border-green-200' : 'bg-green-900/30 border-transparent'}`} />
+            <div className="gad7-semaphore flex flex-col items-center gap-6 mb-8 bg-slate-900 p-8 rounded-3xl w-fit mx-auto shadow-inner">
+              <div className={`gad7-semaphore-light gad7-semaphore-light--red w-16 h-16 rounded-full border-4 ${result.color === 'red' ? 'gad7-semaphore-light--active bg-red-500 shadow-[0_0_20px_rgba(239,68,68,0.8)] border-red-200' : 'gad7-semaphore-light--inactive bg-red-900/30 border-transparent'}`} />
+              <div className={`gad7-semaphore-light gad7-semaphore-light--yellow w-16 h-16 rounded-full border-4 ${result.color === 'orange' || result.color === 'yellow' ? 'gad7-semaphore-light--active bg-yellow-400 shadow-[0_0_20px_rgba(250,204,21,0.8)] border-yellow-100' : 'gad7-semaphore-light--inactive bg-yellow-900/30 border-transparent'}`} />
+              <div className={`gad7-semaphore-light gad7-semaphore-light--green w-16 h-16 rounded-full border-4 ${result.color === 'green' ? 'gad7-semaphore-light--active bg-green-500 shadow-[0_0_20px_rgba(34,197,94,0.8)] border-green-200' : 'gad7-semaphore-light--inactive bg-green-900/30 border-transparent'}`} />
             </div>
 
             <div className="space-y-4 max-w-md mx-auto">
@@ -131,7 +131,7 @@ export function GAD7Test({ onHomeClick }: { onHomeClick?: () => void }) {
 
             <button 
               onClick={handleResetTest} 
-              className="mt-12 text-slate-500 font-bold hover:text-[#1E4D8C] underline"
+              className="cursor-pointer mt-12 text-slate-500 font-bold hover:text-[#1E4D8C] underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
             >
               Repetir el test
             </button>

@@ -293,7 +293,7 @@ export default function PsychologistCitasPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="psychologist-citas-page space-y-6">
       {/* Encabezado */}
       <div>
         <h1 className="text-3xl font-black text-[#1E4D8C]">Citas Agendadas</h1>
@@ -301,7 +301,7 @@ export default function PsychologistCitasPage() {
       </div>
 
       {/* Estadísticas */}
-      <div className="rounded-3xl border border-sky-100 bg-gradient-to-r from-sky-50 via-white to-emerald-50 p-4 md:p-5 shadow-sm">
+      <div className="psychologist-citas-overview rounded-3xl border border-sky-100 bg-gradient-to-r from-sky-50 via-white to-emerald-50 p-4 md:p-5 shadow-sm">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div className="flex items-start gap-3">
             <div>
@@ -345,14 +345,14 @@ export default function PsychologistCitasPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <div className="rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-white p-4 shadow-sm ring-1 ring-amber-100/60">
+        <div className="psychologist-citas-stat-card rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-white p-4 shadow-sm ring-1 ring-amber-100/60">
           <p className="text-sm font-bold text-slate-600 mb-2 flex items-center gap-2">
             <TriangleAlert size={16} className="text-amber-600" />
             Pendientes por responder
           </p>
           <p className="text-3xl font-black text-amber-600">{pendingCount}</p>
         </div>
-        <div className="rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-4 shadow-sm">
+        <div className="psychologist-citas-stat-card rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-4 shadow-sm">
           <p className="text-sm font-bold text-slate-600 mb-2">Próxima cita</p>
           <p className="text-lg font-black text-emerald-700 leading-tight">
             {nextAppointment
@@ -365,11 +365,11 @@ export default function PsychologistCitasPage() {
               : 'Revisa el calendario para ver más detalles'}
           </p>
         </div>
-        <div className="rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50 to-white p-4 shadow-sm">
+        <div className="psychologist-citas-stat-card rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50 to-white p-4 shadow-sm">
           <p className="text-sm font-bold text-slate-600 mb-2">Citas de hoy</p>
           <p className="text-3xl font-black text-violet-700">{todayAppointmentsCount}</p>
         </div>
-        <div className="rounded-2xl border border-sky-200 bg-gradient-to-br from-sky-50 to-white p-4 shadow-sm">
+        <div className="psychologist-citas-stat-card rounded-2xl border border-sky-200 bg-gradient-to-br from-sky-50 to-white p-4 shadow-sm">
           <p className="text-sm font-bold text-slate-600 mb-2 flex items-center gap-2">
             <User size={16} className="text-sky-600" />
             Pacientes totales
@@ -382,11 +382,11 @@ export default function PsychologistCitasPage() {
       <div className="grid md:grid-cols-3 gap-6">
         {/* Columna Izquierda - Calendario */}
         <div className="md:col-span-1">
-          <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+          <div className="psychologist-citas-calendar rounded-lg shadow-md p-6 border border-gray-200 bg-white">
             <h3 className="text-lg font-black text-[#1E4D8C] mb-4">MI CALENDARIO</h3>
             
             {/* Mini Calendario */}
-            <div className="border-2 border-gray-300 rounded-lg p-3 bg-gray-50">
+            <div className="psychologist-citas-calendar-grid border-2 border-gray-300 rounded-lg p-3 bg-gray-50">
               {/* Header con navegación */}
               <div className="flex items-center justify-between mb-3">
                 <button
@@ -451,8 +451,8 @@ export default function PsychologistCitasPage() {
 
         {/* Columna Derecha - Citas del Día */}
         <div className="md:col-span-2">
-          <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-            <div className="mb-4 sticky top-0 z-10 bg-white/95 backdrop-blur-sm pb-3">
+          <div className="psychologist-citas-list rounded-lg shadow-md p-6 border border-gray-200 bg-white">
+            <div className="psychologist-citas-list-header mb-4 sticky top-0 z-10 bg-white/95 backdrop-blur-sm pb-3">
               <h3 className="text-lg font-black text-[#1E4D8C] mb-4">CITAS DEL DÍA</h3>
               
               {/* Buscador */}
@@ -463,7 +463,7 @@ export default function PsychologistCitasPage() {
                   placeholder="Buscar por paciente o email..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#71A5D9] text-sm"
+                  className="psychologist-citas-search w-full pl-10 pr-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#71A5D9] text-sm"
                 />
               </div>
 
@@ -502,7 +502,7 @@ export default function PsychologistCitasPage() {
                   return (
                     <div 
                       key={apt.id} 
-                      className={`border-2 rounded-lg overflow-hidden hover:border-[#71A5D9] hover:shadow-md transition bg-white ${isSelected ? 'border-[#71A5D9] shadow-md' : 'border-gray-200'}`}
+                      className={`psychologist-citas-appointment border-2 rounded-lg overflow-hidden hover:border-[#71A5D9] hover:shadow-md transition bg-white ${isSelected ? 'border-[#71A5D9] shadow-md' : 'border-gray-200'}`}
                     >
                       {/* Header de Cita - abre modal centrado */}
                       <div 

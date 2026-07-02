@@ -70,7 +70,7 @@ export function PatientClient({ initialData }: Props) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="admin-patients-page admin-patients-shell space-y-6">
   {/* Modales */}
   <CreatePatientModal 
     isOpen={isModalOpen} 
@@ -93,7 +93,7 @@ export function PatientClient({ initialData }: Props) {
   />
 
   {/* Encabezado */}
-  <div className="bg-[#D1E7FF] p-6 rounded-xl border border-blue-200">
+  <div className="admin-patients-header bg-[#D1E7FF] p-6 rounded-xl border border-blue-200">
   <h1 className="text-xl font-bold text-gray-900 uppercase">GESTIÓN DE PACIENTES</h1>
   <p className="text-sm text-gray-700">Resumen del apartado gestión de pacientes</p>
   <button 
@@ -106,7 +106,7 @@ export function PatientClient({ initialData }: Props) {
 </div>
 
 {/* Buscador y Filtros */}
-<div className="bg-[#D1E7FF]/50 p-6 rounded-xl border border-blue-100 space-y-4">
+<div className="admin-patients-search bg-[#D1E7FF]/50 p-6 rounded-xl border border-blue-100 space-y-4">
   <div className="flex gap-4">
     <div className="relative flex-1">
       <Search className="absolute left-3 top-2.5 text-gray-500" size={18} />
@@ -138,7 +138,7 @@ export function PatientClient({ initialData }: Props) {
   </div>
 
   {/* Tabla */}
-  <div className="border-2 border-gray-800 rounded-xl overflow-hidden shadow-lg bg-white">
+  <div className="admin-patients-table border-2 border-gray-800 rounded-xl overflow-hidden shadow-lg bg-white">
     <table className="w-full text-sm text-left">
       <thead className="bg-[#BDBDBD] border-b-2 border-gray-800 font-black text-gray-900">
         <tr>

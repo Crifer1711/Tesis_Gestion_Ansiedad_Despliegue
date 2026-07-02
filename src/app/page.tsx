@@ -10,23 +10,23 @@ export default function HomePage() {
   const [isAccessibilityOpen, setIsAccessibilityOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white [font-family:Inter,system-ui,sans-serif]">
+    <div className="home-page-shell min-h-screen bg-slate-950 text-white">
       {/* ============ NAVBAR ============ */}
-      <nav className="fixed top-0 z-50 w-full border-b border-white/10 bg-black/50 backdrop-blur-xl">
+      <nav className="home-nav fixed top-0 z-50 w-full border-b border-white/10 bg-black/50 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 md:px-8 md:py-5">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="relative h-10 w-10 overflow-hidden rounded-2xl bg-white/90 p-1 shadow-inner">
+            <div className="app-logo-badge relative h-10 w-10 overflow-hidden rounded-2xl bg-white/90 p-1 shadow-inner">
               <Image
-                src="/images/Logo-.png"
+                src="/images/Logo2.png"
                 alt="MindPeace"
                 fill
-                className="object-contain"
+                className="app-logo-image object-contain"
                 sizes="40px"
                 priority
               />
             </div>
-            <div className="text-3xl font-semibold tracking-tight text-white">
+            <div className="home-logo-word text-3xl font-semibold tracking-tight text-white">
               MindPeace
             </div>
           </div>
@@ -56,11 +56,11 @@ export default function HomePage() {
       <section className="relative flex min-h-screen items-center overflow-hidden">
         {/* ✅ SOLO UNA IMAGEN ESTÁTICA (psico1.png) */}
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="hero-home-bg absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: "url('/images/psico1.png')" }}
         />
 
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/50 to-slate-950/70" />
+        <div className="hero-home-overlay absolute inset-0 bg-gradient-to-b from-slate-950/50 to-slate-950/70" />
 
         <div className="relative z-10 mx-auto w-full max-w-4xl px-5 pt-32 md:px-8">
           <div className="max-w-2xl">
@@ -127,7 +127,7 @@ export default function HomePage() {
       )}
 
       {/* ============ FOOTER ============ */}
-      <footer className="bg-[#71A5D9] py-4 text-sm text-center">
+      <footer className="home-footer bg-[#71A5D9] py-4 text-sm text-center">
         <div className="mx-auto max-w-7xl px-5">
           <p className="font-semibold text-[#1E4D8C]">© 2026 MindPeace • Todos los derechos reservados</p>
         </div>

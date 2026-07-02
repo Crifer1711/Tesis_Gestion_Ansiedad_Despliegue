@@ -52,17 +52,17 @@ export function PatientHeader({
     }`}>
       <div className="flex items-center justify-between px-5 py-4 md:px-8 md:py-5">
         <Link href="/dashboard/paciente" className="flex items-center gap-3 hover:opacity-80 transition">
-          <div className="relative h-10 w-10 overflow-hidden rounded-2xl bg-white/90 p-1 shadow-inner">
+          <div className="app-logo-badge patient-header-logo relative h-10 w-10 overflow-hidden rounded-2xl bg-white/90 p-1 shadow-inner">
             <Image
-              src="/images/Logo-.png"
+              src="/images/Logo2.png"
               alt="MindPeace"
               fill
-              className="object-contain"
+              className="app-logo-image object-contain"
               sizes="40px"
               priority
             />
           </div>
-          <span className="text-3xl font-semibold tracking-tight text-white [font-family:Georgia,serif]">
+          <span className="text-3xl font-semibold tracking-tight text-white">
             MindPeace
           </span>
         </Link>
@@ -75,7 +75,7 @@ export function PatientHeader({
           </div>
           <button
             onClick={() => signOut({ callbackUrl: '/' })}
-            className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition font-semibold"
+            className="patient-header-logout flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition font-semibold"
           >
             <LogOut size={18} />
             Salir

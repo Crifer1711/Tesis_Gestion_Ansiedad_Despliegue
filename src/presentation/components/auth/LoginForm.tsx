@@ -112,13 +112,13 @@ const LoginFormContent = () => {
           
           {/* Logo y Encabezado */}
           <div className="flex flex-col items-center mb-8">
-            <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-sm border border-gray-100 mb-4 bg-white p-1">
+            <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-sm mb-4 bg-white p-1">
             <Image
-                src="/images/Logo-.png"
+                src="/images/Logo2.png"
                 alt="Logo"
                 fill
                 priority
-                className="object-contain"
+                className="app-logo-image object-contain"
                 sizes="48px"
               />
             </div>

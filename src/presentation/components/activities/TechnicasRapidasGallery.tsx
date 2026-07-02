@@ -44,14 +44,14 @@ export function TechnicasRapidasGallery({ activities }: Props) {
   }, [activities, category]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#eef6ff] via-white to-[#dfeeff]">
+    <div className="tecnicas-page-shell min-h-screen bg-gradient-to-b from-[#eef6ff] via-white to-[#dfeeff]">
       <div className="mx-auto max-w-7xl px-6 py-8 md:py-10">
 
         {/* 3. BOTÓN DE REGRESO AQUÍ */}
         <div className="mb-6">
           <Link
             href="/dashboard/paciente"
-            className="inline-flex w-fit items-center gap-2 rounded-xl bg-[#1d42fb] px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-[#D95536] hover:shadow-lg"
+            className="tecnicas-back-btn inline-flex w-fit items-center gap-2 rounded-xl bg-[#1d42fb] px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-[#163bd1] hover:shadow-lg"
           >
             <Home size={18} />
             Volver al Inicio

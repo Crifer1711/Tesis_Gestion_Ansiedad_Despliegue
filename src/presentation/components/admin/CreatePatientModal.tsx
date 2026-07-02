@@ -70,11 +70,11 @@ export function CreatePatientModal({ isOpen, onClose, onCreated }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white w-full max-w-lg rounded-3xl border-4 border-gray-800 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] overflow-hidden animate-in fade-in zoom-in duration-200">
+    <div className="admin-create-patient-modal fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="admin-create-patient-card bg-white w-full max-w-lg rounded-3xl border-4 border-gray-800 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] overflow-hidden animate-in fade-in zoom-in duration-200">
         
         {/* Encabezado del Modal */}
-        <div className="bg-[#D1E7FF] border-b-4 border-gray-800 p-6 flex justify-between items-center">
+        <div className="admin-create-patient-header bg-[#D1E7FF] border-b-4 border-gray-800 p-6 flex justify-between items-center">
           <h2 className="text-2xl font-black text-gray-900 uppercase">NUEVO PACIENTE</h2>
           <button 
             onClick={onClose}

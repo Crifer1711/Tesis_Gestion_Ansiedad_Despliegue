@@ -17,7 +17,7 @@ export default function PacienteSaludMentalPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100">
+    <div className="salud-mental-page-shell min-h-screen bg-gradient-to-b from-blue-50 to-blue-100">
       <div className="py-8">
         <div className="max-w-7xl mx-auto px-6">
           {/* ❌ ELIMINADO botón "Volver a Infórmate" */}

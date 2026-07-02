@@ -83,12 +83,12 @@ export function HeroSection({ variant = 'public', onNavigate }: HeroSectionProps
 
           {/* Logo centrado */}
           <div className="flex justify-center mb-4">
-            <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden shadow-sm border border-gray-100 bg-white p-1">
+            <div className="hero-section-logo-badge relative w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden bg-white p-1">
               <Image 
-                src="/images/Logo-.png" 
+                src="/images/Logo2.png" 
                 alt="MindPeace Logo" 
                 fill 
-                className="object-contain"
+                className="app-logo-image object-contain"
                 sizes="(max-width: 768px) 64px, 80px"
                 priority
               />
