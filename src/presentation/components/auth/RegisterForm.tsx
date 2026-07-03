@@ -110,14 +110,9 @@ export const RegisterForm = () => {
   };
   
   return (
-    <div 
-      className="flex min-h-screen items-center justify-center bg-cover bg-center p-4 relative"
-      style={{ backgroundImage: "url('/images/fondoLogin.png')" }}
-    >
-      {/* Capa de superposición para mejorar el contraste del formulario frente a la imagen */}
-      <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm z-0"></div>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-100 via-sky-50 to-slate-200 p-4">
 
-      <div className="z-10 w-full max-w-md bg-white p-8 rounded-2xl shadow-2xl border border-gray-100 flex flex-col items-center">
+      <div className="z-10 w-full max-w-md bg-white p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-slate-200 flex flex-col items-center">
         
         {/* LOGO & ENCABEZADO */}
         <div className="flex flex-col items-center mb-6">
