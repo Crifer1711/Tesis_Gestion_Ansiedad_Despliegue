@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import { AlertCircle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+// 1. IMPORTAR LA SESIÓN Y LA ACCIÓN DE GUARDADO
+import { useSession } from 'next-auth/react';
+import { saveGAD7ResultAction } from '@/infrastructure/actions/anxiety.actions';
 
 // Definición de Interfaz
 interface TestResult {
@@ -36,6 +39,9 @@ function getSemaphoreData(score: number): TestResult {
 }
 
 export function GAD7Test({ onHomeClick }: { onHomeClick?: () => void }) {
+  // 2. OBTENER LA SESIÓN DEL USUARIO
+  const { data: session, status } = useSession();
+
   const [responses, setResponses] = useState<number[]>(new Array(7).fill(-1));
   const [result, setResult] = useState<TestResult | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
@@ -56,8 +62,20 @@ export function GAD7Test({ onHomeClick }: { onHomeClick?: () => void }) {
     const score = responses.reduce((sum, val) => sum + val, 0);
     const data = getSemaphoreData(score);
     
-    // Simular guardado (opcional)
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // 3. LÓGICA REAL DE GUARDADO EN LA BASE DE DATOS
+    if (status === "authenticated" && session?.user?.role === "PACIENTE") {
+      try {
+        // Guardamos enviando el puntaje, la interpretación y el arreglo de respuestas
+        await saveGAD7ResultAction(score, data.label, responses);
+        toast.success('Resultados guardados en tu expediente médico.');
+      } catch (error) {
+        console.error("Error al guardar el test:", error);
+        toast.error('Hubo un problema al guardar tus resultados.');
+      }
+    } else {
+      // Si es un usuario público, solo simulamos la carga
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
     
     setResult(data);
     setIsCalculating(false);
@@ -104,7 +122,7 @@ export function GAD7Test({ onHomeClick }: { onHomeClick?: () => void }) {
                 disabled={isCalculating}
                 className="gad7-primary-action cursor-pointer py-4 px-10 bg-[#1E4D8C] text-white font-black text-xl rounded-full hover:scale-105 transition shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isCalculating ? 'Calculando...' : 'VER MI NIVEL ACTUAL'}
+                {isCalculating ? 'Calculando y guardando...' : 'VER MI NIVEL ACTUAL'}
               </button>
             </div>
           </>
