@@ -3341,3 +3341,19 @@ html.theme-high-contrast .tareas-open-btn:hover {
   outline: 3px solid #ffffff !important;
   outline-offset: 2px !important;
 }
+
+/* =========================================
+   CORRECCIÓN: DOBLE BORDE EN INPUTS DE LOGIN/REGISTRO
+========================================= */
+
+/* --- Anular outline en inputs de login/registro --- */
+html .flex.min-h-screen input:focus-visible,
+html .flex.min-h-screen input:focus,
+html .flex.min-h-screen input {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+html .flex.min-h-screen.items-center.justify-center input:focus-visible {
+  outline: none !important;
+}
