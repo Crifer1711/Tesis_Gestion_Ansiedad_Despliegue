@@ -1,12 +1,13 @@
+// src/infrastructure/actions/psychologist.actions.ts
 'use server'
 
 import pool from "@/infrastructure/database/db";
 import { revalidatePath } from "next/cache";
-import bcrypt from "bcrypt"; // Cambiado a bcryptjs para evitar errores de módulo
+import bcrypt from "bcrypt";
 import { PgPsychologistRepository } from "../repositories/pg-psychologist.repository";
 import { GetPsychologistDashboard } from "@/application/use-cases/get-psychologist-dashboard.use-case";
 
-// 1. Interfaces específicas para evitar el error 'any'
+// 1. Interfaces específicas
 interface CreatePsychologistData {
   name: string;
   email: string;
@@ -33,7 +34,7 @@ export async function deletePsychologistAction(id: string) {
   }
 }
 
-// --- CREAR ---
+// --- CREAR --- ✅ CORREGIDO
 export async function createPsychologistAction(formData: CreatePsychologistData) {
   const normalizedName = (formData.name || '').trim().toUpperCase();
   const normalizedEmail = (formData.email || '').trim().toLowerCase();
@@ -43,18 +44,19 @@ export async function createPsychologistAction(formData: CreatePsychologistData)
   const client = await pool.connect();
 
   try {
+    // ✅ Validación de email @espe.edu.ec (case insensitive)
     if (!normalizedEmail.endsWith('@espe.edu.ec')) {
       return { success: false, error: 'El correo del psicólogo debe ser @espe.edu.ec' };
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Creado por el administrador: marcamos la cuenta como aprobada en la BD
+    // ✅ Insertar con lastname vacío o null (por ahora)
     const result = await client.query(
-      `INSERT INTO users (name, email, password, role, status, especialidad, contacto) 
-       VALUES ($1, $2, $3, 'PSICOLOGO', 'Activo', $4, $5)
+      `INSERT INTO users (name, lastname, email, password, role, status, especialidad, contacto) 
+       VALUES ($1, $2, $3, $4, 'PSICOLOGO', 'Activo', $5, $6)
        RETURNING id`,
-      [normalizedName, normalizedEmail, hashedPassword, normalizedEspecialidad, normalizedContacto]
+      [normalizedName, '', normalizedEmail, hashedPassword, normalizedEspecialidad, normalizedContacto]
     );
 
     revalidatePath('/dashboard/admin/psicologos');
@@ -68,13 +70,12 @@ export async function createPsychologistAction(formData: CreatePsychologistData)
   }
 }
 
-// --- ACTUALIZAR (Corregido sin 'any') ---
+// --- ACTUALIZAR ---
 export async function updatePsychologistAction(id: string, formData: UpdatePsychologistData) {
   const { name, email, especialidad, contacto } = formData;
   const client = await pool.connect();
 
   try {
-    // Actualizamos los campos asegurando que las columnas existan
     await client.query(
       `UPDATE users 
        SET name = $1, email = $2, especialidad = $3, contacto = $4 
@@ -92,10 +93,10 @@ export async function updatePsychologistAction(id: string, formData: UpdatePsych
     client.release();
   }
 }
+
 export async function togglePsychologistStatusAction(id: string, currentStatus: string) {
   const client = await pool.connect();
   try {
-    // Alternamos entre activo e inactivo para reflejar el acceso real
     const lowered = (currentStatus || '').toString().toLowerCase();
     const newStatus = (lowered === 'activo' || lowered === 'aprobado') ? 'Inactivo' : 'Activo';
 
@@ -112,8 +113,8 @@ export async function togglePsychologistStatusAction(id: string, currentStatus: 
     client.release();
   }
 }
+
 export async function getDashboardAction(psychologistId: string) {
-  // Siguiendo Clean Architecture: Action -> Use Case -> Repository
   const repository = new PgPsychologistRepository();
   const useCase = new GetPsychologistDashboard(repository);
   
@@ -122,7 +123,6 @@ export async function getDashboardAction(psychologistId: string) {
     return data;
   } catch (error) {
     console.error("Error en getDashboardAction:", error);
-    // Devolvemos datos vacíos para que la UI no rompa si falla la DB
     return {
       stats: { totalPatients: 0, pendingAppointments: 0, acceptedAppointments: 0, todayAppointments: 0 },
       nextAppointments: [],

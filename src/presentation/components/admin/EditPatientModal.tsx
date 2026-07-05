@@ -9,13 +9,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
-// ✅ Esquema con validación de correo @espe.edu.ec
+// EditPatientModal.tsx
 const editPatientSchema = z.object({
   name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
   lastname: z.string().min(3, "El apellido debe tener al menos 3 caracteres"),
   email: z.string()
     .email("Correo inválido")
-    .regex(/@espe\.edu\.ec$/, "El correo debe ser @espe.edu.ec"),
+    .regex(/@espe\.edu\.ec$/i, "El correo debe ser @espe.edu.ec"), // ✅ Con /i
   contacto: z.string().min(7, "Número de contacto inválido"),
   estado: z.union([
     z.literal("Activo"),

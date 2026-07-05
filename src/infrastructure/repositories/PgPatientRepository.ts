@@ -3,12 +3,25 @@ import pool from "../database/db";
 
 export class PgPatientRepository {
   async getPatientFullDetails(patientId: string) {
+    // ✅ Obtener nombre completo del paciente
+    const patientQuery = `
+      SELECT 
+        id,
+        CONCAT(name, ' ', COALESCE(lastname, '')) as nombre_completo,
+        email,
+        contacto as telefono
+      FROM users
+      WHERE id = $1 AND role = 'PACIENTE'
+    `;
+    const patientResult = await pool.query(patientQuery, [patientId]);
+    const patientData = patientResult.rows[0] || { nombre_completo: 'Paciente', email: '', telefono: '' };
+
     // 1. Historial de Citas
     const appointmentsQuery = `
       SELECT 
         appointment_date as fecha, 
         appointment_time as hora, 
-        modality as modality, 
+        modality as modalidad, 
         reason as motivo, 
         status as estado 
       FROM appointments 
@@ -25,14 +38,14 @@ export class PgPatientRepository {
       WHERE patient_id = $1 
       ORDER BY date DESC`;
 
-    // 3. Resultados de Test (UNION ALL corregido)
+    // 3. Resultados de Test
     const testsQuery = `
       SELECT 
         'Test SUS (Usabilidad)' as test,
         created_at as fecha, 
         sus_score as puntaje, 
         interpretation,
-        NULL as responses -- <--- CAMBIADO A PLURAL Y NULL NORMAL
+        NULL as responses
       FROM sus_responses 
       WHERE user_id = $1 
       
@@ -43,7 +56,7 @@ export class PgPatientRepository {
         created_at as fecha, 
         score as puntaje, 
         interpretation,
-        responses -- <--- CAMBIADO A PLURAL
+        responses
       FROM gad7_responses 
       WHERE patient_id = $1 
       
@@ -56,20 +69,24 @@ export class PgPatientRepository {
     ]);
 
     return {
+      patient: {
+        id: patientId,
+        nombre: patientData.nombre_completo?.trim() || 'Paciente',
+        email: patientData.email || '',
+        telefono: patientData.telefono || 'No registrado'
+      },
       appointments: appRes.rows,
       medicalRecords: medicalRes.rows,
       testResults: testsRes.rows
     };
   }
 
-  // Método para guardar test GAD-7 CORREGIDO
   async saveGad7Response(patientId: number, score: number, interpretation: string, responses: number[]) {
     const query = `
       INSERT INTO gad7_responses (patient_id, score, interpretation, responses)
       VALUES ($1, $2, $3, $4)
       RETURNING *`;
       
-    // Asegúrate de enviar el array como string JSON para Postgres
     const res = await pool.query(query, [patientId, score, interpretation, JSON.stringify(responses)]);
     return res.rows[0];
   }

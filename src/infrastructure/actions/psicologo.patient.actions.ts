@@ -4,20 +4,20 @@ import { PatientListItemDTO } from "@/domain/dtos/patient-management.dto";
 import { PgPatientRepository } from "../repositories/PgPatientRepository";
 
 export async function getPatientsForPsychologistAction(psychologistId: number): Promise<{ success: boolean; data: PatientListItemDTO[] }> {
-  // Use safe columns: some deployments may not have 'contacto' or 'last_login' columns
+  // ✅ Modificar la consulta para incluir lastname
   const query = `
     SELECT
       u.id, 
-      u.name as nombre, 
+      CONCAT(u.name, ' ', COALESCE(u.lastname, '')) as nombre, -- ✅ Nombre completo
       u.email, 
       u.contacto as telefono,
-      u.last_login, -- <--- NUEVO CAMPO
+      u.last_login,
       MAX(a.appointment_date) as ultima_cita
     FROM users u
     INNER JOIN appointments a ON u.id = a.patient_id
     WHERE a.psychologist_id = $1 
     AND u.role = 'PACIENTE'
-    GROUP BY u.id, u.name, u.email, u.contacto, u.last_login
+    GROUP BY u.id, u.name, u.lastname, u.email, u.contacto, u.last_login -- ✅ Agregar lastname al GROUP BY
     ORDER BY nombre ASC;
   `;
 
@@ -26,13 +26,12 @@ export async function getPatientsForPsychologistAction(psychologistId: number): 
     
     const patients: PatientListItemDTO[] = result.rows.map(row => ({
       id: row.id.toString(),
-      nombre: row.nombre,
+      nombre: row.nombre?.trim() || 'Paciente', // ✅ Nombre completo
       email: row.email,
       telefono: row.telefono || "Sin número",
       ultimaCita: row.ultima_cita 
         ? new Date(row.ultima_cita).toLocaleDateString('es-EC') 
         : "Sin citas",
-      // 2. Mapeamos el nuevo campo para la interfaz
       lastLogin: row.last_login 
         ? new Date(row.last_login).toLocaleString('es-EC', {
             day: '2-digit',
@@ -49,6 +48,7 @@ export async function getPatientsForPsychologistAction(psychologistId: number): 
     return { success: false, data: [] };
   }
 }
+
 // Función para obtener las estadísticas del Dashboard
 export async function getPsychologistStatsAction(psychologistId: number) {
   try {
@@ -72,6 +72,7 @@ export async function getPsychologistStatsAction(psychologistId: number) {
     return { success: false, stats: { pacientes: "0", pendientes: "0", aceptadas: "0" } };
   }
 }
+
 // src/infrastructure/actions/psicologo.patient.actions.ts
 export async function getDetailedPatientDataAction(patientId: string) {
   try {

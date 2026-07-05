@@ -15,11 +15,11 @@ export class PgPsychologistRepository implements IPsychologistRepository {
     `;
     const statsRes = await pool.query(statsQuery, [psychologistId]);
 
-    // 2. Consulta para "PRÓXIMAS CITAS" con el nombre del paciente
+    // 2. Consulta para "PRÓXIMAS CITAS" con nombre completo
     const appointmentsQuery = `
       SELECT 
         a.appointment_time as hora, 
-        u.name as paciente, 
+        CONCAT(u.name, ' ', COALESCE(u.lastname, '')) as paciente, -- ✅ Nombre completo
         a.modality as tipo, 
         a.status as estado
       FROM appointments a
@@ -30,18 +30,18 @@ export class PgPsychologistRepository implements IPsychologistRepository {
     `;
     const appointmentsRes = await pool.query(appointmentsQuery, [psychologistId]);
 
-    // 3. Consulta para "ACTIVIDADES" agregadas por paciente
+    // 3. Consulta para "ACTIVIDADES" con nombre completo
     const activitiesQuery = `
       SELECT 
         u.id as "estudianteId",
-        u.name as paciente,
+        CONCAT(u.name, ' ', COALESCE(u.lastname, '')) as paciente, -- ✅ Nombre completo
         COUNT(ba.id)::int as asignadas,
         COUNT(CASE WHEN ba.estado = 'completada' THEN 1 END)::int as realizadas,
         COUNT(CASE WHEN ba.estado != 'completada' THEN 1 END)::int as pendientes
       FROM bienestar_asignaciones ba
       JOIN users u ON ba.estudiante_id = u.id
       WHERE ba.psicologo_id = $1
-      GROUP BY u.id, u.name
+      GROUP BY u.id, u.name, u.lastname
       ORDER BY u.name ASC
     `;
     const activitiesRes = await pool.query(activitiesQuery, [psychologistId]);
@@ -53,8 +53,14 @@ export class PgPsychologistRepository implements IPsychologistRepository {
         acceptedAppointments: Number.parseInt(statsRes.rows[0].accepted_appointments || '0', 10),
         todayAppointments: Number.parseInt(statsRes.rows[0].today_appointments || '0', 10),
       },
-      nextAppointments: appointmentsRes.rows, // Aquí ya vienen los datos reales de la DB
-      recentActivities: activitiesRes.rows
+      nextAppointments: appointmentsRes.rows.map(row => ({
+        ...row,
+        paciente: row.paciente?.trim() || 'Paciente'
+      })),
+      recentActivities: activitiesRes.rows.map(row => ({
+        ...row,
+        paciente: row.paciente?.trim() || 'Paciente'
+      }))
     };
   }
 }

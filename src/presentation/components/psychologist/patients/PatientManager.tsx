@@ -39,10 +39,16 @@ interface TestResult {
   puntaje: number;
   interpretation: string;
   fecha: string;
-  responses?: number[]; // Arreglo de números (0-3) guardados en BD
+  responses?: number[];
 }
 
 interface PatientDetails {
+  patient?: {
+    id: string;
+    nombre: string;
+    email: string;
+    telefono: string;
+  };
   appointments: Appointment[];
   medicalRecords: MedicalRecord[];
   testResults: TestResult[];
@@ -61,7 +67,6 @@ export function PatientManager({ patients }: Props) {
   const [details, setDetails] = useState<PatientDetails | null>(null);
   const [loading, setLoading] = useState(false);
   
-  // Estado para el Modal de respuestas (Tipado correctamente, no any)
   const [selectedTestDetails, setSelectedTestDetails] = useState<TestResult | null>(null);
 
   const selectedPatient = patients.find(p => p.id === selectedId);
@@ -78,7 +83,6 @@ export function PatientManager({ patients }: Props) {
       const res = await getDetailedPatientDataAction(selectedId);
       
       if (res.success && res.data) {
-        // Casteamos el resultado a nuestra interfaz PatientDetails
         setDetails(res.data as PatientDetails);
       } else {
         setDetails(null);
@@ -89,6 +93,20 @@ export function PatientManager({ patients }: Props) {
     fetchData();
   }, [selectedId]);
 
+  // ✅ Obtener el nombre del paciente desde details o desde selectedPatient
+  const getPatientName = () => {
+    if (details?.patient?.nombre) {
+      return details.patient.nombre;
+    }
+    return selectedPatient?.nombre || 'Paciente';
+  };
+
+  const getPatientPhone = () => {
+    if (details?.patient?.telefono) {
+      return details.patient.telefono;
+    }
+    return selectedPatient?.telefono || 'No registrado';
+  };
 
   return (
     <div className="psychologist-patient-manager space-y-6">
@@ -132,13 +150,12 @@ export function PatientManager({ patients }: Props) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-gray-800 text-base truncate uppercase">{patient.nombre}</p>
-                  {/* --- INDICADOR VISUAL DE ÚLTIMA SESIÓN --- */}
-  <div className="flex items-center gap-2 mt-1">
-     <span className={`w-2 h-2 rounded-full ${patient.lastLogin !== "Nunca" ? 'bg-green-500' : 'bg-gray-300'}`}></span>
-     <p className="text-[10px] text-slate-500 font-semibold uppercase">
-       En línea: <span className="text-blue-600">{patient.lastLogin}</span>
-     </p>
-  </div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className={`w-2 h-2 rounded-full ${patient.lastLogin !== "Nunca" ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+                    <p className="text-[10px] text-slate-500 font-semibold uppercase">
+                      En línea: <span className="text-blue-600">{patient.lastLogin}</span>
+                    </p>
+                  </div>
                   <p className="text-xs text-blue-600 font-medium truncate mt-0.5">{patient.email}</p>
                 </div>
               </button>
@@ -158,7 +175,7 @@ export function PatientManager({ patients }: Props) {
                   </div>
                   <div className="flex-1 space-y-5 text-center md:text-left w-full">
                     <h2 className="text-2xl md:text-3xl font-black text-gray-800 uppercase tracking-tight">
-                      {selectedPatient.nombre}
+                      {getPatientName()} {/* ✅ Nombre completo */}
                     </h2>
                     <div className="psychologist-patient-detail-stats grid grid-cols-2 md:grid-cols-3 gap-3">
                       <DetailStat label="Citas" value={details?.appointments?.length || 0} icon={Calendar} color="text-orange-500" />
@@ -167,8 +184,8 @@ export function PatientManager({ patients }: Props) {
                     </div>
                   </div>
                 </div>
-                {/* --- NUEVO: GRÁFICO ESTADÍSTICO DE PROGRESO --- */}
-                {/* Preparamos los datos ordenándolos por fecha (del más antiguo al más reciente) */}
+
+                {/* GRÁFICO ESTADÍSTICO DE PROGRESO */}
                 {!loading && details?.testResults && details.testResults.length > 0 && (
                   <div className="mt-8 mb-8">
                     <h3 className="text-sm font-black text-gray-800 uppercase tracking-tight mb-4 flex items-center gap-2">
@@ -221,7 +238,6 @@ export function PatientManager({ patients }: Props) {
                     </div>
                   </div>
                 )}
-                {/* --- FIN DEL GRÁFICO --- */}
 
                 {/* Navegación de Pestañas */}
                 <div className="mt-8">
@@ -265,12 +281,12 @@ export function PatientManager({ patients }: Props) {
 
                         {/* PESTAÑA: FICHA MÉDICA */}
                         {activeTab === 'Ficha Médica' && (
-        <MedicalRecordTab 
-     patientId={selectedPatient.id} 
-     patientName={selectedPatient.nombre} 
-     patientPhone={selectedPatient.telefono} 
-  />
-)}
+                          <MedicalRecordTab 
+                            patientId={selectedPatient.id} 
+                            patientName={getPatientName()} // ✅ Nombre completo
+                            patientPhone={getPatientPhone()} 
+                          />
+                        )}
 
                         {/* PESTAÑA: RESULTADOS TEST */}
                         {activeTab === 'Resultados Test' && (
@@ -297,7 +313,6 @@ export function PatientManager({ patients }: Props) {
                                     </div>
                                   </div>
 
-                                  {/* BOTÓN VER RESPUESTAS (Aparece solo si hay respuestas guardadas) */}
                                   {test.responses && (
                                     <button 
                                       onClick={() => setSelectedTestDetails(test)}
@@ -321,7 +336,7 @@ export function PatientManager({ patients }: Props) {
 
                   <div className="mt-8 pt-4 border-t border-gray-200 text-center">
                     <p className="text-gray-500 text-xs font-medium">
-                      Mostrando información de <span className="text-blue-600 font-bold uppercase">{activeTab}</span> para {selectedPatient.nombre.split(' ')[0]}
+                      Mostrando información de <span className="text-blue-600 font-bold uppercase">{activeTab}</span> para {getPatientName().split(' ')[0]}
                     </p>
                   </div>
                 </div>

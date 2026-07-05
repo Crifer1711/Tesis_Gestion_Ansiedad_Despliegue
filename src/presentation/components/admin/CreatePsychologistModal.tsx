@@ -12,12 +12,13 @@ import { Psychologist } from "@/domain/dtos/psychologist.dto";
 // 1. Definimos el esquema de validación con Zod
 const psychologistSchema = z.object({
   name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
-  email: z.string().email("Correo inválido").endsWith("@espe.edu.ec", "Debe ser un correo institucional @espe.edu.ec"),
+  email: z.string()
+    .email("Correo inválido")
+    .regex(/@espe\.edu\.ec$/i, "Debe ser un correo institucional @espe.edu.ec"), 
   especialidad: z.string().min(3, "La especialidad es requerida"),
   contacto: z.string().min(7, "Número de contacto inválido"),
   password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
 });
-
 // Inferimos el tipo a partir del esquema
 type PsychologistFormData = z.infer<typeof psychologistSchema>;
 
