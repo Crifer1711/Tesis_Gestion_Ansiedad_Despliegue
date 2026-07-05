@@ -15,23 +15,23 @@ const categoryOptions = [
   { value: 'Todos', label: 'Todos' },
   { value: 'Respiración', label: 'Respiración' },
   { value: 'Visualizacion', label: 'Visualización' },
-  { value: 'Sonidos', label: 'Sonidos' },
-  { value: 'Interaccion', label: 'Interactividad' },
+  { value: 'Sonido', label: 'Sonido' },
+  { value: 'Interactividad', label: 'Interactividad' },
 ] as const;
 
 const accentByCategory: Record<string, string> = {
   'Respiración': 'from-sky-400 to-blue-500',
   'Visualizacion': 'from-blue-400 to-cyan-500',
-  'Sonidos': 'from-indigo-400 to-sky-600',
-  'Interaccion': 'from-cyan-400 to-blue-600',
+  'Sonido': 'from-indigo-400 to-sky-600',
+  'Interactividad': 'from-cyan-400 to-blue-600',
   'Todos': 'from-sky-500 to-blue-600',
 };
 
 const categoryLabels: Record<string, string> = {
   'Respiración': 'Respiración',
   'Visualizacion': 'Visualización',
-  'Sonidos': 'Sonidos',
-  'Interaccion': 'Interactividad',
+  'Sonido': 'Sonido',
+  'Interactividad': 'Interactividad',
   'Todos': 'Todos',
 };
 

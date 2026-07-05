@@ -67,7 +67,7 @@ export function AppointmentBookingForm({
                 aria-expanded={isPsychologistMenuOpen}
                 aria-label="Seleccionar psicólogo"
               >
-                <span>{selectedPsychologistName || (loading ? 'Cargando psicólogos...' : psicologos.length === 0 ? 'No hay psicólogos disponibles' : 'Selecciona un psicólogo')}</span>
+                <span>{selectedPsychologistName || (loading ? 'Cargando psicólogos...' : psicologos.length === 0 ? 'No hay psicólogos disponibles' : 'Selecciona un/a psicólogo/a')}</span>
                 <ChevronDown size={16} className={`transition-transform ${isPsychologistMenuOpen ? 'rotate-180' : ''}`} />
               </button>
 
@@ -153,7 +153,10 @@ export function AppointmentBookingForm({
               })}
             </div>
             <p className="mt-2 text-xs font-medium text-slate-600">
-              Presencial: atencion en consultorio. Virtual: sesion por Google Meet.
+              Presencial: atencion en consultorio. 
+            </p>
+            <p className="mt-2 text-xs font-medium text-slate-600">
+              Virtual: atencion por videollamada.
             </p>
           </div>
         </div>

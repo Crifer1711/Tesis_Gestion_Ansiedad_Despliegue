@@ -163,12 +163,12 @@ function DashboardContent() {
 
   useEffect(() => {
     fetchAppointments();
-    // ✅ AUMENTAR EL INTERVALO A 30 SEGUNDOS (en lugar de 5)
+    // AUMENTAR EL INTERVALO A 30 SEGUNDOS (en lugar de 5)
     const interval = setInterval(fetchAppointments, 30000);
     return () => clearInterval(interval);
   }, [fetchAppointments]);
 
-  // ✅ USAR useMemo CON DEPENDENCIAS CORRECTAS
+  // USAR useMemo CON DEPENDENCIAS CORRECTAS
   const now = useMemo(() => new Date(), []);
 
   const upcomingAppointments = useMemo(() => {

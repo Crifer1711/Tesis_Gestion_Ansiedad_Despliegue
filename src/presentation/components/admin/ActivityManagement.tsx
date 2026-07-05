@@ -28,7 +28,7 @@ export function ActivityManagement({ initialActivities = [] }: { initialActiviti
   const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
   const confirm = useConfirm();
 
-  const categories = ['Todos', 'Respiración', 'Visualizacion', 'Sonidos', 'Interaccion', 'Otros'];
+  const categories = ['Todos', 'Respiración', 'Visualizacion', 'Sonido', 'Interactividad', 'Otros'];
 
   useEffect(() => {
     setActivities(initialActivities);

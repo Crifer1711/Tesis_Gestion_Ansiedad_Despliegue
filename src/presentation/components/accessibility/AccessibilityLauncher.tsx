@@ -33,7 +33,7 @@ export function AccessibilityLauncher() {
 
   return (
     <>
-      <div className={`accessibility-launcher fixed z-[70] flex flex-col items-center gap-1 ${isDenseDashboard ? 'right-5 top-28' : 'left-5 top-28'}`}>
+      <div className={`accessibility-launcher fixed z-[70] flex flex-col items-center gap-1 ${isDenseDashboard ? 'right-5 top-28' : 'left-[0px] top-28'}`}>
         {!isDenseDashboard && (
           <span className="rounded-full bg-slate-800/70 px-2 py-0.5 text-xs font-semibold text-white/90 backdrop-blur-sm">
             Accesibilidad

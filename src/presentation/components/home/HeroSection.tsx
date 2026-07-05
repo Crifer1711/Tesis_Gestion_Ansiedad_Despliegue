@@ -31,9 +31,9 @@ export function HeroSection({ variant = 'public', onNavigate }: HeroSectionProps
 
   const quickLinks: QuickLink[] = [
     {
-      id: 'informate',
+      id: 'información',
       number: 1,
-      label: 'Infórmate',
+      label: 'Información',
       icon: <Info className="w-5 h-5 inline mr-2 text-[#1E4D8C]" />,
       sectionIndex: 1,
       description: 'información y educación sobre ansiedad y salud mental'
@@ -132,21 +132,15 @@ export function HeroSection({ variant = 'public', onNavigate }: HeroSectionProps
                   </button>
                 ))}
               </div>
-
-              {/* ✅ TEXTO FINAL ALINEADO A LA IZQUIERDA */}
-              <p className="text-xl md:text-2xl text-slate-800 leading-relaxed font-medium text-left mt-6">
-                Si lo necesitas, podrás encontrar ayuda profesional de especialistas en salud mental.
-              </p>
             </div>
           ) : (
             <>
               <p className="text-lg md:text-xl text-slate-700 mb-8 leading-relaxed text-left">
                 Bienvenido a MindPeace, un espacio dedicado a la gestión de ansiedad en estudiantes universitarios. Encontrarás:
-                <span className="block mt-3">• <strong>Infórmate:</strong> Información y educación sobre ansiedad y salud mental</span>
+                <span className="block mt-3">• <strong>Información:</strong> Información y educación sobre ansiedad y salud mental</span>
                 <span className="block">• <strong>Recursos:</strong> Guías y herramientas para cuidar tu salud mental</span>
                 <span className="block">• <strong>Actividades:</strong> Encontrarás actividades para la gestión de ansiedad</span>
                 <span className="block">• <strong>Citas:</strong> Agenda una cita con un profesional de la salud</span>
-                <span className="block mt-3">Si lo necesitas, podrás encontrar ayuda profesional de especialistas en salud mental.</span>
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">

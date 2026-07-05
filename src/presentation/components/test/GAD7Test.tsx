@@ -32,10 +32,10 @@ const OPTIONS = [
 ];
 
 function getSemaphoreData(score: number): TestResult {
-  if (score <= 4) return { color: 'green', label: 'Bajo', msg: 'Tus niveles de ansiedad parecen estar bajo control.' };
-  if (score <= 9) return { color: 'yellow', label: 'Leve', msg: 'Presentas algunas señales leves de inquietud.' };
-  if (score <= 14) return { color: 'orange', label: 'Moderado', msg: 'Tus niveles de ansiedad son notables en tu día a día.' };
-  return { color: 'red', label: 'Elevado', msg: 'Tus síntomas de ansiedad son persistentes y significativos.' };
+  if (score <= 4) return { color: 'green', label: 'Bajo', msg: 'Tus niveles de ansiedad parecen estar bajo control' };
+  if (score <= 9) return { color: 'yellow', label: 'Leve', msg: 'Presentas algunas señales leves de inquietud' };
+  if (score <= 14) return { color: 'orange', label: 'Moderado', msg: 'Tus niveles de ansiedad son notables en tu día a día' };
+  return { color: 'red', label: 'Elevado', msg: 'Tus síntomas de ansiedad son persistentes y significativos' };
 }
 
 export function GAD7Test({ onHomeClick }: { onHomeClick?: () => void }) {

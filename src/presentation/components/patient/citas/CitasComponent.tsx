@@ -334,7 +334,7 @@ export function CitasComponent() {
   return (
     <>
     <div className="citas-page-shell min-h-screen bg-[radial-gradient(circle_at_15%_20%,#dff1ff_0%,#eef6ff_35%,#f8fbff_70%)] px-4 py-6 md:px-8 md:py-10">
-      <div className="mx-auto max-w-[1450px] space-y-7">
+      <div className="mx-auto max-w-[1450px] space-y-7 pl-10 md:pl-4 lg:pl-10">
         <section className="rounded-3xl border border-[#c7ddf8] bg-white/85 p-6 shadow-[0_20px_45px_rgba(29,78,140,0.12)] backdrop-blur md:p-8">
           {/* NUEVO BOTÓN: Volver al inicio */}
           <div className="mb-6">
@@ -351,7 +351,7 @@ export function CitasComponent() {
               <p className="text-xs font-black uppercase tracking-[0.22em] text-[#4c82bf]">Agenda Clínica</p>
               <h1 className="mt-2 text-3xl font-black text-[#1E4D8C] md:text-5xl">Agendamiento de cita</h1>
               <p className="mt-3 max-w-3xl text-sm text-slate-600 md:text-base">
-                Selecciona el psicólogo, fecha, modalidad y horario para agendar tu cita.
+                Selecciona el/la psicólogo/a, fecha, modalidad y horario para agendar tu cita.
               </p>
             </div>
 
