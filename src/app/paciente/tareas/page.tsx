@@ -237,8 +237,6 @@ export default function TareasPage() {
         <PatientHeader
           activeSection={activeSection}
           onNavClick={setActiveSection}
-          userName={session?.user?.name || 'Paciente'}
-          userRole={session?.user?.role || 'ESTUDIANTE'}
         />
         <div className="pt-28 pb-16">
           <div className="max-w-7xl mx-auto px-6">

@@ -226,8 +226,6 @@ function DashboardContent() {
         <PatientHeader
           activeSection="inicio"
           onNavClick={() => {}}
-          userName={session?.user?.name || 'Paciente'}
-          userRole={session?.user?.role || 'PACIENTE'}
           isModalOpen={!!modalView}
         />
 

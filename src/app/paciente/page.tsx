@@ -16,8 +16,6 @@ export default function PacienteVideosPage() {
         <PatientHeader
           activeSection={activeSection}
           onNavClick={setActiveSection}
-          userName={session?.user?.name || 'Paciente'}
-          userRole={session?.user?.role || 'ESTUDIANTE'}
         />
         <div className="pt-24">
           <VideosEducativos onHomeClick={() => {}} />

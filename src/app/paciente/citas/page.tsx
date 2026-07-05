@@ -25,8 +25,6 @@ export default function CitasPage() {
         <PatientHeader
           activeSection={activeSection}
           onNavClick={setActiveSection}
-          userName={session?.user?.name || 'Paciente'}
-          userRole={session?.user?.role || 'ESTUDIANTE'}
         />
         <div className="flex-1">
           <div className="max-w-7xl mx-auto px-6 pt-6">

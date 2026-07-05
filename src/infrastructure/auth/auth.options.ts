@@ -45,7 +45,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.role = user.role;
-        token.lastname = user.lastname; // ✅ AGREGAR
+        token.lastname = (user as any).lastname || ''; // ✅ AGREGAR
       }
       return token;
     },

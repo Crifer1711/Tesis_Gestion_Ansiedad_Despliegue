@@ -1,9 +1,18 @@
+// src/domain/dtos/user.dto.ts
 export interface User {
-  id: string | number;
-  name: string;
-  lastname?: string;
+  id?: string | number;
   email: string;
-  password: string;
+  password?: string;
+  name: string;
+  lastname: string;
   role: 'PACIENTE' | 'PSICOLOGO' | 'ADMINISTRADOR';
-  status?: string;
+  contacto?: string;
+  status: string;
+  especialidad?: string | null;
+  verificationToken?: string | null;
+  verificationTokenExpiresAt?: Date | null;
+  emailVerifiedAt?: Date | null;
+  created_at?: Date;
+  updated_at?: Date;
+  last_login?: Date;
 }

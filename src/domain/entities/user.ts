@@ -1,16 +1,18 @@
+// src/domain/entities/user.ts
 export interface User {
-  id?: string;
+  id?: string | number;
   email: string;
   password?: string;
   name: string;
   lastname: string;
-  // Actualizamos los roles para incluir 'ESTUDIANTE' que aparece en tu DB
   role: 'PACIENTE' | 'PSICOLOGO' | 'ADMINISTRADOR';
-  // Nuevos campos requeridos por la estructura de tu tabla
-  contacto: string;
+  contacto?: string;
   status: string;
-  especialidad: string | null;
+  especialidad?: string | null;
   verificationToken?: string | null;
   verificationTokenExpiresAt?: Date | null;
   emailVerifiedAt?: Date | null;
+  created_at?: Date;
+  updated_at?: Date;
+  last_login?: Date;
 }
