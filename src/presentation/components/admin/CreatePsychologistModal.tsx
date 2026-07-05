@@ -101,7 +101,7 @@ export function CreatePsychologistModal({ isOpen, onClose, onCreated }: Props) {
           
           {/* Nombre */}
           <div>
-            <label className="block text-xs font-black uppercase mb-1 text-gray-700">Nombre Completo</label>
+            <label className="block text-xs font-black uppercase mb-1 text-gray-700">Nombres Completos</label>
             <input 
               {...register("name", {
                 onChange: (e) => setValue("name", e.target.value.toUpperCase(), { shouldValidate: true })

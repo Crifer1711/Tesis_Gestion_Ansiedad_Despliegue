@@ -84,8 +84,6 @@ export async function PATCH(
     const sessionUserId = Number(session.user.id);
     const currentStatus = appointment.rows[0].status as string;
     
-    console.log(`Checking permission: apt_psych_id=${appointmentPsychologistId} (type: ${typeof appointmentPsychologistId}), session_user_id=${sessionUserId} (type: ${typeof sessionUserId}), role=${session.user.role}`);
-    
     const isOwnerPsychologist = appointmentPsychologistId === sessionUserId;
     const isOwnerPatient = appointmentPatientId === sessionUserId;
     const isAdmin = session.user.role === 'ADMINISTRADOR';
@@ -169,6 +167,32 @@ export async function PATCH(
     );
 
     const updated = result.rows[0];
+
+    // ✅ ✅ ✅ NUEVO: SI LA CITA FUE ACEPTADA, ACTUALIZAR EL ROL DEL PACIENTE
+    if (updateStatus === 'Aceptada') {
+      try {
+        // Verificar si el usuario ya tiene rol PACIENTE
+        const userCheck = await db.query(
+          'SELECT rol FROM usuarios WHERE id = $1',
+          [appointmentPatientId]
+        );
+        
+        if (userCheck.rows.length > 0 && userCheck.rows[0].rol !== 'PACIENTE') {
+          // Actualizar el rol del paciente a PACIENTE
+          await db.query(
+            'UPDATE usuarios SET rol = $1 WHERE id = $2',
+            ['PACIENTE', appointmentPatientId]
+          );
+          console.log(`✅ Rol actualizado a PACIENTE para el usuario ${appointmentPatientId}`);
+        } else {
+          console.log(`ℹ️ El usuario ${appointmentPatientId} ya es PACIENTE o no existe`);
+        }
+      } catch (roleError) {
+        console.error('Error actualizando rol del paciente:', roleError);
+        // No fallamos la actualización de la cita si el rol falla
+      }
+    }
+
     return NextResponse.json({
       id: updated.id,
       status: updated.status,

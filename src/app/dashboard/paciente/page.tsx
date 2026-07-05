@@ -131,6 +131,36 @@ function DashboardContent() {
     }
   }, [status, router]);
 
+  // 1. AGREGAR ESTADO
+    const [hasAcceptedAppointments, setHasAcceptedAppointments] = useState(false);
+
+    // 2. FUNCIÓN PARA VERIFICAR CITAS ACEPTADAS
+    const checkAcceptedAppointments = useCallback(async () => {
+      if (!session?.user?.id) return;
+      
+      try {
+        const res = await fetch(`/api/appointments?patientId=${session.user.id}`, {
+          cache: 'no-store'
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const hasAccepted = Array.isArray(data) && data.some(
+            (apt: any) => apt.status === 'Aceptada'
+          );
+          setHasAcceptedAppointments(hasAccepted);
+        }
+      } catch (error) {
+        console.error('Error checking accepted appointments:', error);
+      }
+    }, [session?.user?.id]);
+
+    // 3. EJECUTAR AL CARGAR Y CADA 30 SEGUNDOS
+    useEffect(() => {
+      checkAcceptedAppointments();
+      const interval = setInterval(checkAcceptedAppointments, 30000);
+      return () => clearInterval(interval);
+    }, [checkAcceptedAppointments]);
+
   const fetchAppointments = useCallback(async () => {
     if (!session?.user?.id) return;
 
@@ -287,8 +317,8 @@ function DashboardContent() {
                     </div>
                   </div>
 
-                  {/* TARJETA VERDE: Solo visible si tiene citas (totalCount > 0) */}
-                  {totalCount > 0 && (
+                  {/* TARJETA VERDE: Solo visible si tiene citas (hasAcceptedAppointments > 0) */}
+                  {hasAcceptedAppointments && (
                     <div className="patient-activity-card patient-activity-card-task rounded-2xl border-2 border-emerald-200 bg-emerald-50/80 p-6 shadow-lg hover:shadow-xl transition flex flex-col justify-between">
                       <div>
                         <div className="flex items-center gap-3 mb-4">

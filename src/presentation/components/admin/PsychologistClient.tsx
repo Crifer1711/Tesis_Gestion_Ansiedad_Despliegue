@@ -131,7 +131,7 @@ export function PsychologistClient({ initialData }: Props) {
           <table className="w-full text-sm text-left">
             <thead className="bg-[#BDBDBD] border-b-2 border-gray-800 font-black text-gray-900">
               <tr>
-                <th className="px-4 py-4 border-r-2 border-gray-800 text-center uppercase">Nombre</th>
+                <th className="px-4 py-4 border-r-2 border-gray-800 text-center uppercase">Nombres Completos</th>
                 <th className="px-4 py-4 border-r-2 border-gray-800 text-center uppercase">Email</th>
                 <th className="px-4 py-4 border-r-2 border-gray-800 text-center uppercase">Contacto</th>
                 <th className="px-4 py-4 border-r-2 border-gray-800 text-center uppercase">Especialidad</th>

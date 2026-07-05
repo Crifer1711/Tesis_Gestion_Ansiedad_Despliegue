@@ -14,7 +14,8 @@ import { countWords, getAppointmentDateTime, getLocalDateString, MAX_MOTIVO_WORD
 const APPOINTMENTS_POLL_INTERVAL_MS = 30000;
 
 export function CitasComponent() {
-  const { data: session } = useSession();
+  // ✅ Agregar 'update' del hook useSession
+  const { data: session, update } = useSession();
   const [formData, setFormData] = useState<AppointmentFormData>({
     psicologo: '',
     fecha: '',
@@ -118,6 +119,7 @@ export function CitasComponent() {
     fetchPsicologos();
   }, []);
 
+  // ✅ MODIFICADO: Agregar lógica para actualizar sesión cuando hay cita aceptada
   const fetchCitasDelPaciente = useCallback(async () => {
     if (!session?.user?.id) return;
 
@@ -138,11 +140,25 @@ export function CitasComponent() {
           cancelReason: apt.cancelReason || null,
         }));
         setCitasAgendadas(citasFormateadas);
+
+        // ✅ NUEVO: Verificar si hay alguna cita aceptada
+        const hasAcceptedAppointment = citasFormateadas.some(
+          (cita) => cita.estado === 'Aceptada'
+        );
+
+        // ✅ NUEVO: Si hay cita aceptada y el rol NO es PACIENTE, actualizar sesión
+        if (hasAcceptedAppointment && session?.user?.role !== 'PACIENTE') {
+          console.log('🔔 Cita aceptada detectada. Actualizando rol a PACIENTE...');
+          await update(); // Forzar actualización de la sesión
+          toast.success('✅ ¡Tu cita ha sido aceptada! Ahora eres paciente.', {
+            duration: 5000,
+          });
+        }
       }
     } catch (error) {
       console.error('Error fetching patient appointments:', error);
     }
-  }, [session?.user?.id]);
+  }, [session?.user?.id, session?.user?.role, update]); // ✅ Agregar 'update' a las dependencias
 
   // Cargar citas del paciente desde el servidor
   useEffect(() => {
@@ -248,7 +264,6 @@ export function CitasComponent() {
           hora: formData.hora,
           modalidad: formData.modalidad,
           motivo: formData.motivo || 'Sin especificar',
-          // requestLink no se solicita desde UI: el psicólogo compartirá el enlace directamente si aplica
         }),
       });
 

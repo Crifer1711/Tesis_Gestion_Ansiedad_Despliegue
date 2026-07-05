@@ -40,11 +40,12 @@ export class LoginUserUseCase {
       await this.authRepository.updateLastLogin(user.id);
     }
 
-    // Retornamos los datos necesarios para la sesión
+    // ✅ Retornamos los datos necesarios para la sesión, incluyendo lastname
     return { 
       id: user.id,
       role: user.role, 
-      name: user.name 
+      name: user.name,
+      lastname: user.lastname || '', // ✅ AGREGAR lastname
     };
   }
 }

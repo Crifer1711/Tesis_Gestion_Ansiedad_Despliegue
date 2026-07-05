@@ -5,8 +5,9 @@ import { revalidatePath } from "next/cache";
 import bcrypt from "bcrypt";
 
 // --- INTERFACES ---
-export interface CreatePatientData { // <--- Debe tener 'export'
+export interface CreatePatientData {
   name: string;
+  lastname: string; // ✅ AGREGADO
   email: string;
   password: string;
   contacto: string;
@@ -14,6 +15,7 @@ export interface CreatePatientData { // <--- Debe tener 'export'
 
 export interface UpdatePatientData {
   name: string;
+  lastname: string; // ✅ AGREGADO
   email: string;
   contacto: string;
   estado: 'Activo' | 'Inactivo' | 'Pendiente';
@@ -25,7 +27,6 @@ export async function deletePatientAction(id: string) {
   try {
     await client.query('BEGIN');
 
-    // Algunas tablas usan RESTRICT sobre estudiante_id, por eso limpiamos primero.
     await client.query('DELETE FROM bienestar_asignaciones WHERE estudiante_id = $1', [id]);
 
     const deletedUser = await client.query(
@@ -56,20 +57,18 @@ export async function deletePatientAction(id: string) {
 
 // --- CREAR PACIENTE ---
 export async function createPatientAction(formData: CreatePatientData) {
-  const { name, email, password, contacto } = formData;
+  const { name, lastname, email, password, contacto } = formData; // ✅ AGREGADO lastname
   const client = await pool.connect();
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Nota: 'fecha_registro' se suele manejar con DEFAULT CURRENT_TIMESTAMP en la DB
-    // Usamos el rol 'ESTUDIANTE' o 'PACIENTE' según tu lógica de negocio
-    // Al crear desde el administrador, marcamos la cuenta como aprobada en la BD
+    // ✅ AGREGADO lastname en la consulta SQL
     const result = await client.query(
-      `INSERT INTO users (name, email, password, role, status, contacto) 
-       VALUES ($1, $2, $3, 'PACIENTE', 'Activo', $4)
+      `INSERT INTO users (name, lastname, email, password, role, status, contacto) 
+       VALUES ($1, $2, $3, $4, 'PACIENTE', 'Activo', $5)
        RETURNING id, TO_CHAR(created_at, 'DD/MM/YY') AS fecha_registro`,
-      [name, email, hashedPassword, contacto]
+      [name, lastname, email, hashedPassword, contacto] // ✅ AGREGADO lastname
     );
 
     revalidatePath('/dashboard/admin/pacientes');
@@ -77,7 +76,6 @@ export async function createPatientAction(formData: CreatePatientData) {
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : "Error desconocido";
     return { success: false, error: errorMessage };
-
   } finally {
     client.release();
   }
@@ -85,18 +83,19 @@ export async function createPatientAction(formData: CreatePatientData) {
 
 // --- ACTUALIZAR PACIENTE ---
 export async function updatePatientAction(id: string, formData: UpdatePatientData) {
-  const { name, email, contacto, estado } = formData;
+  const { name, lastname, email, contacto, estado } = formData; // ✅ AGREGADO lastname
   const client = await pool.connect();
 
   try {
     // Mapeamos los estados de la UI a los valores aceptados por la BD
-    // UI usa 'Activo'/'Inactivo'/'Pendiente' — DB espera 'aprobado'|'pendiente'
     const dbStatus = estado === 'Activo' ? 'aprobado' : 'pendiente';
+    
+    // ✅ AGREGADO lastname en la consulta SQL
     await client.query(
       `UPDATE users 
-       SET name = $1, email = $2, contacto = $3, status = $4 
-       WHERE id = $5`,
-      [name, email, contacto, dbStatus, id]
+       SET name = $1, lastname = $2, email = $3, contacto = $4, status = $5 
+       WHERE id = $6`,
+      [name, lastname, email, contacto, dbStatus, id] // ✅ AGREGADO lastname
     );
 
     revalidatePath('/dashboard/admin/pacientes');
@@ -108,10 +107,10 @@ export async function updatePatientAction(id: string, formData: UpdatePatientDat
     client.release();
   }
 }
+
 export async function togglePatientStatusAction(id: string, currentStatus: string) {
   const client = await pool.connect();
   try {
-    // Alternamos entre activo e inactivo para reflejar el acceso real
     const lowered = (currentStatus || '').toString().toLowerCase();
     const newStatus = (lowered === 'activo' || lowered === 'aprobado') ? 'Inactivo' : 'Activo';
 

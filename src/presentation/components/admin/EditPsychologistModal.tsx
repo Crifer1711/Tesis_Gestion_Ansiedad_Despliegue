@@ -96,9 +96,9 @@ export function EditPsychologistModal({ isOpen, onClose, psychologist, onUpdated
 
         <form onSubmit={handleSubmit(onSubmit)} className="p-8 space-y-5">
           
-          {/* Nombre Completo */}
+          {/* Nombres Completos */}
           <div className="space-y-1">
-            <label className="text-xs font-black text-gray-700 uppercase ml-1">Nombre Completo</label>
+            <label className="text-xs font-black text-gray-700 uppercase ml-1">Nombres Completos</label>
             <input 
               {...register("name")}
               type="text" 
