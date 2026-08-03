@@ -253,9 +253,14 @@ export default function TareasPage() {
           </div>
 
             <h1 className="text-4xl font-black text-[#1E4D8C] mb-4">Mis Tareas</h1>
-            <p className="text-slate-700 leading-relaxed mb-6">
-              Aquí se muestran las actividades, ejercicios o tareas que tu psicólogo te haya asignado para acompañar tu proceso. Podrás abrir cada actividad, revisar sus instrucciones, ver su estado y la fecha límite, y completar el contenido desde esta misma pantalla. Si tu psicólogo aún no te ha asignado tareas, verás el aviso de que no tienes asignaciones disponibles.
-            </p>
+            <div className="rounded-3xl border border-blue-200 bg-blue-50/90 p-5 mb-6">
+              <p className="text-slate-800 text-base leading-7">
+                Aquí se muestran las actividades, ejercicios o tareas que tu psicólogo te haya asignado para acompañar tu proceso. Si aún no tienes citas aceptadas, puedes revisar las Técnicas rápidas y preparar tu primer seguimiento clínico.
+              </p>
+              <p className="mt-3 text-sm font-semibold text-slate-600">
+                Recuerda completar el test <span className="font-black">GAD-7</span> después de tus actividades; esto ayuda a tu psicólogo a revisar tu progreso con claridad.
+              </p>
+            </div>
           <div className="mt-6">
             {loadingAsign ? (
               <div className="text-sm text-gray-600">Cargando asignaciones...</div>
@@ -356,12 +361,14 @@ export default function TareasPage() {
                 </div>
                 <div className="flex-1 p-0 relative">
                   {selectedAsignacion.embed_url ? (
-                    <div className="w-full h-[82vh] bg-white overflow-y-auto">
+                    <div className="w-full h-[82vh] bg-white overflow-hidden">
                       <iframe 
                         src={getIframeUrl()} 
                         title={selectedAsignacion.titulo} 
-                        className="w-full h-full min-h-[82vh] border-0" 
-                        allow="geolocation; microphone; camera; midi; encrypted-media; xr-spatial-tracking"
+                        className="w-full h-full border-0" 
+                        allow="geolocation; microphone; camera; midi; encrypted-media; xr-spatial-tracking; fullscreen"
+                        allowFullScreen
+                        scrolling="yes"
                       />
                     </div>
                   ) : (

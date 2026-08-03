@@ -8,7 +8,7 @@ export async function getPatientsForPsychologistAction(psychologistId: number): 
   const query = `
     SELECT
       u.id, 
-      CONCAT(u.name, ' ', COALESCE(u.lastname, '')) as nombre, -- ✅ Nombre completo
+      CONCAT(u.name, ' ', COALESCE(u.lastname, '')) as nombre,
       u.email, 
       u.contacto as telefono,
       u.last_login,
@@ -16,8 +16,9 @@ export async function getPatientsForPsychologistAction(psychologistId: number): 
     FROM users u
     INNER JOIN appointments a ON u.id = a.patient_id
     WHERE a.psychologist_id = $1 
-    AND u.role = 'PACIENTE'
-    GROUP BY u.id, u.name, u.lastname, u.email, u.contacto, u.last_login -- ✅ Agregar lastname al GROUP BY
+      AND u.role = 'PACIENTE'
+      AND a.status = 'Aceptada'
+    GROUP BY u.id, u.name, u.lastname, u.email, u.contacto, u.last_login
     ORDER BY nombre ASC;
   `;
 

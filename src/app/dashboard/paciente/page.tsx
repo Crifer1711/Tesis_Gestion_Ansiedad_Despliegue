@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Palette, X, Calendar, ClipboardList, Clock, CheckCircle2, ArrowRight, CalendarDays, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -75,7 +75,25 @@ function DashboardContent() {
   const [loadingAppointments, setLoadingAppointments] = useState(true);
   const [modalView, setModalView] = useState<ModalView>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: session, status } = useSession();
+
+  useEffect(() => {
+    const section = searchParams.get('section');
+    const sectionMap: Record<string, number> = {
+      inicio: 0,
+      informacion: 1,
+      recursos: 2,
+      actividades: 3,
+      citas: 4,
+    };
+
+    if (section) {
+      const targetIndex = sectionMap[section] ?? 0;
+      setActiveIndex(targetIndex);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [searchParams]);
 
   const sections: { id: ModalView; label: string; component: React.ReactNode }[] = [
     { id: 'ansiedad', label: 'Ansiedad', component: <AnxietyContent padded={false} /> },
@@ -290,8 +308,15 @@ function DashboardContent() {
             <section className={`min-w-full flex flex-col ${SECTION_HEIGHT}`}>
               <div className="max-w-7xl mx-auto px-6 py-8 md:py-10">
                 <h2 className="text-4xl md:text-5xl font-black text-[#1E4D8C] mb-2">Actividades</h2>
-                <div className="h-1 w-32 bg-[#71A5D9] rounded-full mb-8" />
-                
+                <div className="h-1 w-32 bg-[#71A5D9] rounded-full mb-6" />
+                <div className="w-full rounded-3xl border border-blue-200 bg-white/90 p-6 shadow-lg shadow-slate-200/50 mb-8 text-slate-700">
+                  <p className="text-base leading-8 font-semibold text-slate-900 mb-3">
+                    Puedes explorar las Técnicas rápidas aunque aún no tengas una cita con el psicólogo.
+                  </p>
+                  <p className="text-sm leading-7">
+                    Como nuevo usuario de perfil estudiante, todavía no se muestran tareas clínicas reales hasta que agendes y tu cita sea aceptada. Cuando eso ocurra, el apartado "Mis tareas" se habilitará para que tu psicólogo te asigne seguimiento y actividades de control.
+                  </p>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* TARJETA MORADA: Siempre visible */}
                   <div className="patient-activity-card patient-activity-card-tech rounded-2xl border-2 border-purple-200 bg-purple-50/80 p-6 shadow-lg hover:shadow-xl transition">
@@ -316,7 +341,7 @@ function DashboardContent() {
                   </div>
 
                   {/* TARJETA VERDE: Solo visible si tiene citas (hasAcceptedAppointments > 0) */}
-                  {hasAcceptedAppointments && (
+                  {hasAcceptedAppointments ? (
                     <div className="patient-activity-card patient-activity-card-task rounded-2xl border-2 border-emerald-200 bg-emerald-50/80 p-6 shadow-lg hover:shadow-xl transition flex flex-col justify-between">
                       <div>
                         <div className="flex items-center gap-3 mb-4">
@@ -332,17 +357,38 @@ function DashboardContent() {
                           Aquí encontrarás los ejercicios y actividades que tu psicóloga ha preparado para ti. Recuerda completarlos siguiendo las indicaciones de tu sesión.
                         </p>
                       </div>
-                      
-                      {/* NUEVO BOTÓN PARA MIS TAREAS */}
+
                       <div>
-                        <Link 
-                          href="/paciente/tareas" 
+                        <Link
+                          href="/paciente/tareas"
                           className="patient-activity-btn patient-activity-btn-task inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700 hover:shadow-md"
                         >
                           Ir a Mis Tareas
                           <ArrowRight size={18} />
                         </Link>
                       </div>
+                    </div>
+                  ) : (
+                    <div className="patient-activity-card rounded-2xl border-2 border-slate-200 bg-slate-50/80 p-6 shadow-lg hover:shadow-xl transition">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="patient-activity-icon-box rounded-xl bg-slate-100 p-3">
+                          <CalendarDays className="h-6 w-6 text-slate-600" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Mis tareas</p>
+                          <p className="text-lg font-black text-slate-800">Próximo paso</p>
+                        </div>
+                      </div>
+                      <p className="text-sm text-slate-700 mb-5">
+                        Aún no tienes tareas clínicas asignadas. Agenda una cita con un psicólogo y cuando tu cita sea aceptada, el apartado "Mis tareas" se habilitará para tu seguimiento.
+                      </p>
+                      <Link
+                        href="/paciente/citas"
+                        className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-slate-800"
+                      >
+                        Ver citas
+                        <ArrowRight size={18} />
+                      </Link>
                     </div>
                   )}
                   

@@ -82,12 +82,6 @@ const SOCIAL_GUIDES = [
 
 const PERSONAL_GUIDES = [
   {
-    title: 'Guías de autoayuda: depresión y ansiedad',
-    image: 'https://www.sspa.juntadeandalucia.es/servicioandaluzdesalud/sites/default/files/styles/sas_200x/public/sincfiles/wsas-media-imagen_publicacion/2020/pub_567_1.jpg?itok=9zDGMg4D',
-    url: 'https://consaludmental.org/publicaciones/Guiasautoayudadepresionansiedad.pdf',
-    resourceType: 'Guía',
-  },
-  {
     title: 'Manejo integral de la ansiedad',
     image: 'https://www.espainun.com/wp-content/uploads/2024/02/ataques-de-ansiedad-768x768.jpg',
     url: 'https://semergen.es/files/docs/biblioteca/docConsultaRapida/2024/manejodelaAnsiedad.pdf',
