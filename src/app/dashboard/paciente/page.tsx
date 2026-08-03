@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Palette, X, Calendar, ClipboardList, Clock, CheckCircle2, ArrowRight, CalendarDays, ArrowLeft } from 'lucide-react';
@@ -65,7 +65,11 @@ const formatDateTime = (fecha: string, hora: string) => {
 };
 
 export default function PatientPage() {
-  return <DashboardContent />;
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-600">Cargando contenido...</div>}>
+      <DashboardContent />
+    </Suspense>
+  );
 }
 
 function DashboardContent() {
