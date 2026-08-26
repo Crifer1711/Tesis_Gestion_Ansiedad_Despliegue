@@ -26,7 +26,11 @@ export class UserRepository {
         email: row.email,
         contacto: row.contacto || "N/A", 
         // Map DB status values to UI-friendly labels
-        status: (row.status === 'aprobado') ? 'Activo' : (row.status === 'pendiente' ? 'Pendiente' : row.status || 'Pendiente'),
+        status: row.status === 'aprobado' || row.status === 'activo'
+          ? 'Activo'
+          : row.status === 'inactivo'
+            ? 'Inactivo'
+            : 'Pendiente',
         role: row.role,
         fecha_registro: row.fecha_registro
       }));

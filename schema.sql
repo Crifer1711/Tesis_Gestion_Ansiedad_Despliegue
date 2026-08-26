@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS public.users (
     password VARCHAR(255) NOT NULL,
     role VARCHAR(50) NOT NULL CHECK (role IN ('PACIENTE', 'PSICOLOGO', 'ADMINISTRADOR')),
     contacto VARCHAR(20),
-    status VARCHAR(20) NOT NULL DEFAULT 'pendiente' CHECK (status IN ('pendiente', 'activo', 'aprobado')),
+    status VARCHAR(20) NOT NULL DEFAULT 'pendiente' CHECK (status IN ('pendiente', 'activo', 'aprobado', 'inactivo')),
     especialidad VARCHAR(255),
     verification_token TEXT,
     verification_token_expires_at TIMESTAMP,

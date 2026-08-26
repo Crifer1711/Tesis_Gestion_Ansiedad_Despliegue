@@ -28,6 +28,7 @@ export class RegisterUserUseCase {
 
     const newUser: User = {
       ...userData,
+      role: 'PACIENTE',
       password: hashedPassword,
       status: 'pendiente',
       verificationToken,

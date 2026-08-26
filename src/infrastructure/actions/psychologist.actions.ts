@@ -54,7 +54,7 @@ export async function createPsychologistAction(formData: CreatePsychologistData)
     // ✅ Insertar con lastname vacío o null (por ahora)
     const result = await client.query(
       `INSERT INTO users (name, lastname, email, password, role, status, especialidad, contacto) 
-       VALUES ($1, $2, $3, $4, 'PSICOLOGO', 'Activo', $5, $6)
+       VALUES ($1, $2, $3, $4, 'PSICOLOGO', 'activo', $5, $6)
        RETURNING id`,
       [normalizedName, '', normalizedEmail, hashedPassword, normalizedEspecialidad, normalizedContacto]
     );
@@ -98,14 +98,14 @@ export async function togglePsychologistStatusAction(id: string, currentStatus: 
   const client = await pool.connect();
   try {
     const lowered = (currentStatus || '').toString().toLowerCase();
-    const newStatus = (lowered === 'activo' || lowered === 'aprobado') ? 'Inactivo' : 'Activo';
+    const newStatus = (lowered === 'activo' || lowered === 'aprobado') ? 'inactivo' : 'activo';
 
     await client.query(
       'UPDATE users SET status = $1 WHERE id = $2 AND role = $3',
       [newStatus, id, 'PSICOLOGO']
     );
 
-    return { success: true, newStatus };
+    return { success: true, newStatus: newStatus === 'activo' ? 'Activo' : 'Inactivo' };
   } catch (error: unknown) {
     console.error("Error al cambiar estado del psicólogo:", error);
     return { success: false, error: "No se pudo actualizar el estado" };

@@ -66,7 +66,7 @@ export async function createPatientAction(formData: CreatePatientData) {
     // ✅ AGREGADO lastname en la consulta SQL
     const result = await client.query(
       `INSERT INTO users (name, lastname, email, password, role, status, contacto) 
-       VALUES ($1, $2, $3, $4, 'PACIENTE', 'Activo', $5)
+       VALUES ($1, $2, $3, $4, 'PACIENTE', 'activo', $5)
        RETURNING id, TO_CHAR(created_at, 'DD/MM/YY') AS fecha_registro`,
       [name, lastname, email, hashedPassword, contacto] // ✅ AGREGADO lastname
     );
@@ -112,14 +112,14 @@ export async function togglePatientStatusAction(id: string, currentStatus: strin
   const client = await pool.connect();
   try {
     const lowered = (currentStatus || '').toString().toLowerCase();
-    const newStatus = (lowered === 'activo' || lowered === 'aprobado') ? 'Inactivo' : 'Activo';
+    const newStatus = (lowered === 'activo' || lowered === 'aprobado') ? 'inactivo' : 'activo';
 
     await client.query(
       'UPDATE users SET status = $1 WHERE id = $2',
       [newStatus, id]
     );
 
-    return { success: true, newStatus };
+    return { success: true, newStatus: newStatus === 'activo' ? 'Activo' : 'Inactivo' };
   } catch (error: unknown) {
     console.error(error);
     return { success: false, error: "No se pudo cambiar el estado" };
