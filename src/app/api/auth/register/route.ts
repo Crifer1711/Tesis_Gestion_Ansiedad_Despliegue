@@ -13,14 +13,8 @@ export async function POST(request: Request) {
 
     const result = await useCase.execute(body);
 
-    // Respondemos rápido al usuario y dejamos el envío de correo en segundo plano.
-    void sendVerificationEmail(result.email, result.verificationToken)
-      .then(() => {
-        console.info('[Register] Verification email sent for:', result.email);
-      })
-      .catch((emailError) => {
-        console.error('[Register] Verification email could not be sent:', emailError);
-      });
+    await sendVerificationEmail(result.email, result.verificationToken);
+    console.info('[Register] Verification email sent for:', result.email);
 
     return NextResponse.json(
       { message: result.message },

@@ -8,8 +8,8 @@ export const sendVerificationEmail = async (email: string, token: string) => {
 
   const host = process.env.SMTP_HOST;
   const port = Number(process.env.SMTP_PORT || 587);
-  const user = process.env.SMTP_USER;
-  const password = process.env.SMTP_PASS;
+  const user = process.env.SMTP_USER?.trim();
+  const password = process.env.SMTP_PASS?.replace(/\s/g, '');
 
   if (!host || !user || !password || !Number.isInteger(port)) {
     throw new Error('SMTP configuration is incomplete. Set SMTP_HOST, SMTP_PORT, SMTP_USER and SMTP_PASS.');
