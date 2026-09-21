@@ -20,6 +20,9 @@ export const sendVerificationEmail = async (email: string, token: string) => {
     port,
     secure: port === 465,
     auth: { user, pass: password },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
   });
 
   const html = `
